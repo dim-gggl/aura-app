@@ -1,80 +1,394 @@
+/* 1. FONT IMPORTS */
+@import url('https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Dai+Banna+SIL:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Expletus+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* 2. ROOT & DEFAULT THEME (ÉLÉGANT) */
 :root {
-    --card-border: 1px solid rgba(0,0,0,.125);
-    --card-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+    /* Fonts */
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Dai Banna SIL", serif;
+    --font-family-logo: "Expletus Sans", sans-serif;
+    --font-family-monospace: "VT323", monospace;
+
+    /* Base Theme Variables (Elegant) */
+    --theme-bg-color: #f8f9fa;
+    --theme-text-color: #212529;
+    --theme-primary-color: #4a5568; /* Sophisticated gray */
+    --theme-secondary-color: #718096;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #2b6cb0;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: rgba(0, 0, 0, 0.1);
+    --theme-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --theme-border-radius: 0.25rem;
+    --theme-header-bg: var(--theme-primary-color);
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #e2e8f0;
+    --theme-alert-border-color: #cbd5e0;
+    --theme-alert-text-color: #2d3748;
+
+    /* App specific */
+    --artwork-card-image-height: 200px;
+    --artwork-card-object-fit: cover;
+    /* Note form */
+    --note-form-container-max-width: 800px;
+    --note-form-container-margin: 0 auto;
+    --form-floating-textarea-min-height: 300px;
+    --form-floating-textarea-resize: vertical;
+    --character-counter-font-size: 0.875rem;
+    --character-counter-color: #6c757d;
+    --character-counter-text-align: right;
+    --character-counter-margin-top: 0.25rem;
+    --favorite-toggle-cursor: pointer;
+    --favorite-toggle-transition: all 0.2s ease;
+    --favorite-toggle-active-color: #ffc107;
+
 }
 
-:root[data-theme="light"] {
-    --bs-body-bg: #ffffff;
-    --bs-body-color: #212529;
-    --bs-primary: #0d6efd;
-    --bs-secondary: #6c757d;
+/* 3. FUTURISTIC THEME */
+:root[data-theme="futuristic"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
+    --theme-bg-color: #0d1117;
+    --theme-text-color: #c9d1d9;
+    --theme-primary-color: #0dd5fd;
+    --theme-secondary-color: #8b949e;
+    --theme-primary-text-color: #0d1117;
+    --theme-link-color: var(--theme-primary-color);
+    --theme-card-bg: #161b22;
+    --theme-card-border-color: #30363d;
+    --theme-card-shadow: 0 0 15px rgba(13, 213, 253, 0.1);
+    --theme-border-radius: 0rem; /* Sharp corners */
+    --theme-header-bg: #161b22;
+    --theme-header-text-color: var(--theme-primary-color);
+    --theme-alert-bg: #2d333b;
+    --theme-alert-border-color: var(--theme-primary-color);
+    --theme-alert-text-color: var(--theme-text-color);
+    --bs-secondary-color: var(--theme-secondary-color);
 }
 
-:root[data-theme="dark"] {
-    --bs-body-bg: #1a1a1a;
-    --bs-body-color: #ffffff;
-    --bs-primary: #0d6efd;
-    --bs-secondary: #6c757d;
+/* 4. PLAYFUL THEME */
+:root[data-theme="playful"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Expletus Sans", sans-serif;
+    --font-family-logo: "Expletus Sans", sans-serif;
+
+    --theme-bg-color: #fffbeb; /* Creamy yellow */
+    --theme-text-color: #78350f; /* Dark brown */
+    --theme-primary-color: #fb923c; /* Orange */
+    --theme-secondary-color: #f87171; /* Red */
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #d946ef; /* Fuchsia */
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #fde68a;
+    --theme-card-shadow: 4px 4px 0px var(--theme-primary-color); /* Hard shadow */
+    --theme-border-radius: 1rem; /* Very rounded */
+    --theme-header-bg: var(--theme-primary-color);
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #fef3c7;
+    --theme-alert-border-color: #fde68a;
+    --theme-alert-text-color: #92400e;
 }
 
-:root[data-theme="blue"] {
-    --bs-body-bg: #f0f8ff;
-    --bs-body-color: #1e3a8a;
-    --bs-primary: #1e40af;
-    --bs-secondary: #64748b;
+/* 5. NEW THEMES */
+
+/* MINIMALIST THEME */
+:root[data-theme="minimal"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
+    --theme-bg-color: #ffffff;
+    --theme-text-color: #000000;
+    --theme-primary-color: #222222;
+    --theme-secondary-color: #555555;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #000000;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #000000;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0;
+    --theme-header-bg: #ffffff;
+    --theme-header-text-color: #000000;
+    --theme-alert-bg: #eeeeee;
+    --theme-alert-border-color: #dddddd;
+    --theme-alert-text-color: #000000;
 }
 
-:root[data-theme="green"] {
-    --bs-body-bg: #f0fdf4;
-    --bs-body-color: #14532d;
-    --bs-primary: #16a34a;
-    --bs-secondary: #64748b;
+/* RETRO THEME */
+:root[data-theme="retro"] {
+    --font-family-body: var(--font-family-monospace);
+    --font-family-headings: var(--font-family-monospace);
+    --font-family-logo: var(--font-family-monospace);
+
+    --theme-bg-color: #000000;
+    --theme-text-color: #00ff00;
+    --theme-primary-color: #00ff00;
+    --theme-secondary-color: #00aa00;
+    --theme-primary-text-color: #000000;
+    --theme-link-color: #00ff00;
+    --theme-card-bg: #050505;
+    --theme-card-border-color: #00ff00;
+    --theme-card-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    --theme-border-radius: 0;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: #00ff00;
+    --theme-alert-bg: #111111;
+    --theme-alert-border-color: #00ff00;
+    --theme-alert-text-color: #00ff00;
+    --bs-secondary-color: var(--theme-secondary-color);
 }
 
-:root[data-theme="purple"] {
-    --bs-body-bg: #faf5ff;
-    --bs-body-color: #581c87;
-    --bs-primary: #9333ea;
-    --bs-secondary: #64748b;
+/* NATURE THEME */
+:root[data-theme="nature"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Dai Banna SIL", serif;
+
+    --theme-bg-color: #f5f5dc; /* Beige */
+    --theme-text-color: #5d4037; /* Dark Brown */
+    --theme-primary-color: #4caf50; /* Green */
+    --theme-secondary-color: #8d6e63; /* Lighter Brown */
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #2e7d32;
+    --theme-card-bg: #fafafa;
+    --theme-card-border-color: #d7ccc8;
+    --theme-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --theme-border-radius: 0.5rem;
+    --theme-header-bg: #388e3c; /* Darker Green */
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #e8f5e9;
+    --theme-alert-border-color: #c8e6c9;
+    --theme-alert-text-color: #2e7d32;
 }
 
+/* OCEAN THEME */
+:root[data-theme="ocean"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
+    --theme-bg-color: #e0f7fa; /* Light cyan */
+    --theme-text-color: #004d40; /* Teal */
+    --theme-primary-color: #0288d1; /* Blue */
+    --theme-secondary-color: #ffc107; /* Amber/Sand */
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #01579b;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #b2ebf2;
+    --theme-card-shadow: 0 3px 6px rgba(0, 121, 194, 0.1);
+    --theme-border-radius: 0.75rem;
+    --theme-header-bg: var(--theme-primary-color);
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #b3e5fc;
+    --theme-alert-border-color: #81d4fa;
+    --theme-alert-text-color: #01579b;
+}
+
+/* GOTHIC THEME */
+:root[data-theme="gothic"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Dai Banna SIL", serif;
+
+    --theme-bg-color: #121212;
+    --theme-text-color: #e0e0e0;
+    --theme-primary-color: #9a031e; /* Dark Red */
+    --theme-secondary-color: #5f0f40; /* Purple */
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #e91e63;
+    --theme-card-bg: #1e1e1e;
+    --theme-card-border-color: #424242;
+    --theme-card-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: var(--theme-primary-color);
+    --theme-alert-bg: #311111;
+    --theme-alert-border-color: var(--theme-primary-color);
+    --theme-alert-text-color: #ffcdd2;
+    --bs-secondary-color: #c72f4b;
+}
+
+
+/* 6. GENERIC STYLES using the variables */
 body {
-    background-color: var(--bs-body-bg);
-    color: var(--bs-body-color);
+    background-color: var(--theme-bg-color);
+    color: var(--theme-text-color);
+    font-family: var(--font-family-body);
 }
 
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.5rem;
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-headings);
+}
+
+a {
+    color: var(--theme-link-color);
+}
+
+/* Components */
+.navbar {
+    background-color: var(--theme-header-bg);
+}
+
+.navbar .navbar-brand {
+    font-family: var(--font-family-logo);
+    font-weight: 600;
+    font-style: italic;
+    color: var(--theme-header-text-color);
+}
+
+.navbar .nav-link, .navbar .dropdown-item {
+    color: var(--theme-header-text-color);
+    font-family: var(--font-family-headings);
+}
+
+.navbar .dropdown-menu {
+    background-color: var(--theme-header-bg);
+    border-color: var(--theme-card-border-color);
+}
+.navbar .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-dark .navbar-toggler-icon {
+    /* Ensures toggler is visible on all themes */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+:root[data-theme="minimal"] .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 0.7)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .card {
-    border: var(--card-border);
-    box-shadow: var(--card-shadow);
+    background-color: var(--theme-card-bg);
+    border: 1px solid var(--theme-card-border-color);
+    box-shadow: var(--theme-card-shadow);
+    border-radius: var(--theme-border-radius);
+    color: var(--theme-text-color);
+    transition: all 0.3s ease;
 }
 
-.artwork-card img {
-    height: 200px;
-    object-fit: cover;
+.form-control, .form-select {
+    border-radius: var(--theme-border-radius);
+    background-color: var(--theme-card-bg);
+    color: var(--theme-text-color);
+    border-color: var(--theme-card-border-color);
+}
+.form-control:focus {
+    background-color: var(--theme-card-bg);
+    color: var(--theme-text-color);
+    border-color: var(--theme-primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--theme-primary-color-rgb, 13, 110, 253), .25);
+}
+
+.btn {
+    border-radius: var(--theme-border-radius);
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--theme-primary-color);
+    border-color: var(--theme-primary-color);
+    color: var(--theme-primary-text-color);
+}
+.btn-primary:hover {
+    background-color: var(--theme-primary-color);
+    border-color: var(--theme-primary-color);
+    color: var(--theme-primary-text-color);
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    color: var(--theme-primary-color);
+    border-color: var(--theme-primary-color);
+}
+.btn-outline-primary:hover {
+    background-color: var(--theme-primary-color);
+    border-color: var(--theme-primary-color);
+    color: var(--theme-primary-text-color);
+}
+
+.alert {
+    background-color: var(--theme-alert-bg);
+    color: var(--theme-alert-text-color);
+    border: 1px solid var(--theme-alert-border-color);
+    border-radius: var(--theme-border-radius);
+}
+
+/* App specific */
+.artwork-card img, .artwork-card .card-img-top {
+    height: var(--artwork-card-image-height);
+    object-fit: var(--artwork-card-object-fit);
+    border-top-left-radius: var(--theme-border-radius);
+    border-top-right-radius: var(--theme-border-radius);
+}
+:root[data-theme="playful"] .artwork-card img {
+    border: 2px solid var(--theme-text-color);
+}
+:root[data-theme="retro"] .card {
+    border-width: 2px;
 }
 
 .stats-card {
-    background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
-    color: var(--bs-body-bg);
+    background: linear-gradient(135deg, var(--theme-primary-color), var(--theme-secondary-color));
+    color: var(--theme-primary-text-color);
 }
 
-.search-highlight {
-    background-color: yellow;
-    padding: 2px 4px;
-    border-radius: 3px;
+.text-muted {
+	--bs-text-opacity: 1;
+	color: var(--bs-secondary-color) !important;
 }
 
-@media (max-width: 768px) {
-    .navbar-nav {
-        text-align: center;
-    }
-    
-    .artwork-card img {
-        height: 150px;
-    }
+.note-form-container {
+    max-width: var(--note-form-container-max-width);
+    margin: var(--note-form-container-margin);
+}
+
+.form-floating textarea {
+    min-height: var(--form-floating-textarea-min-height);
+    resize: var(--form-floating-textarea-resize);
+}
+
+.character-counter {
+    font-size: var(--character-counter-font-size);
+    color: var(--character-counter-color);
+    text-align: var(--character-counter-text-align);
+    margin-top: var(--character-counter-margin-top);
+}
+
+.favorite-toggle {
+    cursor: var(--favorite-toggle-cursor);
+    transition: var(--favorite-toggle-transition);
+}
+
+.favorite-toggle:hover {
+    transform: scale(1.1);
+}
+
+.favorite-toggle.active {
+    color: var(--favorite-toggle-active-color);
+}
+
+.preview-section {
+    display: none;
+    background-color: var(--bs-light);
+    border: 1px solid var(--theme-card-border-color);
+    border-radius: var(--theme-border-radius);
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.btn-preview {
+    transition: all 0.2s ease;
+}
+
+.toolbar {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem 0.375rem 0 0;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+}
+
+.toolbar button {
+    margin-right: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
 }

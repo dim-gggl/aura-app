@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Aura{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="note-form-container">
+        <!-- En-tête avec navigation -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'core:dashboard' %}">
+                                <i class="bi bi-house"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'notes:list' %}">
+                                <i class="bi bi-journal-text"></i> Notes
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ title }}</li>
+                    </ol>
+                </nav>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h2 mb-0">
+                        <i class="bi bi-journal-plus"></i> {{ title }}
+                    </h1>
+                    <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour aux notes
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulaire principal -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-pencil"></i> Informations de la note
+                        </h5>
+                    </div>
+                    
+                    <div class="card-body">
+                        <form method="post" id="noteForm">
+                            {% csrf_token %}
+                            
+                            <!-- Titre et favori -->
+                            <div class="row mb-3">
+                                <div class="col-md-10">
+                                    <div class="form-floating">
+                                        {{ form.title }}
+                                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                                            <i class="bi bi-type"></i> Titre de la note *
+                                        </label>
+                                    </div>
+                                    {% if form.title.help_text %}
+                                        <div class="form-text">{{ form.title.help_text }}</div>
+                                    {% endif %}
+                                    {% if form.title.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.title.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                                        <div class="form-check form-switch">
+                                            {{ form.is_favorite }}
+                                            <label class="form-check-label d-flex align-items-center" for="{{ form.is_favorite.id_for_label }}">
+                                                <i class="bi bi-star favorite-toggle me-2" id="favoriteIcon"></i>
+                                                <span class="d-none d-md-inline">Favori</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Barre d'outils pour le contenu -->
+                            <div class="mb-3">
+                                <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-file-text"></i> Contenu de la note *
+                                </label>
+                                
+                                <div class="toolbar">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('**', '**')" title="Gras">
+                                        <i class="bi bi-type-bold"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('*', '*')" title="Italique">
+                                        <i class="bi bi-type-italic"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('~~', '~~')" title="Barré">
+                                        <i class="bi bi-type-strikethrough"></i>
+                                    </button>
+                                    <span class="vr mx-2"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('# ', '')" title="Titre">
+                                        <i class="bi bi-type-h1"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('- ', '')" title="Liste">
+                                        <i class="bi bi-list-ul"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertFormatting('> ', '')" title="Citation">
+                                        <i class="bi bi-quote"></i>
+                                    </button>
+                                    <span class="vr mx-2"></span>
+                                    <button type="button" class="btn btn-sm btn-outline-info btn-preview" onclick="togglePreview()">
+                                        <i class="bi bi-eye"></i> Aperçu
+                                    </button>
+                                </div>
+                                
+                                <div class="position-relative">
+                                    {{ form.content }}
+                                    <div class="character-counter">
+                                        <span id="charCount">0</span> caractères
+                                    </div>
+                                </div>
+                                
+                                <!-- Zone d'aperçu -->
+                                <div id="previewSection" class="preview-section">
+                                    <h6><i class="bi bi-eye"></i> Aperçu du rendu :</h6>
+                                    <div id="previewContent"></div>
+                                </div>
+                                
+                                {% if form.content.help_text %}
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle"></i> {{ form.content.help_text }}
+                                        <br><small class="text-muted">
+                                            <strong>Formatage supporté :</strong> 
+                                            **gras**, *italique*, ~~barré~~, # titres, - listes, > citations
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if form.content.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.content.errors %}
+                                            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="text-muted small">
+                                            <i class="bi bi-info-circle"></i>
+                                            Les champs marqués d'un * sont obligatoires
+                                        </div>
+                                        
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary">
+                                                <i class="bi bi-x-circle"></i> Annuler
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle"></i> 
+                                                {% if note %}Mettre à jour{% else %}Créer la note{% endif %}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Aide contextuelle -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="bi bi-lightbulb"></i> Conseils d'utilisation
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled small">
+                                    <li><i class="bi bi-check text-success"></i> Utilisez des titres descriptifs pour retrouver vos notes facilement</li>
+                                    <li><i class="bi bi-check text-success"></i> Marquez vos notes importantes comme favorites</li>
+                                    <li><i class="bi bi-check text-success"></i> Organisez votre contenu avec des titres et listes</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled small">
+                                    <li><i class="bi bi-check text-success"></i> Utilisez l'aperçu pour vérifier le rendu</li>
+                                    <li><i class="bi bi-check text-success"></i> Le formatage Markdown est supporté</li>
+                                    <li><i class="bi bi-check text-success"></i> Les notes sont sauvegardées automatiquement</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du DOM
+    const favoriteCheckbox = document.getElementById('{{ form.is_favorite.id_for_label }}');
+    const favoriteIcon = document.getElementById('favoriteIcon');
+    const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+    const charCount = document.getElementById('charCount');
+    const previewSection = document.getElementById('previewSection');
+    const previewContent = document.getElementById('previewContent');
+    
+    // Gestion de l'icône favori
+    function updateFavoriteIcon() {
+        if (favoriteCheckbox.checked) {
+            favoriteIcon.classList.remove('bi-star');
+            favoriteIcon.classList.add('bi-star-fill', 'active');
+        } else {
+            favoriteIcon.classList.remove('bi-star-fill', 'active');
+            favoriteIcon.classList.add('bi-star');
+        }
+    }
+    
+    // Initialisation de l'icône favori
+    updateFavoriteIcon();
+    
+    // Écouter les changements du checkbox favori
+    favoriteCheckbox.addEventListener('change', updateFavoriteIcon);
+    
+    // Permettre de cliquer sur l'icône pour basculer le favori
+    favoriteIcon.addEventListener('click', function() {
+        favoriteCheckbox.checked = !favoriteCheckbox.checked;
+        updateFavoriteIcon();
+    });
+    
+    // Compteur de caractères
+    function updateCharCount() {
+        const count = contentTextarea.value.length;
+        charCount.textContent = count.toLocaleString();
+        
+        // Changement de couleur selon le nombre de caractères
+        if (count > 5000) {
+            charCount.className = 'text-danger';
+        } else if (count > 3000) {
+            charCount.className = 'text-warning';
+        } else {
+            charCount.className = 'text-muted';
+        }
+    }
+    
+    // Initialisation et écoute du compteur
+    updateCharCount();
+    contentTextarea.addEventListener('input', updateCharCount);
+    
+    // Auto-resize du textarea
+    function autoResize() {
+        contentTextarea.style.height = 'auto';
+        contentTextarea.style.height = contentTextarea.scrollHeight + 'px';
+    }
+    
+    contentTextarea.addEventListener('input', autoResize);
+    autoResize(); // Initialisation
+    
+    // Sauvegarde automatique (optionnel)
+    let saveTimeout;
+    function autoSave() {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(function() {
+            // Ici on pourrait implémenter une sauvegarde AJAX
+            console.log('Auto-save triggered');
+        }, 2000);
+    }
+    
+    contentTextarea.addEventListener('input', autoSave);
+    document.getElementById('{{ form.title.id_for_label }}').addEventListener('input', autoSave);
+});
+
+// Fonction d'insertion de formatage
+function insertFormatting(before, after) {
+    const textarea = document.getElementById('{{ form.content.id_for_label }}');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    const replacement = before + selectedText + after;
+    
+    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    
+    // Repositionner le curseur
+    const newPosition = start + before.length + selectedText.length;
+    textarea.setSelectionRange(newPosition, newPosition);
+    textarea.focus();
+    
+    // Déclencher l'événement input pour mettre à jour le compteur
+    textarea.dispatchEvent(new Event('input'));
+}
+
+// Fonction d'aperçu
+function togglePreview() {
+    const previewSection = document.getElementById('previewSection');
+    const previewContent = document.getElementById('previewContent');
+    const textarea = document.getElementById('{{ form.content.id_for_label }}');
+    const previewBtn = document.querySelector('.btn-preview');
+    
+    if (previewSection.style.display === 'none' || !previewSection.style.display) {
+        // Afficher l'aperçu
+        let content = textarea.value;
+        
+        // Formatage markdown basique
+        content = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/~~(.*?)~~/g, '<del>$1</del>')
+            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+            .replace(/^- (.*$)/gm, '<li>$1</li>')
+            .replace(/^> (.*$)/gm, '<blockquote class="border-start border-primary border-3 ps-3 text-muted">$1</blockquote>')
+            .replace(/\n/g, '<br>');
+        
+        // Envelopper les listes
+        content = content.replace(/(<li>.*<\/li>)/g, '<ul class="list-unstyled">$1</ul>');
+        
+        if (!content.trim()) {
+            content = '<em class="text-muted">Aucun contenu à prévisualiser...</em>';
+        }
+        
+        previewContent.innerHTML = content;
+        previewSection.style.display = 'block';
+        previewBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Masquer';
+        previewBtn.classList.add('btn-warning');
+        previewBtn.classList.remove('btn-outline-info');
+    } else {
+        // Masquer l'aperçu
+        previewSection.style.display = 'none';
+        previewBtn.innerHTML = '<i class="bi bi-eye"></i> Aperçu';
+        previewBtn.classList.remove('btn-warning');
+        previewBtn.classList.add('btn-outline-info');
+    }
+}
+
+// Raccourcis clavier
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 'b':
+                e.preventDefault();
+                insertFormatting('**', '**');
+                break;
+            case 'i':
+                e.preventDefault();
+                insertFormatting('*', '*');
+                break;
+            case 's':
+                e.preventDefault();
+                document.getElementById('noteForm').submit();
+                break;
+        }
+    }
+});
+
+// Confirmation avant de quitter si des modifications non sauvegardées
+let formChanged = false;
+document.getElementById('noteForm').addEventListener('input', function() {
+    formChanged = true;
+});
+
+document.getElementById('noteForm').addEventListener('submit', function() {
+    formChanged = false;
+});
+
+window.addEventListener('beforeunload', function(e) {
+    if (formChanged) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+</script>
+{% endblock %}
