@@ -6,6 +6,7 @@ from crispy_forms.layout import Layout, Submit
 
 from core.models import UserProfile, User
 
+
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)

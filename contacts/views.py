@@ -68,8 +68,8 @@ def contact_create(request):
 @login_required
 def contact_detail(request, pk):
     contact = get_object_or_404(Contact, pk=pk, user=request.user)
-    
     return render(request, 'contacts/contact_detail.html', {'contact': contact})
+
 
 @login_required
 def contact_update(request, pk):

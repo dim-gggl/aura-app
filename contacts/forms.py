@@ -7,10 +7,10 @@ from .models import Contact
 class ContactForm(forms.ModelForm):
     class Meta:
         model = Contact
-        exclude = ['user']
+        exclude = ["user"]
         widgets = {
-            'address': forms.Textarea(attrs={'rows': 3}),
-            'notes': forms.Textarea(attrs={'rows': 4}),
+            "address": forms.Textarea(attrs={"rows": 3}),
+            "notes": forms.Textarea(attrs={"rows": 4}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -18,17 +18,17 @@ class ContactForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.layout = Layout(
             Row(
-                Column('name', css_class='form-group col-md-8 mb-0'),
-                Column('contact_type', css_class='form-group col-md-4 mb-0'),
-                css_class='form-row'
+                Column("name", css_class="form-group col-md-8 mb-0"),
+                Column("contact_type", css_class="form-group col-md-4 mb-0"),
+                css_class="form-row"
             ),
-            'address',
+            "address",
             Row(
-                Column('phone', css_class='form-group col-md-6 mb-0'),
-                Column('email', css_class='form-group col-md-6 mb-0'),
-                css_class='form-row'
+                Column("phone", css_class="form-group col-md-6 mb-0"),
+                Column("email", css_class="form-group col-md-6 mb-0"),
+                css_class="form-row"
             ),
-            'website',
-            'notes',
-            Submit('submit', 'Enregistrer', css_class='btn btn-primary')
+            "website",
+            "notes",
+            Submit("submit", "Enregistrer", css_class="btn btn-primary")
         )

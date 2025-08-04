@@ -79,7 +79,7 @@ def search(request):
         ).filter(
             Q(title__icontains=query) |
             Q(artists__name__icontains=query) |
-            Q(keywords__icontains=query) |
+            Q(keywords__name__icontains=query) |
             Q(notes__icontains=query)
         ).distinct()[:10]
         

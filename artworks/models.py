@@ -2,6 +2,9 @@ from django.db import models
 # from django.contrib.auth.models import User
 from django.urls import reverse
 import uuid
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFill
+
 from core.models import User
 
 
@@ -15,7 +18,7 @@ class Artist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Artiste"
         verbose_name_plural = "Artistes"
     
@@ -24,13 +27,13 @@ class Artist(models.Model):
 
 
 class Collection(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='collections')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="collections")
     name = models.CharField(max_length=200, verbose_name="Nom de la collection")
     description = models.TextField(blank=True, verbose_name="Description")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Collection"
         verbose_name_plural = "Collections"
     
@@ -39,7 +42,7 @@ class Collection(models.Model):
 
 
 class Exhibition(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exhibitions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="exhibitions")
     name = models.CharField(max_length=200, verbose_name="Nom de l'exposition")
     location = models.CharField(max_length=200, blank=True, verbose_name="Lieu")
     start_date = models.DateField(null=True, blank=True, verbose_name="Date de début")
@@ -48,7 +51,7 @@ class Exhibition(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['-start_date']
+        ordering = ["-start_date"]
         verbose_name = "Exposition"
         verbose_name_plural = "Expositions"
     
@@ -61,7 +64,7 @@ class ArtType(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Type d'art"
         verbose_name_plural = "Types d'art"
     
@@ -74,7 +77,7 @@ class Support(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Support"
         verbose_name_plural = "Supports"
     
@@ -87,7 +90,7 @@ class Technique(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Technique"
         verbose_name_plural = "Techniques"
     
@@ -100,7 +103,7 @@ class Keyword(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
         verbose_name = "Mot-clé"
         verbose_name_plural = "Mots-clés"
     
@@ -110,29 +113,29 @@ class Keyword(models.Model):
 
 class Artwork(models.Model):
     ART_TYPES = [
-        ('peinture', 'Peinture'),
-        ('sculpture', 'Sculpture'),
-        ('photographie', 'Photographie'),
-        ('gravure', 'Gravure'),
-        ('dessin', 'Dessin'),
-        ('bd', 'Bande dessinée'),
-        ('illustration', 'Illustration'),
-        ('poésie', 'Poésie'),
-        ('autre', 'Autre'),
+        ("peinture", "Peinture"),
+        ("sculpture", "Sculpture"),
+        ("photographie", "Photographie"),
+        ("gravure", "Gravure"),
+        ("dessin", "Dessin"),
+        ("bd", "Bande dessinée"),
+        ("illustration", "Illustration"),
+        ("poésie", "Poésie"),
+        ("autre", "Autre"),
     ]
     
     LOCATIONS = [
-        ('domicile', 'Domicile'),
-        ('stockage', 'Stockage'),
-        ('exposee', 'Exposée'),
-        ('pretee', 'Prêtée'),
-        ('restauration', 'En restauration'),
-        ('autre', 'Autre'),
+        ("domicile", "Domicile"),
+        ("stockage", "Stockage"),
+        ("exposee", "Exposée"),
+        ("pretee", "Prêtée"),
+        ("restauration", "En restauration"),
+        ("autre", "Autre"),
     ]
     
     # Identification
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='artworks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="artworks")
     
     # Informations de base
     title = models.CharField(max_length=300, blank=True, verbose_name="Titre")
@@ -160,12 +163,12 @@ class Artwork(models.Model):
     is_borrowed = models.BooleanField(default=False, verbose_name="Est empruntée")
     is_signed = models.BooleanField(default=False, verbose_name="Est signée")
     is_acquired = models.BooleanField(default=True, verbose_name="Est acquise")
-    current_location = models.CharField(max_length=50, choices=LOCATIONS, default='domicile', verbose_name="Localisation actuelle")
+    current_location = models.CharField(max_length=50, choices=LOCATIONS, default="domicile", verbose_name="Localisation actuelle")
     
     # Relations
     collections = models.ManyToManyField(Collection, blank=True, verbose_name="Collection(s)")
     exhibitions = models.ManyToManyField(Exhibition, blank=True, verbose_name="Exposition(s)")
-    parent_artwork = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Œuvre parente")
+    parent_artwork = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Œuvre parente")
     owners = models.CharField(max_length=500, blank=True, verbose_name="Propriétaire(s)")
     
     # Informations complémentaires
@@ -179,7 +182,7 @@ class Artwork(models.Model):
     last_exhibited = models.DateField(null=True, blank=True, verbose_name="Dernière exposition")
     
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
         verbose_name = "Œuvre d'art"
         verbose_name_plural = "Œuvres d'art"
     
@@ -187,15 +190,15 @@ class Artwork(models.Model):
         if self.title:
             return self.title
         elif self.artists.exists():
-            return f"Œuvre de {', '.join([artist.name for artist in self.artists.all()])}"
+            return f"Œuvre de {", ".join([artist.name for artist in self.artists.all()])}"
         else:
             return f"Œuvre #{str(self.id)[:8]}"
     
     def get_absolute_url(self):
-        return reverse('artworks:detail', kwargs={'pk': self.pk})
+        return reverse("artworks:detail", kwargs={"pk": self.pk})
     
     def get_artists_display(self):
-        return ', '.join([artist.name for artist in self.artists.all()])
+        return ", ".join([artist.name for artist in self.artists.all()])
     
     def get_dimensions_display(self):
         dimensions = []
@@ -205,18 +208,24 @@ class Artwork(models.Model):
             dimensions.append(f"L: {self.width}cm")
         if self.depth:
             dimensions.append(f"P: {self.depth}cm")
-        return ' × '.join(dimensions) if dimensions else "Non spécifiées"
+        return " x ".join(dimensions) if dimensions else "Non spécifiées"
 
 
 class ArtworkPhoto(models.Model):
-    artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE, related_name='photos')
-    image = models.ImageField(upload_to='artworks/photos/%Y/%m/%d/', verbose_name="Photo")
+    artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE, related_name="photos")
+    image = models.ImageField(upload_to="artworks/photos/%Y/%m/%d/", verbose_name="Photo")
+
+    image_thumbnail = ImageSpecField(source='image',
+                                    processors=[ResizeToFill(400, 300)],
+                                    format='JPEG',
+                                    options={'quality': 80})
+
     caption = models.CharField(max_length=300, blank=True, verbose_name="Légende")
     is_primary = models.BooleanField(default=False, verbose_name="Photo principale")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['-is_primary', 'created_at']
+        ordering = ["-is_primary", "created_at"]
         verbose_name = "Photo d'œuvre"
         verbose_name_plural = "Photos d'œuvres"
     
@@ -225,17 +234,17 @@ class ArtworkPhoto(models.Model):
 
 
 class WishlistItem(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlist')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wishlist")
     title = models.CharField(max_length=300, verbose_name="Titre")
     artist_name = models.CharField(max_length=200, blank=True, verbose_name="Artiste")
     estimated_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Prix estimé (€)")
-    priority = models.IntegerField(default=3, choices=[(1, 'Haute'), (2, 'Moyenne'), (3, 'Basse')], verbose_name="Priorité")
+    priority = models.IntegerField(default=3, choices=[(1, "Haute"), (2, "Moyenne"), (3, "Basse")], verbose_name="Priorité")
     notes = models.TextField(blank=True, verbose_name="Notes")
     source_url = models.URLField(blank=True, verbose_name="URL source")
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ['priority', '-created_at']
+        ordering = ["priority", "-created_at"]
         verbose_name = "Œuvre convoitée"
         verbose_name_plural = "Œuvres convoitées"
     

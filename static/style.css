@@ -1,3 +1,8 @@
+:root {
+    --card-border: 1px solid rgba(0,0,0,.125);
+    --card-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+}
+
 :root[data-theme="light"] {
     --bs-body-bg: #ffffff;
     --bs-body-color: #212529;
@@ -44,8 +49,8 @@ body {
 }
 
 .card {
-    border: 1px solid rgba(0,0,0,.125);
-    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+    border: var(--card-border);
+    box-shadow: var(--card-shadow);
 }
 
 .artwork-card img {
@@ -55,7 +60,7 @@ body {
 
 .stats-card {
     background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
-    color: white;
+    color: var(--bs-body-bg);
 }
 
 .search-highlight {

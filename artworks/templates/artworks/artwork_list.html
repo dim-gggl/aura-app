@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load crispy_forms_tags %}
 
 {% block title %}Mes œuvres - Catalogue{% endblock %}
 
@@ -30,70 +31,10 @@
                 </div>
                 <div class="card-body">
                     <form method="get" class="row g-3">
-                        <div class="col-md-3">
-                            <input type="text" class="form-control" name="search" 
-                                   placeholder="Rechercher..." value="{{ current_filters.search }}">
-                        </div>
-                        <div class="col-md-2">
-                            <select name="art_type" class="form-select">
-                                <option value="">Tous les types</option>
-                                {% for value, label in art_types %}
-                                    <option value="{{ value }}" 
-                                            {% if current_filters.art_type == value %}selected{% endif %}>
-                                        {{ label }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="location" class="form-select">
-                                <option value="">Toutes localisations</option>
-                                {% for value, label in locations %}
-                                    <option value="{{ value }}" 
-                                            {% if current_filters.location == value %}selected{% endif %}>
-                                        {{ label }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="artist" class="form-select">
-                                <option value="">Tous les artistes</option>
-                                {% for artist in artists %}
-                                    <option value="{{ artist.id }}" 
-                                            {% if current_filters.artist == artist.id|stringformat:"s" %}selected{% endif %}>
-                                        {{ artist.name }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="sort_by" class="form-select">
-                                <option value="-created_at" 
-                                        {% if current_filters.sort_by == "-created_at" %}selected{% endif %}>
-                                    Plus récentes
-                                </option>
-                                <option value="title" 
-                                        {% if current_filters.sort_by == "title" %}selected{% endif %}>
-                                    Titre A-Z
-                                </option>
-                                <option value="-title" 
-                                        {% if current_filters.sort_by == "-title" %}selected{% endif %}>
-                                    Titre Z-A
-                                </option>
-                                <option value="creation_year" 
-                                        {% if current_filters.sort_by == "creation_year" %}selected{% endif %}>
-                                    Année croissante
-                                </option>
-                                <option value="-creation_year" 
-                                        {% if current_filters.sort_by == "-creation_year" %}selected{% endif %}>
-                                    Année décroissante
-                                </option>
-                            </select>
-                        </div>
-                        <div class="col-md-1">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="bi bi-search"></i>
+                        {{ filter.form|crispy }}
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel"></i> Filtrer
                             </button>
                         </div>
                     </form>
@@ -108,7 +49,7 @@
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card artwork-card h-100">
                     {% if artwork.photos.first %}
-                        <img src="{{ artwork.photos.first.image.url }}" 
+                        <img src="{{ artwork.photos.first.image_thumbnail.url }}" 
                              class="card-img-top" alt="{{ artwork.title }}">
                     {% else %}
                         <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
