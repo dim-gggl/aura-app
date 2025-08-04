@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Gérez votre collection d'art avec élégance
+                </h1>
+                <p class="lead mb-4">
+                    Aura vous permet de répertorier, organiser et suivre toutes vos œuvres d'art 
+                    en un seul endroit. Parfait pour les collectionneurs passionnés.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-person-plus"></i> Commencer gratuitement
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> Se connecter
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="bi bi-palette display-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-collection text-primary display-4 mb-3"></i>
+                    <h5 class="card-title">Gestion complète</h5>
+                    <p class="card-text">
+                        Répertoriez toutes vos œuvres avec leurs détails complets : artiste, 
+                        dimensions, provenance, localisation actuelle...
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-search text-primary display-4 mb-3"></i>
+                    <h5 class="card-title">Recherche avancée</h5>
+                    <p class="card-text">
+                        Trouvez rapidement n'importe quelle œuvre grâce à notre système 
+                        de recherche et de filtrage sophistiqué.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-pdf text-primary display-4 mb-3"></i>
+                    <h5 class="card-title">Export & Documentation</h5>
+                    <p class="card-text">
+                        Exportez les fiches de vos œuvres en PDF ou HTML pour vos 
+                        assurances, expositions ou ventes.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

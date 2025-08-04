@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Tableau de bord - Catalogue{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="bi bi-house"></i> Tableau de bord
+                <small class="text-muted">Bonjour {{ user.get_full_name|default:user.username }}</small>
+            </h1>
+        </div>
+    </div>
+    
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title">Œuvres</h5>
+                            <h2 class="mb-0">{{ total_artworks }}</h2>
+                        </div>
+                        <i class="bi bi-palette2 display-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title">Contacts</h5>
+                            <h2 class="mb-0">{{ total_contacts }}</h2>
+                        </div>
+                        <i class="bi bi-person-lines-fill display-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title">Notes</h5>
+                            <h2 class="mb-0">{{ total_notes }}</h2>
+                        </div>
+                        <i class="bi bi-journal-text display-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card stats-card text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h5 class="card-title">Souhaits</h5>
+                            <h2 class="mb-0">{{ total_wishlist }}</h2>
+                        </div>
+                        <i class="bi bi-heart display-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Actions rapides -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning"></i> Actions rapides
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'artworks:create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Ajouter une œuvre
+                        </a>
+                        <a href="{% url 'contacts:create' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus"></i> Ajouter un contact
+                        </a>
+                        <a href="{% url 'notes:create' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-journal-plus"></i> Nouvelle note
+                        </a>
+                        <a href="{% url 'artworks:random_suggestion' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-shuffle"></i> Suggestion d'exposition
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Œuvres récentes -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history"></i> Œuvres récentes
+                    </h5>
+                    <a href="{% url 'artworks:list' %}" class="btn btn-sm btn-outline-primary">
+                        Voir toutes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_artworks %}
+                        <div class="row">
+                            {% for artwork in recent_artworks %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card artwork-card">
+                                        {% if artwork.photos.first %}
+                                            <img src="{{ artwork.photos.first.image.url }}" 
+                                                 class="card-img-top" alt="{{ artwork.title }}">
+                                        {% else %}
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                                 style="height: 150px;">
+                                                <i class="bi bi-image text-muted display-4"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="card-body p-2">
+                                            <h6 class="card-title mb-1">
+                                                {{ artwork.title|default:"Sans titre" }}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ artwork.get_artists_display|default:"Artiste inconnu" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">
+                            <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                            Aucune œuvre ajoutée pour le moment.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Suggestion d'exposition -->
+        {% if suggested_artwork %}
+            <div class="col-lg-6 mb-4">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-lightbulb"></i> Suggestion d'exposition
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>{{ suggested_artwork.title|default:"Sans titre" }}</h6>
+                        <p class="text-muted mb-2">{{ suggested_artwork.get_artists_display }}</p>
+                        <p class="small text-muted">
+                            Cette œuvre n'a pas été exposée depuis longtemps. 
+                            Pourquoi ne pas l'exposer à nouveau ?
+                        </p>
+                        <a href="{{ suggested_artwork.get_absolute_url }}" class="btn btn-sm btn-warning">
+                            Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Notes favorites -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-star"></i> Notes favorites
+                    </h5>
+                    <a href="{% url 'notes:list' %}" class="btn btn-sm btn-outline-primary">
+                        Voir toutes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if favorite_notes %}
+                        {% for note in favorite_notes %}
+                            <div class="mb-2 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                                <h6 class="mb-1">
+                                    <a href="{% url 'notes:detail' note.pk %}" class="text-decoration-none">
+                                        {{ note.title }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    {{ note.updated_at|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">
+                            Aucune note favorite.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

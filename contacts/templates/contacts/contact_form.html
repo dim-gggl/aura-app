@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}{{ title }} - Carnet d’adresses{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">{{ title }}</h1>
+    <a href="{% url 'contacts:list' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="card">
+      <div class="card-body">
+        {% crispy form %}
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

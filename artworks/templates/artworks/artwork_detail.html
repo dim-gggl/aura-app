@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{ artwork.title|default:"Œuvre" }} - Catalogue{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">
+                    {{ artwork.title|default:"Sans titre" }}
+                </h1>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'artworks:update' artwork.pk %}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <a href="{% url 'artworks:export_html' artwork.pk %}" class="btn btn-outline-info">
+                        <i class="bi bi-file-code"></i> Export HTML
+                    </a>
+                    <a href="{% url 'artworks:export_pdf' artwork.pk %}" class="btn btn-outline-info">
+                        <i class="bi bi-file-pdf"></i> Export PDF
+                    </a>
+                    <a href="{% url 'artworks:delete' artwork.pk %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Photos -->
+        <div class="col-lg-6 mb-4">
+            {% if photos %}
+                <div id="artworkCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for photo in photos %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ photo.image.url }}" class="d-block w-100" 
+                                     alt="{{ photo.caption|default:artwork.title }}"
+                                     style="height: 400px; object-fit: contain; background: #f8f9fa;">
+                                {% if photo.caption %}
+                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded">
+                                        <p>{{ photo.caption }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if photos|length > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#artworkCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#artworkCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                     style="height: 400px;">
+                    <div class="text-center text-muted">
+                        <i class="bi bi-image display-1 mb-3"></i>
+                        <p>Aucune photo disponible</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Informations détaillées -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle"></i> Détails de l'œuvre
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        {% if artwork.get_artists_display %}
+                            <dt class="col-sm-4">Artiste(s):</dt>
+                            <dd class="col-sm-8">{{ artwork.get_artists_display }}</dd>
+                        {% endif %}
+                        
+                        {% if artwork.creation_year %}
+                            <dt class="col-sm-4">Année:</dt>
+                            <dd class="col-sm-8">{{ artwork.creation_year }}</dd>
+                        {% endif %}
+                        
+                        {% if artwork.origin_country %}
+                            <dt class="col-sm-4">Pays d'origine:</dt>
+                            <dd class="col-sm-8">{{ artwork.origin_country }}</dd>
+                        {% endif %}
+                        
+                        {% if artwork.art_type %}
+                            <dt class="col-sm-4">Type d'art:</dt>
+                            <dd class="col-sm-8">{{ artwork.get_art_type_display }}</dd>
+                        {% endif %}
+                        
+                        {% if artwork.support %}
+                            <dt class="col-sm-4">Support:</dt>
+                            <dd class="col-sm-8">{{ artwork.support }}</dd>
+                        {% endif %}
+                        
+                        {% if artwork.technique %}
+                            <dt class="col-sm-4">Technique:</dt>
+                            <dd class="col-sm-8">{{ artwork.technique }}</dd>
+                        {% endif %}
+                        
+                        <dt class="col-sm-4">Dimensions:</dt>
+                        <dd class="col-sm-8">{{ artwork.get_dimensions_display }}</dd>
+                        
+                        {% if artwork.weight %}
+                            <dt class="col-sm-4">Poids:</dt>
+                            <dd class="col-sm-8">{{ artwork.weight }} kg</dd>
+                        {% endif %}
+                        
+                        <dt class="col-sm-4">Localisation:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-secondary">{{ artwork.get_current_location_display }}</span>
+                        </dd>
+                        
+                        <dt class="col-sm-4">Statut:</dt>
+                        <dd class="col-sm-8">
+                            {% if artwork.is_signed %}
+                                <span class="badge bg-success me-1">Signée</span>
+                            {% endif %}
+                            {% if artwork.is_framed %}
+                                <span class="badge bg-info me-1">Encadrée</span>
+                            {% endif %}
+                            {% if artwork.is_borrowed %}
+                                <span class="badge bg-warning me-1">Empruntée</span>
+                            {% endif %}
+                            {% if not artwork.is_acquired %}
+                                <span class="badge bg-danger me-1">Non acquise</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <!-- Informations d'acquisition -->
+            {% if artwork.acquisition_date or artwork.acquisition_place or artwork.price or artwork.provenance %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-receipt"></i> Acquisition
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            {% if artwork.acquisition_date %}
+                                <dt class="col-sm-4">Date:</dt>
+                                <dd class="col-sm-8">{{ artwork.acquisition_date|date:"d/m/Y" }}</dd>
+                            {% endif %}
+                            
+                            {% if artwork.acquisition_place %}
+                                <dt class="col-sm-4">Lieu:</dt>
+                                <dd class="col-sm-8">{{ artwork.acquisition_place }}</dd>
+                            {% endif %}
+                            
+                            {% if artwork.price %}
+                                <dt class="col-sm-4">Prix:</dt>
+                                <dd class="col-sm-8">{{ artwork.price|floatformat:2 }} €</dd>
+                            {% endif %}
+                            
+                            {% if artwork.provenance %}
+                                <dt class="col-sm-4">Provenance:</dt>
+                                <dd class="col-sm-8">{{ artwork.provenance|linebreaks }}</dd>
+                            {% endif %}
+                            
+                            {% if artwork.owners %}
+                                <dt class="col-sm-4">Propriétaire(s):</dt>
+                                <dd class="col-sm-8">{{ artwork.owners }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Informations complémentaires -->
+    <div class="row mt-4">
+        {% if artwork.collections.exists or artwork.exhibitions.exists %}
+            <div class="col-lg-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-collection"></i> Collections et Expositions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if artwork.collections.exists %}
+                            <h6>Collections:</h6>
+                            <ul class="list-unstyled">
+                                {% for collection in artwork.collections.all %}
+                                    <li><span class="badge bg-primary">{{ collection.name }}</span></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        
+                        {% if artwork.exhibitions.exists %}
+                            <h6>Expositions:</h6>
+                            <ul class="list-unstyled">
+                                {% for exhibition in artwork.exhibitions.all %}
+                                    <li>
+                                        <strong>{{ exhibition.name }}</strong>
+                                        {% if exhibition.start_date %}
+                                            <small class="text-muted">({{ exhibition.start_date|date:"Y" }})</small>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if artwork.keywords or artwork.contextual_references or artwork.notes %}
+            <div class="col-lg-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="bi bi-journal-text"></i> Notes et références
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if artwork.keywords %}
+                            <h6>Mots-clés:</h6>
+                            <p>
+                                {% for keyword in artwork.keywords|split:"," %}
+                                    <span class="badge bg-light text-dark me-1">{{ keyword|strip }}</span>
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        
+                        {% if artwork.contextual_references %}
+                            <h6>Références contextuelles:</h6>
+                            <p>{{ artwork.contextual_references|linebreaks }}</p>
+                        {% endif %}
+                        
+                        {% if artwork.notes %}
+                            <h6>Notes:</h6>
+                            <p>{{ artwork.notes|linebreaks }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Navigation -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'artworks:list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                <small class="text-muted align-self-center">
+                    Ajoutée le {{ artwork.created_at|date:"d/m/Y à H:i" }}
+                    {% if artwork.updated_at != artwork.created_at %}
+                        • Modifiée le {{ artwork.updated_at|date:"d/m/Y à H:i" }}
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Mes œuvres - Catalogue{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">
+                    <i class="bi bi-palette2"></i> Mes œuvres
+                    <span class="badge bg-secondary">{{ page_obj.paginator.count }}</span>
+                </h1>
+                <a href="{% url 'artworks:create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Ajouter une œuvre
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtres -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-funnel"></i> Filtres et recherche
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" name="search" 
+                                   placeholder="Rechercher..." value="{{ current_filters.search }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="art_type" class="form-select">
+                                <option value="">Tous les types</option>
+                                {% for value, label in art_types %}
+                                    <option value="{{ value }}" 
+                                            {% if current_filters.art_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="location" class="form-select">
+                                <option value="">Toutes localisations</option>
+                                {% for value, label in locations %}
+                                    <option value="{{ value }}" 
+                                            {% if current_filters.location == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="artist" class="form-select">
+                                <option value="">Tous les artistes</option>
+                                {% for artist in artists %}
+                                    <option value="{{ artist.id }}" 
+                                            {% if current_filters.artist == artist.id|stringformat:"s" %}selected{% endif %}>
+                                        {{ artist.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sort_by" class="form-select">
+                                <option value="-created_at" 
+                                        {% if current_filters.sort_by == "-created_at" %}selected{% endif %}>
+                                    Plus récentes
+                                </option>
+                                <option value="title" 
+                                        {% if current_filters.sort_by == "title" %}selected{% endif %}>
+                                    Titre A-Z
+                                </option>
+                                <option value="-title" 
+                                        {% if current_filters.sort_by == "-title" %}selected{% endif %}>
+                                    Titre Z-A
+                                </option>
+                                <option value="creation_year" 
+                                        {% if current_filters.sort_by == "creation_year" %}selected{% endif %}>
+                                    Année croissante
+                                </option>
+                                <option value="-creation_year" 
+                                        {% if current_filters.sort_by == "-creation_year" %}selected{% endif %}>
+                                    Année décroissante
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Liste des œuvres -->
+    <div class="row">
+        {% for artwork in page_obj %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="card artwork-card h-100">
+                    {% if artwork.photos.first %}
+                        <img src="{{ artwork.photos.first.image.url }}" 
+                             class="card-img-top" alt="{{ artwork.title }}">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image text-muted display-4"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title">
+                            {{ artwork.title|default:"Sans titre" }}
+                        </h6>
+                        <p class="card-text text-muted small mb-2">
+                            {{ artwork.get_artists_display|default:"Artiste inconnu" }}
+                        </p>
+                        {% if artwork.creation_year %}
+                            <p class="card-text small text-muted mb-2">
+                                <i class="bi bi-calendar"></i> {{ artwork.creation_year }}
+                            </p>
+                        {% endif %}
+                        <p class="card-text small mb-2">
+                            <i class="bi bi-geo-alt"></i> {{ artwork.get_current_location_display }}
+                        </p>
+                        
+                        <div class="mt-auto">
+                            <div class="btn-group w-100" role="group">
+                                <a href="{{ artwork.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'artworks:update' artwork.pk %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'artworks:export_pdf' artwork.pk %}" class="btn btn-outline-info btn-sm">
+                                    <i class="bi bi-file-pdf"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                    <h4 class="text-muted">Aucune œuvre trouvée</h4>
+                    <p class="text-muted">
+                        {% if current_filters.search or current_filters.art_type or current_filters.location %}
+                            Essayez de modifier vos critères de recherche.
+                        {% else %}
+                            Commencez par ajouter votre première œuvre.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'artworks:create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ajouter une œuvre
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="Pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
