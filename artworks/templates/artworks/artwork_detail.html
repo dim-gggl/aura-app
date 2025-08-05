@@ -231,7 +231,7 @@
                         {% if artwork.keywords %}
                             <h6>Mots-clés:</h6>
                             <p>
-                                {% for keyword in artwork.keywords|split:"," %}
+                                {% for keyword in artwork.keywords %}
                                     <span class="badge bg-light text-dark me-1">{{ keyword|strip }}</span>
                                 {% endfor %}
                             </p>
