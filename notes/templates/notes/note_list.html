@@ -9,17 +9,54 @@
     </a>
   </div>
 
+  <!-- Filtres de recherche -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-6">
+          <label for="search" class="form-label">Rechercher</label>
+          <input type="text" class="form-control" id="search" name="search" value="{{ current_filters.search }}" placeholder="Titre ou contenu...">
+        </div>
+        <div class="col-md-3">
+          <label for="favorites" class="form-label">Filtre</label>
+          <select class="form-select" id="favorites" name="favorites">
+            <option value="">Toutes les notes</option>
+            <option value="1" {% if current_filters.favorites == '1' %}selected{% endif %}>Favoris uniquement</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Filtrer
+          </button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <a href="{% url 'notes:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i>
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   {% if notes %}
     <div class="list-group">
       {% for note in notes %}
         <div class="list-group-item">
           <div class="d-flex justify-content-between">
             <div>
-              <h5 class="mb-1">{{ note.title }}</h5>
+              <h5 class="mb-1">
+                {{ note.title }}
+                {% if note.is_favorite %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% endif %}
+              </h5>
               <small class="text-muted">Modifiée le {{ note.updated_at|date:"d/m/Y H:i" }}</small>
             </div>
             <div class="text-end">
-              <a href="{% url 'notes:edit' note.pk %}" class="btn btn-sm btn-outline-secondary">
+              <a href="{% url 'notes:detail' note.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{% url 'notes:update' note.pk %}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-pencil"></i>
               </a>
               <a href="{% url 'notes:delete' note.pk %}" class="btn btn-sm btn-outline-danger">
@@ -31,6 +68,37 @@
         </div>
       {% endfor %}
     </div>
+    
+    <!-- Pagination -->
+    {% if notes.has_other_pages %}
+      <nav aria-label="Navigation des notes" class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if notes.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ notes.previous_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.favorites %}&favorites={{ current_filters.favorites }}{% endif %}">Précédent</a>
+            </li>
+          {% endif %}
+          
+          {% for num in notes.paginator.page_range %}
+            {% if notes.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > notes.number|add:'-3' and num < notes.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.favorites %}&favorites={{ current_filters.favorites }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if notes.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ notes.next_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.favorites %}&favorites={{ current_filters.favorites }}{% endif %}">Suivant</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
   {% else %}
     <p class="text-muted">Aucune note enregistrée.</p>
   {% endif %}

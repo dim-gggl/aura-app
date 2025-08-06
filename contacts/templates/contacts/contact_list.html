@@ -9,6 +9,37 @@
     </a>
   </div>
 
+  <!-- Filtres de recherche -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <label for="search" class="form-label">Rechercher</label>
+          <input type="text" class="form-control" id="search" name="search" value="{{ current_filters.search }}" placeholder="Nom, adresse, email...">
+        </div>
+        <div class="col-md-3">
+          <label for="type" class="form-label">Type de contact</label>
+          <select class="form-select" id="type" name="type">
+            <option value="">Tous les types</option>
+            {% for value, label in contact_types %}
+              <option value="{{ value }}" {% if current_filters.type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="bi bi-search"></i> Filtrer
+          </button>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <a href="{% url 'contacts:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Réinitialiser
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   {% if contacts %}
     <div class="table-responsive">
       <table class="table table-bordered table-striped align-middle">
@@ -41,6 +72,37 @@
         </tbody>
       </table>
     </div>
+    
+    <!-- Pagination -->
+    {% if contacts.has_other_pages %}
+      <nav aria-label="Navigation des contacts">
+        <ul class="pagination justify-content-center">
+          {% if contacts.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ contacts.previous_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}">Précédent</a>
+            </li>
+          {% endif %}
+          
+          {% for num in contacts.paginator.page_range %}
+            {% if contacts.number == num %}
+              <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > contacts.number|add:'-3' and num < contacts.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if contacts.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ contacts.next_page_number }}{% if current_filters.search %}&search={{ current_filters.search }}{% endif %}{% if current_filters.type %}&type={{ current_filters.type }}{% endif %}">Suivant</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
   {% else %}
     <p class="text-muted">Aucun contact pour le moment.</p>
   {% endif %}

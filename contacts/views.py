@@ -35,7 +35,7 @@ def contact_list(request):
     page_obj = paginator.get_page(page_number)
     
     context = {
-        'page_obj': page_obj,
+        'contacts': page_obj,
         'contact_types': Contact.CONTACT_TYPES,
         'current_filters': {
             'search': search,
@@ -54,7 +54,7 @@ def contact_create(request):
             contact.user = request.user
             contact.save()
             messages.success(request, 'Contact ajouté avec succès.')
-            return redirect('contacts:detail', pk=contact.pk)
+            return redirect('contacts:list')
     else:
         form = ContactForm()
     

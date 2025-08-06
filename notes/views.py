@@ -33,7 +33,7 @@ def note_list(request):
     page_obj = paginator.get_page(page_number)
     
     context = {
-        'page_obj': page_obj,
+        'notes': page_obj,
         'current_filters': {
             'search': search,
             'favorites': favorites_only,
@@ -51,7 +51,7 @@ def note_create(request):
             note.user = request.user
             note.save()
             messages.success(request, 'Note créée avec succès.')
-            return redirect('notes:detail', pk=note.pk)
+            return redirect('notes:list')
     else:
         form = NoteForm()
     
