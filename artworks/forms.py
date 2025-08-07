@@ -1,14 +1,50 @@
+"""
+Django forms for the artworks application.
+
+This module contains all form classes used for creating and editing artworks,
+artists, collections, exhibitions, and related entities. Forms use django-crispy-forms
+for enhanced styling and layout, and custom widgets for dynamic functionality.
+
+The forms include:
+- ArtworkForm: Complex form with multiple sections and custom keyword handling
+- ArtistForm: Simple form for artist biographical information
+- CollectionForm: Form for user collections
+- ExhibitionForm: Form for exhibition details with date validation
+- WishlistItemForm: Form for wishlist items with priority levels
+- ArtworkPhotoForm/FormSet: Inline formset for managing artwork photos
+
+All forms use Crispy Forms for consistent Bootstrap styling and responsive layouts.
+"""
+
 from django import forms
 from django.forms import inlineformset_factory
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Row, Column, Submit, Div, HTML
 
-from .models import Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, ArtType, Support, Technique, Keyword
+from .models import (
+    Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, 
+    ArtType, Support, Technique, Keyword
+)
 from .widgets import SelectOrCreateWidget, SelectMultipleOrCreateWidget, TagWidget
 
 
 class ArtworkForm(forms.ModelForm):
-    # Champ personnalisé pour les mots-clés
+    """
+    Comprehensive form for creating and editing artworks.
+    
+    This form handles all aspects of artwork data including basic information,
+    dimensions, acquisition details, location, and relationships with other entities.
+    Features custom keyword handling and dynamic widget integration.
+    
+    Key features:
+    - Organized into logical fieldsets using Crispy Forms
+    - Custom keyword text field with autocomplete functionality
+    - SelectOrCreate widgets for dynamic entity creation
+    - User-specific querysets for collections and exhibitions
+    - Responsive layout with Bootstrap grid system
+    """
+    
+    # Custom field for keyword management with autocomplete
     keywords_text = forms.CharField(
         required=False,
         widget=TagWidget(),
@@ -18,13 +54,19 @@ class ArtworkForm(forms.ModelForm):
     
     class Meta:
         model = Artwork
+        # Exclude fields that are auto-managed or set programmatically
         exclude = ['user', 'id', 'created_at', 'updated_at', 'keywords']
         widgets = {
+            # Date inputs with HTML5 date picker
             'acquisition_date': forms.DateInput(attrs={'type': 'date'}),
             'last_exhibited': forms.DateInput(attrs={'type': 'date'}),
+            
+            # Text areas with appropriate sizing
             'notes': forms.Textarea(attrs={'rows': 4}),
             'contextual_references': forms.Textarea(attrs={'rows': 3}),
             'provenance': forms.Textarea(attrs={'rows': 3}),
+            
+            # Dynamic widgets for related entities
             'artists': SelectMultipleOrCreateWidget(Artist, 'artworks:artist_create_ajax'),
             'art_type': SelectOrCreateWidget(ArtType, 'artworks:arttype_create_ajax'),
             'support': SelectOrCreateWidget(Support, 'artworks:support_create_ajax'),
@@ -34,27 +76,36 @@ class ArtworkForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        """
+        Initialize form with user-specific data and custom layout.
+        
+        Args:
+            user: Current user for filtering collections and exhibitions
+        """
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
+        # Limit collections and exhibitions to current user only
         if user:
             self.fields['collections'].queryset = Collection.objects.filter(user=user)
             self.fields['exhibitions'].queryset = Exhibition.objects.filter(user=user)
         
-        # Peupler le champ keywords_text avec les mots-clés existants
+        # Populate keyword field with existing keywords for editing
         if self.instance and self.instance.pk:
             keywords = self.instance.keywords.all()
             self.fields['keywords_text'].initial = ', '.join([kw.name for kw in keywords])
         
-        # Définir les querysets pour les widgets SelectOrCreate
+        # Set querysets for reference entities (available to all users)
         self.fields['artists'].queryset = Artist.objects.all()
         self.fields['art_type'].queryset = ArtType.objects.all()
         self.fields['support'].queryset = Support.objects.all()
         self.fields['technique'].queryset = Technique.objects.all()
         
+        # Configure Crispy Forms helper for layout
         self.helper = FormHelper()
-        self.helper.form_tag = False
+        self.helper.form_tag = False  # Template handles form tags
         self.helper.layout = Layout(
+            # Basic artwork information
             Fieldset(
                 'Informations générales',
                 Row(
@@ -74,6 +125,8 @@ class ArtworkForm(forms.ModelForm):
                     css_class='form-row'
                 ),
             ),
+            
+            # Physical characteristics
             Fieldset(
                 'Dimensions et caractéristiques',
                 Row(
@@ -90,6 +143,8 @@ class ArtworkForm(forms.ModelForm):
                     css_class='form-row'
                 ),
             ),
+            
+            # Acquisition and provenance
             Fieldset(
                 'Acquisition et provenance',
                 Row(
@@ -101,6 +156,8 @@ class ArtworkForm(forms.ModelForm):
                 'provenance',
                 'owners',
             ),
+            
+            # Current status and location
             Fieldset(
                 'Localisation et statut',
                 Row(
@@ -115,6 +172,8 @@ class ArtworkForm(forms.ModelForm):
                 ),
                 'last_exhibited',
             ),
+            
+            # Additional information
             Fieldset(
                 'Informations complémentaires',
                 'parent_artwork',
@@ -122,28 +181,51 @@ class ArtworkForm(forms.ModelForm):
                 'contextual_references',
                 'notes',
             ),
-            # Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
     
     def save(self, commit=True):
+        """
+        Save the artwork and handle keyword processing.
+        
+        Processes the keywords_text field to create/associate Keyword objects.
+        Keywords are created automatically if they don't exist.
+        
+        Args:
+            commit: Whether to save to database immediately
+            
+        Returns:
+            Artwork: The saved artwork instance
+        """
         instance = super().save(commit=commit)
         
         if commit:
-            # Traiter les mots-clés
+            # Process keywords from the text field
             keywords_text = self.cleaned_data.get('keywords_text', '')
             if keywords_text:
+                # Split by comma and clean up whitespace
                 keyword_names = [name.strip() for name in keywords_text.split(',') if name.strip()]
                 keywords = []
+                # Create keywords if they don't exist
                 for name in keyword_names:
                     keyword, created = Keyword.objects.get_or_create(name=name)
                     keywords.append(keyword)
+                # Set the many-to-many relationship
                 instance.keywords.set(keywords)
             else:
+                # Clear keywords if field is empty
                 instance.keywords.clear()
         
         return instance
 
+
 class ArtistForm(forms.ModelForm):
+    """
+    Form for creating and editing artist information.
+    
+    Simple form with biographical fields and responsive layout.
+    All fields are optional except name.
+    """
+    
     class Meta:
         model = Artist
         fields = '__all__'
@@ -152,6 +234,7 @@ class ArtistForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form with Crispy Forms layout."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -166,15 +249,24 @@ class ArtistForm(forms.ModelForm):
             Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
 
+
 class CollectionForm(forms.ModelForm):
+    """
+    Form for creating and editing user collections.
+    
+    Simple form with name and description fields.
+    User field is excluded as it's set programmatically.
+    """
+    
     class Meta:
         model = Collection
-        exclude = ['user']
+        exclude = ['user']  # User is set in the view
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form with Crispy Forms layout."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -183,10 +275,18 @@ class CollectionForm(forms.ModelForm):
             Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
 
+
 class ExhibitionForm(forms.ModelForm):
+    """
+    Form for creating and editing exhibitions.
+    
+    Includes date fields with HTML5 date pickers and validation
+    to ensure end date is not before start date.
+    """
+    
     class Meta:
         model = Exhibition
-        exclude = ['user']
+        exclude = ['user']  # User is set in the view
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),
@@ -194,6 +294,7 @@ class ExhibitionForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form with Crispy Forms layout."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -208,15 +309,24 @@ class ExhibitionForm(forms.ModelForm):
             Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
 
+
 class WishlistItemForm(forms.ModelForm):
+    """
+    Form for creating and editing wishlist items.
+    
+    Allows users to track artworks they want to acquire with
+    priority levels and estimated pricing information.
+    """
+    
     class Meta:
         model = WishlistItem
-        exclude = ['user']
+        exclude = ['user']  # User is set in the view
         widgets = {
             'notes': forms.Textarea(attrs={'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form with Crispy Forms layout."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -235,8 +345,15 @@ class WishlistItemForm(forms.ModelForm):
             Submit('submit', 'Ajouter', css_class='btn btn-primary')
         )
 
-# Formset pour les photos
+
 class ArtworkPhotoForm(forms.ModelForm):
+    """
+    Form for individual artwork photos within the photo formset.
+    
+    Handles image upload, caption, and primary photo designation.
+    Used as part of the ArtworkPhotoFormSet for managing multiple photos.
+    """
+    
     class Meta:
         model = ArtworkPhoto
         fields = ['image', 'caption', 'is_primary']
@@ -247,9 +364,10 @@ class ArtworkPhotoForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        """Initialize form with Crispy Forms layout for inline display."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_tag = False
+        self.helper.form_tag = False  # Used within a formset
         self.helper.layout = Layout(
             Row(
                 Column('image', css_class='form-group col-md-6 mb-0'),
@@ -262,9 +380,12 @@ class ArtworkPhotoForm(forms.ModelForm):
             ),
         )
 
+
+# Inline formset for managing multiple photos per artwork
 ArtworkPhotoFormSet = inlineformset_factory(
-    Artwork, ArtworkPhoto,
+    Artwork,           # Parent model
+    ArtworkPhoto,      # Child model
     form=ArtworkPhotoForm,
-    extra=3,
-    can_delete=True
+    extra=3,           # Number of empty forms to display
+    can_delete=True    # Allow deletion of existing photos
 )

@@ -1,3 +1,21 @@
+"""
+Views for the artworks application.
+
+This module contains all the view functions for managing artworks, artists,
+collections, exhibitions, and related entities. It provides both regular
+views for the web interface and AJAX endpoints for dynamic functionality.
+
+The views are organized into the following sections:
+- Artwork CRUD operations
+- Artist management
+- Collection management  
+- Exhibition management
+- Wishlist functionality
+- Reference entity management (ArtType, Support, Technique, Keyword)
+- AJAX endpoints for dynamic form interactions
+- Export functionality
+"""
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,10 +25,10 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 import json
-# WeasyPrint sera importé uniquement quand nécessaire
-import random
+import random  # Used for random artwork suggestions
 from datetime import datetime, timedelta
 
+# Import all models used in the views
 from .models import (
     Artwork, 
     Artist, 
@@ -23,6 +41,7 @@ from .models import (
     Technique, 
     Keyword
 )
+# Import forms for handling user input
 from .forms import (
     ArtworkForm, 
     ArtistForm, 
@@ -35,23 +54,48 @@ from .widgets import SelectOrCreateWidget, TagWidget
 from .filters import ArtworkFilter
 
 
+# ========================================
+# ARTWORK VIEWS
+# ========================================
+
+
 @login_required
 def artwork_list(request):
+    """
+    Display a paginated and filterable list of the user's artworks.
     
+    This view provides the main artwork listing page with:
+    - Filtering by various criteria (artist, type, location, etc.)
+    - Search functionality
+    - Pagination (12 items per page)
+    - Optimized queries with prefetch_related for performance
+    
+    Args:
+        request: The HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered artwork list page
+    """
+    # Get all user's artworks with optimized queries to reduce database hits
+    # prefetch_related loads related artists and photos in separate queries
     artworks = Artwork.objects.filter(user=request.user).prefetch_related("artists", "photos")
+    
+    # Get artists that have artworks for this user (for filter dropdown)
     artist_queryset = Artist.objects.filter(artwork__user=request.user).distinct()
+    
+    # Apply filters based on GET parameters
     artwork_filter = ArtworkFilter(
         request.GET, 
         queryset=artworks
     )
+    # Limit artist choices to only those relevant to this user
     artwork_filter.form.fields['artists'].queryset = artist_queryset
     
-    # Pagination
-    paginator = Paginator(artworks, 12)
+    # Implement pagination for better performance and UX
+    paginator = Paginator(artworks, 12)  # 12 artworks per page for grid layout
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    
     context = {
         "filter": artwork_filter,
         "page_obj": page_obj,
@@ -62,7 +106,26 @@ def artwork_list(request):
 
 @login_required
 def artwork_detail(request, pk):
+    """
+    Display detailed information about a specific artwork.
+    
+    Shows comprehensive artwork information including photos, dimensions,
+    acquisition details, and related entities. Only accessible to the
+    artwork's owner for security.
+    
+    Args:
+        request: The HTTP request object
+        pk: Primary key (UUID) of the artwork to display
+        
+    Returns:
+        HttpResponse: Rendered artwork detail page
+        
+    Raises:
+        Http404: If artwork doesn't exist or doesn't belong to current user
+    """
+    # get_object_or_404 ensures artwork exists and belongs to current user
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
+    # Get all photos for this artwork, ordered by primary status
     photos = artwork.photos.all()
     
     context = {
@@ -75,23 +138,39 @@ def artwork_detail(request, pk):
 
 @login_required
 def artwork_create(request):
+    """
+    Handle creation of new artworks with photos.
+    
+    This view manages both the artwork form and associated photo formset.
+    On successful creation, the user is redirected to the artwork detail page.
+    
+    Args:
+        request: The HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered form page (GET) or redirect to detail page (POST success)
+    """
     if request.method == "POST":
+        # Initialize forms with POST data and files
         form = ArtworkForm(request.POST, request.FILES, user=request.user)
         photo_formset = ArtworkPhotoFormSet(request.POST, request.FILES)
         
         if form.is_valid() and photo_formset.is_valid():
+            # Save artwork but don't commit to DB yet (need to set user)
             artwork = form.save(commit=False)
             artwork.user = request.user
             artwork.save()
+            # Save many-to-many relationships after the main object is saved
             form.save_m2m()
             
-            # Sauvegarder le formset avec l'instance de l'œuvre
+            # Associate photo formset with the saved artwork and save photos
             photo_formset.instance = artwork
             photo_formset.save()
             
             messages.success(request, "Oeuvre ajoutée avec succès.")
             return redirect("artworks:detail", pk=artwork.pk)
     else:
+        # GET request: initialize empty forms
         form = ArtworkForm(user=request.user)
         photo_formset = ArtworkPhotoFormSet()
     
@@ -144,32 +223,55 @@ def artwork_delete(request, pk):
     return render(request, "artworks/artwork_confirm_delete.html", {"artwork": artwork})
 
 
+# ========================================
+# RANDOM SUGGESTION FEATURE
+# ========================================
+
 @login_required
 def random_suggestion(request):
+    """
+    Suggest a random artwork for exhibition from user's collection.
+    
+    This feature helps users discover artworks in their collection that haven't
+    been exhibited recently (more than 6 months ago) or never exhibited.
+    Only considers artworks currently at home or in storage.
+    
+    Args:
+        request: The HTTP request object
+        
+    Returns:
+        HttpResponse: Page with suggested artwork or "no suggestion" message
+    """
     try:
-        # Œuvres non exposées depuis plus de 6 mois
+        # Define "recently exhibited" as within the last 6 months
         six_months_ago = datetime.now().date() - timedelta(days=180)
         
+        # Find artworks that are available for exhibition:
+        # - Located at home or in storage (not already on display/loan)
+        # - Not exhibited recently or never exhibited
         artworks = Artwork.objects.filter(
             user=request.user,
-            current_location__in=["domicile", "stockage"]
+            current_location__in=["domicile", "stockage"]  # Available locations
         ).filter(
+            # Either last exhibited more than 6 months ago OR never exhibited
             Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
         )
         
         if artworks.exists():
-            # Convertir en liste pour éviter les problèmes avec random.choice sur un queryset
+            # Convert queryset to list to avoid issues with random.choice on querysets
+            # This loads all matching artworks into memory but improves reliability
             artworks_list = list(artworks)
             suggested_artwork = random.choice(artworks_list)
             return render(request, "artworks/random_suggestion.html", {
                 "artwork": suggested_artwork
             })
         else:
+            # No artworks available for suggestion
             return render(request, "artworks/random_suggestion.html", {
                 "no_suggestion": True
             })
     except Exception as e:
-        # En cas d'erreur, rediriger vers la liste des œuvres avec un message
+        # Graceful error handling - redirect with user-friendly message
         messages.error(request, "Une erreur est survenue lors de la génération de la suggestion.")
         return redirect("artworks:list")
 
@@ -237,16 +339,38 @@ def wishlist(request):
     return render(request, "artworks/wishlist.html", context)
 
 
+# ========================================
+# ARTIST MANAGEMENT VIEWS
+# ========================================
+
 @login_required
 def artist_list(request):
+    """
+    Display a list of artists that have artworks in the user's collection.
+    
+    Shows only artists associated with the current user's artworks, with
+    artwork count annotations and search functionality.
+    
+    Args:
+        request: The HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered artist list page with pagination
+    """
+    # Get artists that have artworks belonging to the current user
+    # distinct() prevents duplicates when artists have multiple artworks
+    # annotate with artwork count for display
     artists = Artist.objects.filter(artwork__user=request.user).distinct().annotate(
         artwork_count=Count("artwork")
     ).order_by("name")
     
+    # Handle search functionality
     search = request.GET.get("search", "")
     if search:
+        # Case-insensitive search in artist names
         artists = artists.filter(name__icontains=search)
     
+    # Pagination with more items per page since artist list is simpler
     paginator = Paginator(artists, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -313,26 +437,55 @@ def artist_update(request, pk):
     return render(request, "artworks/artist_form.html", context)
 
 
+# ========================================
+# AJAX ENDPOINTS FOR DYNAMIC FUNCTIONALITY
+# ========================================
+
 @require_POST
 @login_required
 def artist_create_ajax(request):
-    """Créer un nouvel artiste via AJAX"""
+    """
+    Create a new artist via AJAX for dynamic form functionality.
+    
+    This endpoint is used by the SelectOrCreateWidget to allow users
+    to create new artists on-the-fly while filling out artwork forms.
+    Uses get_or_create to prevent duplicates.
+    
+    Args:
+        request: The HTTP request object with JSON body containing artist name
+        
+    Returns:
+        JsonResponse: Success response with artist data or error message
+        
+    Expected JSON payload:
+        {"name": "Artist Name"}
+        
+    Response format:
+        Success: {"success": True, "id": int, "name": str, "created": bool}
+        Error: {"error": str} with appropriate HTTP status code
+    """
     try:
+        # Parse JSON data from request body
         data = json.loads(request.body)
         name = data.get("name", "").strip()
         
+        # Validate input
         if not name:
             return JsonResponse({"error": "Le nom est requis"}, status=400)
         
+        # Create artist or get existing one (prevents duplicates)
         artist, created = Artist.objects.get_or_create(name=name)
         
         return JsonResponse({
             "success": True,
             "id": artist.pk,
             "name": artist.name,
-            "created": created
+            "created": created  # True if new artist, False if existing
         })
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
+        # Log error in production, return generic message to user
         return JsonResponse({"error": str(e)}, status=500)
 
 
@@ -666,23 +819,42 @@ def keyword_create_ajax(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-# Vues pour la gestion des entités de référence
+# ========================================
+# REFERENCE ENTITY MANAGEMENT VIEWS
+# ========================================
+# These views handle CRUD operations for reference entities like
+# ArtType, Support, Technique, and Keyword that are shared across users
 
 @login_required
 def arttype_list(request):
-    """Liste des types d'art"""
+    """
+    Display a list of all art types with artwork count and search functionality.
+    
+    Art types are shared reference entities used to categorize artworks.
+    Shows count of artworks using each type across all users.
+    
+    Args:
+        request: The HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered reference list page for art types
+    """
+    # Get all art types with count of associated artworks
     art_types = ArtType.objects.all().annotate(
         artwork_count=Count("artwork")
     ).order_by("name")
     
+    # Handle search functionality
     search = request.GET.get("search", "")
     if search:
         art_types = art_types.filter(name__icontains=search)
     
+    # Pagination for large lists
     paginator = Paginator(art_types, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     
+    # Context for generic reference template
     context = {
         "page_obj": page_obj,
         "search": search,
