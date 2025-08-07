@@ -121,43 +121,43 @@ Aura est doté d'un riche ensemble de fonctionnalités qui en font une solution 
 
 Allez au-delà des simples listes et des feuilles de calcul. Aura vous permet de créer un dossier numérique détaillé pour chaque œuvre d'art avec un ensemble complet de champs, garantissant qu'aucun détail critique n'est jamais perdu.
 
-- Informations de base** : Saisissez l'essentiel, notamment le titre de l'œuvre, son ou ses créateurs, l'année de création et son pays d'origine.
-- Détails artistiques** : Documentez le type d'art spécifique (par exemple, peinture, sculpture, photographie), le support (par exemple, toile, bois, papier) et les techniques employées (par exemple, huile, acrylique, techniques mixtes).
-- Attributs physiques** : Enregistrez les dimensions physiques précises (hauteur, largeur, profondeur) et le poids, ce qui est crucial pour l'expédition, le stockage et la planification de l'installation.
-- Acquisition et provenance** : Suivez l'historique complet de l'acquisition, y compris la date, le lieu et le prix. Conservez un historique détaillé et chronologique de la propriété (provenance), ce qui est essentiel pour l'authentification et l'évaluation.
-- Statut dynamique et localisation** : Connaissez toujours l'état et l'emplacement exacts de vos œuvres d'art. Utilisez des champs clairs pour définir son emplacement actuel (par exemple, à la maison, dans un entrepôt, en prêt, dans une galerie) et les indicateurs d'état (par exemple, encadré, signé, en cours de restauration).
-- Galerie de photos riches** : Téléchargez plusieurs images haute résolution pour chaque œuvre. Capturez l'œuvre d'art sous différents angles, documentez les signatures ou mettez en évidence des détails spécifiques. Vous pouvez définir une photo principale à afficher et ajouter des légendes descriptives à chaque image.
+- **Informations de base** : Saisissez l'essentiel, notamment le titre de l'œuvre, son ou ses créateurs, l'année de création et son pays d'origine.
+- **Détails artistiques** : Documentez le type d'art spécifique (par exemple, peinture, sculpture, photographie), le support (par exemple, toile, bois, papier) et les techniques employées (par exemple, huile, acrylique, techniques mixtes).
+- **Attributs physiques** : Enregistrez les dimensions physiques précises (hauteur, largeur, profondeur) et le poids, ce qui est crucial pour l'expédition, le stockage et la planification de l'installation.
+- **Acquisition et provenance** : Suivez l'historique complet de l'acquisition, y compris la date, le lieu et le prix. Conservez un historique détaillé et chronologique de la propriété (provenance), ce qui est essentiel pour l'authentification et l'évaluation.
+- **Statut dynamique et localisation** : Connaissez toujours l'état et l'emplacement exacts de vos œuvres d'art. Utilisez des champs clairs pour définir son emplacement actuel (par exemple, à la maison, dans un entrepôt, en prêt, dans une galerie) et les indicateurs d'état (par exemple, encadré, signé, en cours de restauration).
+- **Galerie de photos riches** : Téléchargez plusieurs images haute résolution pour chaque œuvre. Capturez l'œuvre d'art sous différents angles, documentez les signatures ou mettez en évidence des détails spécifiques. Vous pouvez définir une photo principale à afficher et ajouter des légendes descriptives à chaque image.
 
 #### **Organisation et recherche puissantes**
 
 Gérez et parcourez votre collection sans effort, quelle que soit sa taille. Les outils d'Aura sont conçus pour fournir un accès rapide et intuitif à vos données.
 
-- Filtrage et recherche avancés** : Un système de filtrage puissant et polyvalent vous permet d'interroger votre collection en fonction de presque tous les critères. Trouvez des œuvres d'art d'un artiste spécifique, d'une certaine période, d'un lieu particulier, ou étiquetées avec des mots-clés spécifiques.
+- **Filtrage et recherche avancés** : Un système de filtrage puissant et polyvalent vous permet d'interroger votre collection en fonction de presque tous les critères. Trouvez des œuvres d'art d'un artiste spécifique, d'une certaine période, d'un lieu particulier, ou étiquetées avec des mots-clés spécifiques.
 - **Gestion des entités relationnelles** : L'application offre une fonctionnalité CRUD (Create, Read, Update, Delete) complète pour toutes les entités liées, y compris **Artistes**, **Collections** et **Expositions**. Les formulaires sont conçus pour permettre la création à la volée ; par exemple, si un artiste n'est pas encore dans votre base de données, vous pouvez l'ajouter directement à partir du formulaire de création d'œuvre d'art sans interrompre votre flux de travail.
-- Exportation de données professionnelles** : Générez et exportez des fiches de données magnifiquement formatées pour n'importe quelle œuvre d'art aux formats **HTML** et **PDF**. Ces fiches sont parfaites pour fournir de la documentation aux compagnies d'assurance, aux galeries ou à des fins d'archivage personnel.
+- **Exportation de données professionnelles** : Générez et exportez des fiches de données magnifiquement formatées pour n'importe quelle œuvre d'art aux formats **HTML** et **PDF**. Ces fiches sont parfaites pour fournir de la documentation aux compagnies d'assurance, aux galeries ou à des fins d'archivage personnel.
 
 #### **Outils de productivité intégrés**
 
 Aura comprend plusieurs modules conçus pour rationaliser l'ensemble de votre flux de travail de gestion des collections.
 
-- Carnet d'adresses** : Maintenez un carnet d'adresses organisé de tous vos contacts professionnels. Ce CRM dédié est parfait pour garder une trace des galeries, des musées, des collègues collectionneurs, des experts, des restaurateurs et des agents de transport.
-- Bloc-notes** : Une fonction de prise de notes intégrée vous permet de noter des recherches, des pensées ou des rappels. Vous pouvez mettre en favoris les notes importantes et les épingler sur votre tableau de bord pour y accéder rapidement.
-- Liste de souhaits stratégiques** : Ne vous contentez pas de rêver à votre prochaine acquisition. Suivez les œuvres d'art que vous souhaitez acquérir, avec les niveaux de priorité, les prix estimés et les URL des sources, transformant ainsi votre liste de souhaits en un outil de planification stratégique.
+- **Carnet d'adresses** : Maintenez un carnet d'adresses organisé de tous vos contacts professionnels. Ce CRM dédié est parfait pour garder une trace des galeries, des musées, des collègues collectionneurs, des experts, des restaurateurs et des agents de transport.
+- **Bloc-notes** : Une fonction de prise de notes intégrée vous permet de noter des recherches, des pensées ou des rappels. Vous pouvez mettre en favoris les notes importantes et les épingler sur votre tableau de bord pour y accéder rapidement.
+- **Liste de souhaits stratégiques** : Ne vous contentez pas de rêver à votre prochaine acquisition. Suivez les œuvres d'art que vous souhaitez acquérir, avec les niveaux de priorité, les prix estimés et les URL des sources, transformant ainsi votre liste de souhaits en un outil de planification stratégique.
 
 #### **Personnalisation et expérience utilisateur**
 
-- Comptes privés et sécurisés** : Une authentification robuste des utilisateurs et une structure de données par utilisateur garantissent que les informations de votre collection restent privées et sécurisées.
-- Thèmes personnalisables** : Faites de l'application la vôtre. Personnalisez votre expérience en choisissant parmi une variété de thèmes visuels distincts (par exemple, Élégant, Futuriste, Minimaliste, Rétro, Nature) directement à partir des paramètres de votre profil.
+- **Comptes privés et sécurisés** : Une authentification robuste des utilisateurs et une structure de données par utilisateur garantissent que les informations de votre collection restent privées et sécurisées.
+- **Thèmes personnalisables** : Faites de l'application la vôtre. Personnalisez votre expérience en choisissant parmi une variété de thèmes visuels distincts (par exemple, Élégant, Futuriste, Minimaliste, Rétro, Nature) directement à partir des paramètres de votre profil.
 
 ## Tech Stack
 
 Aura est construit sur une pile technologique moderne, robuste et évolutive, choisie pour sa fiabilité et sa rapidité de développement.
 
-- Backend** : **Python** avec le **Django Framework**, fournissant une base sécurisée et riche en fonctionnalités.
-- Frontal** : **HTML**, **CSS**, et **JavaScript**, stylisé avec **Bootstrap 5** pour une interface utilisateur réactive et propre.
-- Base de données** : **PostgreSQL** pour les environnements de production assure l'intégrité des données et la performance, avec **SQLite3** utilisé pour le développement local léger.
-- Stockage de fichiers** : **Amazon S3** est utilisé pour le stockage de fichiers multimédias évolutifs dans le nuage en production, avec un stockage de fichiers local pour le développement.
-- Bibliothèques clés** :
+- **Backend** : **Python** avec le **Django Framework**, fournissant une base sécurisée et riche en fonctionnalités.
+- **Frontal** : **HTML**, **CSS**, et **JavaScript**, stylisé avec **Bootstrap 5** pour une interface utilisateur réactive et propre.
+- **Base de données** : **PostgreSQL** pour les environnements de production assure l'intégrité des données et la performance, avec **SQLite3** utilisé pour le développement local léger.
+- **Stockage de fichiers** : **Amazon S3** est utilisé pour le stockage de fichiers multimédias évolutifs dans le nuage en production, avec un stockage de fichiers local pour le développement.
+- **Bibliothèques clés** :
     - `django-crispy-forms` & `crispy-bootstrap5` : Pour rendre des formulaires propres, beaux et accessibles.
     - `django-filter` : Pour alimenter le système de recherche avancée et de filtrage.
     - `django-imagekit` : Pour le traitement des images à la volée et la génération de vignettes afin d'optimiser les performances.

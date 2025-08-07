@@ -75,25 +75,37 @@ class UserProfile(models.Model):
     # Each theme provides a different visual experience for the user
     THEME_CHOICES = [
         ('elegant', 'Élégant'),           # Classic, refined appearance
-        ('futuristic', 'Futuriste'),     # Modern, sci-fi inspired
-        ('playful', 'Ludique'),          # Bright, fun colors
-        ('minimal', 'Minimaliste'),      # Clean, simple design
-        ('retro', 'Rétro'),              # Vintage-inspired styling
-        ('nature', 'Nature'),            # Earth tones, organic feel
-        ('ocean', 'Océan'),              # Blue tones, water-inspired
-        ('gothic', 'Gothique'),          # Dark, dramatic styling
-        ('sunset', 'Coucher de soleil'), # Warm, golden colors
-        ('forest', 'Forêt'),             # Green tones, woodland feel
-        ('desert', 'Désert'),            # Sandy, warm earth tones
-        ('cyberpunk', 'Cyberpunk'),      # Neon, high-tech aesthetic
-        ('steampunk', 'Steampunk'),      # Industrial, brass tones
-        ('artdeco', 'Art Déco'),         # 1920s inspired design
-        ('noir', 'Noir'),                # Black and white, dramatic
-        ('pastel', 'Pastel'),            # Soft, muted colors
-        ('solarized', 'Solarisé'),       # Developer-friendly color scheme
-        ('vaporwave', 'Vaporwave'),      # 80s retro-futuristic aesthetic
-    ]
+        ('futuristic', 'Futuriste'),      # Modern, sci-fi inspired
+        ('playful', 'Ludique'),           # Bright, fun colors
+        ('minimal', 'Minimaliste'),       # Clean, simple design
+        ('retro', 'Rétro'),               # Vintage-inspired styling
+        ('nature', 'Nature'),             # Earth tones, organic feel
+        ('ocean', 'Océan'),               # Blue tones, water-inspired
+        ('gothic', 'Gothique'),           # Dark, dramatic styling
+        ('sunset', 'Coucher de soleil'),  # Warm, golden colors
+        ('forest', 'Forêt'),              # Green tones, woodland feel
+        ('desert', 'Désert'),             # Sandy, warm earth tones
+        ('cyberpunk', 'Cyberpunk'),       # Neon, high-tech aesthetic
+        ('steampunk', 'Steampunk'),       # Industrial, brass tones
+        ('artdeco', 'Art Déco'),          # 1920s inspired design
+        ('noir', 'Noir'),                 # Black and white, dramatic
+        ('pastel', 'Pastel'),             # Soft, muted colors
+        ('solarized', 'Solarisé'),        # Developer-friendly color scheme
+        ('vaporwave', 'Vaporwave'),       # 80s retro-futuristic aesthetic
+        ('onyx', 'Onyx'),                 # Deep, rich black
+        ('burntwood', 'Bois Brûlé'),      # Dark, rustic wood
+        ('leather', 'Cuir'),              # Rich, luxurious leather
+        ('concrete', 'Béton'),            # Industrial, raw concrete
+        ('midnight', 'Minuit'),           # Dark, mysterious midnight
+        ('slate', 'Ardoise'),             # Slate gray, cool and neutral
+        ('espresso', 'Espresso'),         # Rich, dark coffee
+        ('ink', 'Encre'),                 # Dark, rich ink
+        ('graphite', 'Graphite'),         # Graphite gray, cool and neutral
+        ('velvet', 'Velours'),            # Soft, velvety texture
+    ]  
     
+    def __str__(self):
+        return f"Profil de {self.user.username}"
     # One-to-one relationship with User model
     # CASCADE ensures profile is deleted when user is deleted
     user = models.OneToOneField(

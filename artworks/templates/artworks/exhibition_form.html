@@ -18,39 +18,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="row">
-                            <div class="col-12">
-                                {{ form.name|as_crispy_field }}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                {{ form.location|as_crispy_field }}
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-6">
-                                        {{ form.start_date|as_crispy_field }}
-                                    </div>
-                                    <div class="col-6">
-                                        {{ form.end_date|as_crispy_field }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-12">
-                                {{ form.description|as_crispy_field }}
-                            </div>
-                        </div>
-                        
-                        {% include 'includes/form_actions.html' with cancel_url="artworks:exhibition_list" %}
-                    </form>
+                    {{ form|crispy }}
                 </div>
             </div>
         </div>
@@ -60,26 +28,19 @@
 {% block extra_js %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Focus sur le champ nom
-            document.getElementById('id_name').focus();
-            
-            // Configuration des champs de date
+            const nameField = document.getElementById('id_name');
+            if (nameField) nameField.focus();
+
             const startDateField = document.getElementById('id_start_date');
             const endDateField = document.getElementById('id_end_date');
-            
             if (startDateField && endDateField) {
                 startDateField.addEventListener('change', function() {
-                    if (this.value) {
-                        endDateField.min = this.value;
-                    }
+                    if (this.value) endDateField.min = this.value;
                 });
-                
                 endDateField.addEventListener('change', function() {
-                    if (this.value && startDateField.value) {
-                        if (this.value < startDateField.value) {
-                            alert('La date de fin ne peut pas être antérieure à la date de début.');
-                            this.value = '';
-                        }
+                    if (this.value && startDateField.value && this.value < startDateField.value) {
+                        alert('La date de fin ne peut pas être antérieure à la date de début.');
+                        this.value = '';
                     }
                 });
             }

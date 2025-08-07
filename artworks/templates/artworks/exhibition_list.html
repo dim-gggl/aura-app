@@ -95,6 +95,6 @@
             {% endfor %}
         </div>
     {% else %}
-        {% include 'includes/empty_state.html' with title="Aucune exposition" message="Vous n'avez pas encore créé d'exposition." action_url="artworks:exhibition_create" action_text="Créer ma première exposition" %}
+        {% include 'includes/empty_state.html' with title="Aucune exposition" message="Vous n'avez pas encore créé d'exposition." action_url=url 'artworks:exhibition_create' action_text="Créer ma première exposition" %}
     {% endif %}
 {% endblock %}

@@ -117,7 +117,9 @@ def profile(request):
                 profile.profile_picture = None
             
             # Save the form data
-            form.save()
+            updated_profile = form.save()
+            # Persist theme in session for immediate application on next request
+            request.session['current_theme'] = updated_profile.theme
             
             # Provide success feedback
             messages.success(request, 'Profil mis à jour avec succès.')

@@ -37,6 +37,12 @@
             
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Veuillez corriger les erreurs ci-dessous :</strong>
+                    {{ form.errors }}
+                </div>
+                {% endif %}
                 
                 <!-- Photo de profil actuelle -->
                 <div class="card mb-4">

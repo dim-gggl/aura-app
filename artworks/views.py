@@ -618,12 +618,17 @@ def exhibition_create(request):
             exhibition.save()
             messages.success(request, "Exposition créée avec succès.")
             return redirect("artworks:exhibition_detail", pk=exhibition.pk)
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
+            # Optionnel: afficher les erreurs détaillées en développement
+            # messages.error(request, form.errors.as_ul())
     else:
         form = ExhibitionForm()
     
     context = {
         "form": form,
         "title": "Créer une exposition",
+        "cancel_url": "artworks:exhibition_list",
     }
     
     return render(request, "artworks/exhibition_form.html", context)
@@ -639,6 +644,8 @@ def exhibition_update(request, pk):
             form.save()
             messages.success(request, "Exposition modifiée avec succès.")
             return redirect("artworks:exhibition_detail", pk=exhibition.pk)
+        else:
+            messages.error(request, "Veuillez corriger les erreurs du formulaire.")
     else:
         form = ExhibitionForm(instance=exhibition)
     
@@ -646,6 +653,7 @@ def exhibition_update(request, pk):
         "form": form,
         "exhibition": exhibition,
         "title": "Modifier l\"exposition",
+        "cancel_url": "artworks:exhibition_detail",
     }
     
     return render(request, "artworks/exhibition_form.html", context)

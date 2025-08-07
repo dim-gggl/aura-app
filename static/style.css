@@ -2,6 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Dai+Banna+SIL:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Expletus+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Almendra+SC&family=Josefin+Sans:wght@400;700&family=Orbitron:wght@400;700&family=Righteous&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
 /* 2. ROOT & DEFAULT THEME (ÉLÉGANT) */
 :root {
@@ -48,6 +50,9 @@
 
 /* 3. FUTURISTIC THEME */
 :root[data-theme="futuristic"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
     --theme-bg-color: #0d1117;
     --theme-text-color: #c9d1d9;
     --theme-primary-color: #0dd5fd;
@@ -68,8 +73,10 @@
 
 /* 4. PLAYFUL THEME */
 :root[data-theme="playful"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Expletus Sans", sans-serif;
     --font-family-logo: "Expletus Sans", sans-serif;
+
     --theme-bg-color: #fffbeb; /* Creamy yellow */
     --theme-text-color: #78350f; /* Dark brown */
     --theme-primary-color: #fb923c; /* Orange */
@@ -91,6 +98,9 @@
 
 /* MINIMALIST THEME */
 :root[data-theme="minimal"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
     --theme-bg-color: #ffffff;
     --theme-text-color: #000000;
     --theme-primary-color: #222222;
@@ -113,6 +123,7 @@
     --font-family-body: var(--font-family-monospace);
     --font-family-headings: var(--font-family-monospace);
     --font-family-logo: var(--font-family-monospace);
+
     --theme-bg-color: #000000;
     --theme-text-color: #00ff00;
     --theme-primary-color: #00ff00;
@@ -133,7 +144,9 @@
 
 /* NATURE THEME */
 :root[data-theme="nature"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
+
     --theme-bg-color: #f5f5dc; /* Beige */
     --theme-text-color: #5d4037; /* Dark Brown */
     --theme-primary-color: #4caf50; /* Green */
@@ -153,6 +166,9 @@
 
 /* OCEAN THEME */
 :root[data-theme="ocean"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+
     --theme-bg-color: #e0f7fa; /* Light cyan */
     --theme-text-color: #004d40; /* Teal */
     --theme-primary-color: #0288d1; /* Blue */
@@ -172,7 +188,9 @@
 
 /* GOTHIC THEME */
 :root[data-theme="gothic"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
+
     --theme-bg-color: #121212;
     --theme-text-color: #e0e0e0;
     --theme-primary-color: #9a031e; /* Dark Red */
@@ -191,8 +209,11 @@
     --bs-secondary-color: #c72f4b;
 }
 
+/* 6. ADDITIONAL THEMES */
+
 /* SUNSET THEME */
 :root[data-theme="sunset"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Josefin Sans", sans-serif;
     --theme-bg-color: #2c1e3d;
     --theme-text-color: #fdeed9;
@@ -214,6 +235,7 @@
 
 /* FOREST THEME */
 :root[data-theme="forest"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
     --theme-bg-color: #f4f1e9;
     --theme-text-color: #3d403a;
@@ -234,6 +256,8 @@
 
 /* DESERT THEME */
 :root[data-theme="desert"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
     --theme-bg-color: #fdf4e3;
     --theme-text-color: #4a2c2a;
     --theme-primary-color: #d77a61;
@@ -275,6 +299,7 @@
 
 /* STEAMPUNK THEME */
 :root[data-theme="steampunk"] {
+    --font-family-body: "Ancizar Sans", serif;
     --font-family-headings: "Almendra SC", serif;
     --theme-bg-color: #f5eeda;
     --theme-text-color: #5a3d2b;
@@ -403,7 +428,225 @@
     --bs-secondary-color: #f7b2ff;
 }
 
-/* 7. GENERIC STYLES using the variables */
+/* 7. SERIOUS THEMES */
+
+/* ONYX THEME */
+:root[data-theme="onyx"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Josefin Sans", sans-serif;
+    --theme-bg-color: #000000;
+    --theme-text-color: #e5e5e5;
+    --theme-primary-color: #d4d4d4;
+    --theme-secondary-color: #a3a3a3;
+    --theme-primary-text-color: #000000;
+    --theme-link-color: #ffffff;
+    --theme-card-bg: #171717;
+    --theme-card-border-color: #404040;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #171717;
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #262626;
+    --theme-alert-border-color: #525252;
+    --theme-alert-text-color: #e5e5e5;
+    --bs-secondary-color: var(--theme-secondary-color);
+}
+
+/* BURNT WOOD THEME */
+:root[data-theme="burntwood"] {
+    --font-family-body: "Lora", serif;
+    --font-family-headings: "Almendra SC", serif;
+    --theme-bg-color: #1c1c1c;
+    --theme-text-color: #d7d2cb;
+    --theme-primary-color: #e57c23;
+    --theme-secondary-color: #4a443d;
+    --theme-primary-text-color: #1c1c1c;
+    --theme-link-color: #f8b88b;
+    --theme-card-bg: #2b2b2b;
+    --theme-card-border-color: #4a443d;
+    --theme-card-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: var(--theme-primary-color);
+    --theme-alert-bg: #3a3a3a;
+    --theme-alert-border-color: #e57c23;
+    --theme-alert-text-color: #f8b88b;
+    --bs-secondary-color: #9c958d;
+}
+
+/* LEATHER THEME */
+:root[data-theme="leather"] {
+    --font-family-body: "Lora", serif;
+    --font-family-headings: "Lora", serif;
+    --theme-bg-color: #f4eee8;
+    --theme-text-color: #3e2723;
+    --theme-primary-color: #5d4037;
+    --theme-secondary-color: #a1887f;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #6d4c41;
+    --theme-card-bg: #efebe9;
+    --theme-card-border-color: #d7ccc8;
+    --theme-card-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    --theme-border-radius: 0.25rem;
+    --theme-header-bg: #3e2723;
+    --theme-header-text-color: #f4eee8;
+    --theme-alert-bg: #d7ccc8;
+    --theme-alert-border-color: #bcaaa4;
+    --theme-alert-text-color: #3e2723;
+}
+
+/* CONCRETE THEME */
+:root[data-theme="concrete"] {
+    --font-family-body: "Roboto Mono", monospace;
+    --font-family-headings: "Roboto Mono", monospace;
+    --theme-bg-color: #e0e0e0;
+    --theme-text-color: #212121;
+    --theme-primary-color: #d32f2f;
+    --theme-secondary-color: #757575;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #b71c1c;
+    --theme-card-bg: #f5f5f5;
+    --theme-card-border-color: #bdbdbd;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0;
+    --theme-header-bg: #333333;
+    --theme-header-text-color: #f5f5f5;
+    --theme-alert-bg: #d9d9d9;
+    --theme-alert-border-color: #bdbdbd;
+    --theme-alert-text-color: #212121;
+}
+
+/* MIDNIGHT THEME */
+:root[data-theme="midnight"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Josefin Sans", sans-serif;
+    --theme-bg-color: #0c1445;
+    --theme-text-color: #dbe4ff;
+    --theme-primary-color: #8f9dff;
+    --theme-secondary-color: #5c6ac4;
+    --theme-primary-text-color: #0c1445;
+    --theme-link-color: #a9b5ff;
+    --theme-card-bg: #19235c;
+    --theme-card-border-color: #3c4a9c;
+    --theme-card-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    --theme-border-radius: 0.3rem;
+    --theme-header-bg: #050a29;
+    --theme-header-text-color: #dbe4ff;
+    --theme-alert-bg: #1f2b6e;
+    --theme-alert-border-color: #5c6ac4;
+    --theme-alert-text-color: #dbe4ff;
+    --bs-secondary-color: #8391d4;
+}
+
+/* SLATE THEME */
+:root[data-theme="slate"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+    --theme-bg-color: #f8fafc;
+    --theme-text-color: #334155;
+    --theme-primary-color: #475569;
+    --theme-secondary-color: #94a3b8;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #1e293b;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #e2e8f0;
+    --theme-card-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    --theme-border-radius: 0.375rem;
+    --theme-header-bg: #1e293b;
+    --theme-header-text-color: #f1f5f9;
+    --theme-alert-bg: #f1f5f9;
+    --theme-alert-border-color: #e2e8f0;
+    --theme-alert-text-color: #334155;
+}
+
+/* ESPRESSO THEME */
+:root[data-theme="espresso"] {
+    --font-family-body: "Lora", serif;
+    --font-family-headings: "Lora", serif;
+    --theme-bg-color: #1a1110;
+    --theme-text-color: #d7ccc8;
+    --theme-primary-color: #8d6e63;
+    --theme-secondary-color: #5d4037;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #bcaaa4;
+    --theme-card-bg: #2f2321;
+    --theme-card-border-color: #4e342e;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: #d7ccc8;
+    --theme-alert-bg: #4e342e;
+    --theme-alert-border-color: #8d6e63;
+    --theme-alert-text-color: #d7ccc8;
+    --bs-secondary-color: #a1887f;
+}
+
+/* INK THEME */
+:root[data-theme="ink"] {
+    --font-family-body: "Lora", serif;
+    --font-family-headings: "Josefin Sans", sans-serif;
+    --theme-bg-color: #f8f8f8;
+    --theme-text-color: #111111;
+    --theme-primary-color: #000000;
+    --theme-secondary-color: #666666;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #000000;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #dddddd;
+    --theme-card-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    --theme-border-radius: 0.1rem;
+    --theme-header-bg: #ffffff;
+    --theme-header-text-color: #000000;
+    --theme-alert-bg: #eeeeee;
+    --theme-alert-border-color: #cccccc;
+    --theme-alert-text-color: #111111;
+}
+
+/* GRAPHITE THEME */
+:root[data-theme="graphite"] {
+    --font-family-body: "Roboto Mono", monospace;
+    --font-family-headings: "Roboto Mono", monospace;
+    --theme-bg-color: #212121;
+    --theme-text-color: #e0e0e0;
+    --theme-primary-color: #757575;
+    --theme-secondary-color: #616161;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #bdbdbd;
+    --theme-card-bg: #303030;
+    --theme-card-border-color: #424242;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: #e0e0e0;
+    --theme-alert-bg: #424242;
+    --theme-alert-border-color: #616161;
+    --theme-alert-text-color: #e0e0e0;
+    --bs-secondary-color: var(--theme-secondary-color);
+}
+
+/* VELVET THEME */
+:root[data-theme="velvet"] {
+    --font-family-body: "Lora", serif;
+    --font-family-headings: "Dai Banna SIL", serif;
+    --theme-bg-color: #240011;
+    --theme-text-color: #f2e6f1;
+    --theme-primary-color: #9a031e;
+    --theme-secondary-color: #5f0f40;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #e91e63;
+    --theme-card-bg: #3c0921;
+    --theme-card-border-color: #5f0f40;
+    --theme-card-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: #f2e6f1;
+    --theme-alert-bg: #5f0f40;
+    --theme-alert-border-color: #9a031e;
+    --theme-alert-text-color: #f2e6f1;
+    --bs-secondary-color: #d1a7c7;
+}
+
+/* 8. GENERIC STYLES using the variables */
 body {
     background-color: var(--theme-bg-color);
     color: var(--theme-text-color);

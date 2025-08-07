@@ -6,10 +6,9 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            {% include 'includes/page_header.html' with 
-                title="Résultats de recherche" 
-                back_url=url 'core:dashboard' 
-                back_text="Retour au tableau de bord" %}
+            {% with title="Résultats de recherche" back_url=url 'core:dashboard' back_text="Retour au tableau de bord" %}
+                {% include 'includes/page_header.html' %}
+            {% endwith %}
 
             {% if query %}
                 <div class="alert alert-info">
@@ -183,22 +182,18 @@
 
                 <!-- Aucun résultat -->
                 {% if not results.artworks and not results.contacts and not results.notes %}
-                    {% include 'includes/empty_state.html' with 
-                        icon="search" 
-                        title="Aucun résultat trouvé" 
-                        message="Aucune œuvre, contact ou note ne correspond à votre recherche \"{{ query }}\"." 
-                        action_url=url 'core:dashboard' 
-                        action_text="Retour au tableau de bord" 
-                        action_icon="house" %}
+                    {% include 'includes/empty_state.html' %}
                 {% endif %}
 
             {% else %}
                 <!-- Formulaire de recherche -->
-                {% include 'includes/empty_state.html' with 
+                {% with 
                     icon="search" 
                     title="Recherche globale" 
                     message="Recherchez dans vos œuvres d'art, contacts et notes." 
                     show_action=False %}
+                    {% include 'includes/empty_state.html' %}
+                {% endwith %}
                 
                 <form method="get" action="{% url 'core:search' %}" class="mt-4">
                     <div class="row justify-content-center">

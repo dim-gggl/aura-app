@@ -5,12 +5,14 @@ Variables attendues :
 - icon: Icône Bootstrap (optionnel, défaut: "inbox")
 - title: Titre principal (optionnel, défaut: "Aucun résultat")
 - message: Message descriptif (optionnel, défaut: "Aucun élément trouvé")
-- action_url: URL pour l'action principale (optionnel)
+- action_url: URL pour l'action principale (optionnel) — peut être un nom d'URL ou une URL complète
 - action_text: Texte du bouton d'action (optionnel)
 - action_icon: Icône du bouton d'action (optionnel, défaut: "plus")
 - show_action: Boolean pour afficher le bouton d'action (optionnel, défaut: True)
 - icon_size: Taille de l'icône (optionnel, défaut: "4rem")
 {% endcomment %}
+
+{% load static %}
 
 <div class="text-center py-5">
     <i class="bi bi-{{ icon|default:'inbox' }} text-muted" style="font-size: {{ icon_size|default:'4rem' }};"></i>
@@ -19,9 +21,15 @@ Variables attendues :
     
     {% if show_action|default:True and action_url and action_text %}
         <div class="mt-4">
-            <a href="{{ action_url }}" class="btn btn-primary">
-                <i class="bi bi-{{ action_icon|default:'plus' }}"></i> {{ action_text }}
-            </a>
+            {% if action_url|slice:":1" == "/" %}
+                <a href="{{ action_url }}" class="btn btn-primary">
+                    <i class="bi bi-{{ action_icon|default:'plus' }}"></i> {{ action_text }}
+                </a>
+            {% else %}
+                <a href="{% url action_url %}" class="btn btn-primary">
+                    <i class="bi bi-{{ action_icon|default:'plus' }}"></i> {{ action_text }}
+                </a>
+            {% endif %}
         </div>
     {% endif %}
 </div>

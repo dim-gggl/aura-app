@@ -11,6 +11,8 @@ Key functionality:
 - Fallback handling: Provides sensible defaults for anonymous users
 """
 
+from django.core.exceptions import ObjectDoesNotExist
+
 def theme_context(request):
     """
     Add the current user's theme to the template context.
@@ -43,13 +45,18 @@ def theme_context(request):
     # Default theme for fallback situations
     default_theme = 'elegant'
 
+    # If a theme is stored in session (set after profile update), use it directly
+    session_theme = request.session.get('current_theme')
+    if session_theme:
+        return {'current_theme': session_theme}
+
     # Check if user is authenticated
     if request.user.is_authenticated:
         try:
             # Attempt to get the user's profile
             # Note: profile is a OneToOneField that may not exist yet
             profile = request.user.profile
-            
+
             if profile and profile.theme:
                 # User has a profile with a theme set
                 theme = profile.theme
@@ -57,15 +64,15 @@ def theme_context(request):
                 # Profile exists but no theme set, or profile doesn't exist
                 # Import here to avoid circular imports
                 from core.models import UserProfile
-                
+
                 # Create profile if it doesn't exist, or update existing one
                 profile, created = UserProfile.objects.get_or_create(
                     user=request.user,
                     defaults={'theme': default_theme}
                 )
                 theme = profile.theme if profile.theme else default_theme
-                
-        except AttributeError:
+
+        except (AttributeError, ObjectDoesNotExist):
             # Handle case where user.profile relationship doesn't exist
             # This can happen during migrations or in test environments
             theme = default_theme

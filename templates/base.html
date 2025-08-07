@@ -160,9 +160,20 @@
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const currentTheme = '{{ current_theme }}';
-        if (currentTheme) {
-            document.documentElement.setAttribute('data-theme', currentTheme);
+        // 1) Server-provided theme (session/context)
+        const serverTheme = '{{ current_theme }}';
+        if (serverTheme) {
+            document.documentElement.setAttribute('data-theme', serverTheme);
+        }
+
+        // 2) If a localStorage theme exists, prefer it for immediate UX continuity
+        try {
+            const storedTheme = localStorage.getItem('aura-theme');
+            if (storedTheme) {
+                document.documentElement.setAttribute('data-theme', storedTheme);
+            }
+        } catch (e) {
+            // Ignore storage errors (Safari private mode, etc.)
         }
     });
     </script>

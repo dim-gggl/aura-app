@@ -48,12 +48,14 @@ def contact_list(request):
         HttpResponse: Rendered contact list with pagination and filters
     """
     # Get all contacts for the current user
-    contacts = Contact.objects.filter(user=request.user)
+    contacts = Contact.objects.filter(user=request.user).only(
+        "id", "name", "email", "phone", "contact_type", "created_at"
+    )
     
     # === SEARCH FUNCTIONALITY ===
-    # Extract search parameters from GET request
-    search = request.GET.get('search', '').strip()
-    contact_type = request.GET.get('type', '')
+    # Extract search parameters from GET request (robust to missing params)
+    search = (request.GET.get('search') or '').strip()
+    contact_type = (request.GET.get('type') or '').strip()
     
     # Apply text search across multiple fields if provided
     if search:

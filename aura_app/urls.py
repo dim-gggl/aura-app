@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 # ========================================
 # MAIN URL PATTERNS
@@ -38,6 +41,17 @@ urlpatterns = [
     # User authentication and account management
     # Includes registration, login, logout, profile, and password management
     path("accounts/", include("accounts.urls")),
+
+    # =========================================
+    # API URLS
+    # =========================================
+
+    # API Endpoints
+    path("api/", include("aura_app.api_urls")),
+
+    # JWT authentication
+    path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
 
 # ========================================
