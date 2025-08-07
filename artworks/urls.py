@@ -33,6 +33,27 @@ urlpatterns = [
     path("exhibitions/<int:pk>/", views.exhibition_detail, name="exhibition_detail"),
     path("exhibitions/<int:pk>/edit/", views.exhibition_update, name="exhibition_update"),
     
+    # Reference entities (Types d'art, Supports, Techniques, Mots-clés)
+    path("art-types/", views.arttype_list, name="arttype_list"),
+    path("art-types/create/", views.arttype_create, name="arttype_create"),
+    path("art-types/<int:pk>/edit/", views.arttype_update, name="arttype_update"),
+    path("art-types/<int:pk>/delete/", views.arttype_delete, name="arttype_delete"),
+    
+    path("supports/", views.support_list, name="support_list"),
+    path("supports/create/", views.support_create, name="support_create"),
+    path("supports/<int:pk>/edit/", views.support_update, name="support_update"),
+    path("supports/<int:pk>/delete/", views.support_delete, name="support_delete"),
+    
+    path("techniques/", views.technique_list, name="technique_list"),
+    path("techniques/create/", views.technique_create, name="technique_create"),
+    path("techniques/<int:pk>/edit/", views.technique_update, name="technique_update"),
+    path("techniques/<int:pk>/delete/", views.technique_delete, name="technique_delete"),
+    
+    path("keywords/", views.keyword_list, name="keyword_list"),
+    path("keywords/create/", views.keyword_create, name="keyword_create"),
+    path("keywords/<int:pk>/edit/", views.keyword_update, name="keyword_update"),
+    path("keywords/<int:pk>/delete/", views.keyword_delete, name="keyword_delete"),
+    
     # AJAX endpoints
     path("ajax/artist/create/", views.artist_create_ajax, name="artist_create_ajax"),
     path("ajax/collection/create/", views.collection_create_ajax, name="collection_create_ajax"),

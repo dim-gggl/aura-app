@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Supprimer {{ entity_name }} - Aura{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'includes/page_header.html' with title="Supprimer "|add:entity_name back_url=back_url %}
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Confirmation de suppression
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Attention !</strong> Cette action est irréversible.
+                    </div>
+                    
+                    <p>Êtes-vous sûr de vouloir supprimer {{ entity_name }} <strong>{{ object.name }}</strong> ?</p>
+                    
+                    {% if object.artwork_count > 0 %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            Ce {{ entity_name }} est actuellement associé à <strong>{{ object.artwork_count }}</strong> œuvre{{ object.artwork_count|pluralize }}.
+                            La suppression ne supprimera pas les œuvres, mais retirera cette association.
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="{{ back_url }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

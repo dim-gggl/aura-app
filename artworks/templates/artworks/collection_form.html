@@ -1,0 +1,28 @@
+{% extends "base_form.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - {{ block.super }}{% endblock %}
+
+{% block form_title %}
+    <i class="fas fa-folder-open me-2"></i>
+    {{ title }}
+{% endblock %}
+
+{% block form_content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i>
+                {% if collection %}Modifier{% else %}Créer{% endif %}
+            </button>
+            <a href="{% if collection %}{% url 'artworks:collection_detail' collection.pk %}{% else %}{% url 'artworks:collection_list' %}{% endif %}" 
+               class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Annuler
+            </a>
+        </div>
+    </form>
+{% endblock %}

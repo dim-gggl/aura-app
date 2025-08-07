@@ -211,15 +211,22 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Éléments du DOM
+    // Get the favorite checkbox
     const favoriteCheckbox = document.getElementById('{{ form.is_favorite.id_for_label }}');
+    // Get the favorite icon
     const favoriteIcon = document.getElementById('favoriteIcon');
+    // Get the content textarea
     const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+    // Get the character counter
     const charCount = document.getElementById('charCount');
+    // Get the preview section
     const previewSection = document.getElementById('previewSection');
+    // Get the preview content
     const previewContent = document.getElementById('previewContent');
     
-    // Gestion de l'icône favori
+    // Management of the favorite icon
     function updateFavoriteIcon() {
+        // If the favorite checkbox is checked
         if (favoriteCheckbox.checked) {
             favoriteIcon.classList.remove('bi-star');
             favoriteIcon.classList.add('bi-star-fill', 'active');
@@ -229,24 +236,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Initialisation de l'icône favori
+    // Initialization of the favorite icon
     updateFavoriteIcon();
     
-    // Écouter les changements du checkbox favori
+    // Listen to changes of the favorite checkbox
     favoriteCheckbox.addEventListener('change', updateFavoriteIcon);
     
-    // Permettre de cliquer sur l'icône pour basculer le favori
+    // Allow to click on the icon to toggle the favorite
     favoriteIcon.addEventListener('click', function() {
+        // Toggle the favorite checkbox
         favoriteCheckbox.checked = !favoriteCheckbox.checked;
         updateFavoriteIcon();
     });
     
-    // Compteur de caractères
+    // Character counter
     function updateCharCount() {
+        // Get the number of characters
         const count = contentTextarea.value.length;
         charCount.textContent = count.toLocaleString();
         
-        // Changement de couleur selon le nombre de caractères
+        // Change the color according to the number of characters
         if (count > 5000) {
             charCount.className = 'text-danger';
         } else if (count > 3000) {
@@ -256,11 +265,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Initialisation et écoute du compteur
+    // Initialization and listening to the counter
     updateCharCount();
     contentTextarea.addEventListener('input', updateCharCount);
     
-    // Auto-resize du textarea
+    // Auto-resize of the textarea
     function autoResize() {
         contentTextarea.style.height = 'auto';
         contentTextarea.style.height = contentTextarea.scrollHeight + 'px';
@@ -269,12 +278,12 @@ document.addEventListener('DOMContentLoaded', function() {
     contentTextarea.addEventListener('input', autoResize);
     autoResize(); // Initialisation
     
-    // Sauvegarde automatique (optionnel)
+    // Automatic save (optional)
     let saveTimeout;
     function autoSave() {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(function() {
-            // Ici on pourrait implémenter une sauvegarde AJAX
+            // Here we could implement an AJAX save
             console.log('Auto-save triggered');
         }, 2000);
     }
@@ -283,38 +292,51 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('{{ form.title.id_for_label }}').addEventListener('input', autoSave);
 });
 
-// Fonction d'insertion de formatage
+// Function to insert formatting
 function insertFormatting(before, after) {
+    // Get the textarea
     const textarea = document.getElementById('{{ form.content.id_for_label }}');
+    // Get the start of the selection
     const start = textarea.selectionStart;
+    // Get the end of the selection
     const end = textarea.selectionEnd;
+    // Get the selected text
     const selectedText = textarea.value.substring(start, end);
+    // Get the replacement
     
+    // Get the replacement
     const replacement = before + selectedText + after;
     
+    // Replace the selected text
     textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
     
-    // Repositionner le curseur
+    // Reposition the cursor
     const newPosition = start + before.length + selectedText.length;
+    // Set the selection range
     textarea.setSelectionRange(newPosition, newPosition);
+    // Focus on the textarea
     textarea.focus();
     
-    // Déclencher l'événement input pour mettre à jour le compteur
+    // Trigger the input event to update the counter
     textarea.dispatchEvent(new Event('input'));
 }
 
-// Fonction d'aperçu
+// Function to toggle the preview
 function togglePreview() {
+    // Get the preview section
     const previewSection = document.getElementById('previewSection');
+    // Get the preview content
     const previewContent = document.getElementById('previewContent');
+    // Get the textarea
     const textarea = document.getElementById('{{ form.content.id_for_label }}');
+    // Get the preview button
     const previewBtn = document.querySelector('.btn-preview');
     
     if (previewSection.style.display === 'none' || !previewSection.style.display) {
-        // Afficher l'aperçu
+        // Display the preview
         let content = textarea.value;
         
-        // Formatage markdown basique
+        // Basic markdown formatting
         content = content
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -326,7 +348,7 @@ function togglePreview() {
             .replace(/^> (.*$)/gm, '<blockquote class="border-start border-primary border-3 ps-3 text-muted">$1</blockquote>')
             .replace(/\n/g, '<br>');
         
-        // Envelopper les listes
+        // Wrap the lists
         content = content.replace(/(<li>.*<\/li>)/g, '<ul class="list-unstyled">$1</ul>');
         
         if (!content.trim()) {
@@ -339,47 +361,62 @@ function togglePreview() {
         previewBtn.classList.add('btn-warning');
         previewBtn.classList.remove('btn-outline-info');
     } else {
-        // Masquer l'aperçu
+        // Hide the preview
         previewSection.style.display = 'none';
+        // Reset the preview button to the default state
         previewBtn.innerHTML = '<i class="bi bi-eye"></i> Aperçu';
+        // Reset the button's class list
         previewBtn.classList.remove('btn-warning');
         previewBtn.classList.add('btn-outline-info');
     }
 }
 
-// Raccourcis clavier
+// Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
+    // If the Ctrl or Meta key is pressed
     if (e.ctrlKey || e.metaKey) {
         switch(e.key) {
             case 'b':
+                // Prevent the default behavior
                 e.preventDefault();
+                // Insert formatting
                 insertFormatting('**', '**');
                 break;
             case 'i':
+                // Prevent the default behavior
                 e.preventDefault();
+                // Insert formatting
                 insertFormatting('*', '*');
                 break;
             case 's':
+                // Prevent the default behavior
                 e.preventDefault();
+                // Submit the form
                 document.getElementById('noteForm').submit();
                 break;
         }
     }
 });
 
-// Confirmation avant de quitter si des modifications non sauvegardées
+// Confirmation before leaving if there are unsaved modifications
 let formChanged = false;
+// Listen to changes of the form
 document.getElementById('noteForm').addEventListener('input', function() {
     formChanged = true;
 });
 
+// Listen to the submission of the form
 document.getElementById('noteForm').addEventListener('submit', function() {
     formChanged = false;
 });
 
+// Confirmation before leaving if there are unsaved modifications
 window.addEventListener('beforeunload', function(e) {
+    // If there are unsaved modifications
     if (formChanged) {
+        // Prevent the default behavior
         e.preventDefault();
+        // Set the return value to an empty string
         e.returnValue = '';
     }
 });

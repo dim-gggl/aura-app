@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Tableau de bord - Catalogue{% endblock %}
+{% block title %}Tableau de bord - Aura{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -101,8 +101,59 @@
             </div>
         </div>
         
+        <!-- Gestion des références -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> Gestion des références
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a href="{% url 'artworks:artist_list' %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-person"></i><br>
+                                <small>Artistes</small>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'artworks:collection_list' %}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-collection"></i><br>
+                                <small>Collections</small>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'artworks:arttype_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-tag"></i><br>
+                                <small>Types d'art</small>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'artworks:support_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-layers"></i><br>
+                                <small>Supports</small>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'artworks:technique_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-brush"></i><br>
+                                <small>Techniques</small>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'artworks:keyword_list' %}" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-tags"></i><br>
+                                <small>Mots-clés</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Œuvres récentes -->
-        <div class="col-lg-8 mb-4">
+        <div class="col-lg-4 mb-4">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
@@ -114,31 +165,37 @@
                 </div>
                 <div class="card-body">
                     {% if recent_artworks %}
-                        <div class="row">
-                            {% for artwork in recent_artworks %}
-                                <div class="col-md-6 col-lg-4 mb-3">
-                                    <div class="card artwork-card">
+                        {% for artwork in recent_artworks %}
+                            <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-4">
                                         {% if artwork.photos.first %}
                                             <img src="{{ artwork.photos.first.image.url }}" 
-                                                 class="card-img-top" alt="{{ artwork.title }}">
+                                                 class="img-fluid rounded" alt="{{ artwork.title }}"
+                                                 style="height: 60px; width: 100%; object-fit: cover;">
                                         {% else %}
-                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                                 style="height: 150px;">
-                                                <i class="bi bi-image text-muted display-4"></i>
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="height: 60px;">
+                                                <i class="bi bi-image text-muted"></i>
                                             </div>
                                         {% endif %}
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title mb-1">
+                                    </div>
+                                    <div class="col-8">
+                                        <h6 class="mb-1">
+                                            <a href="{{ artwork.get_absolute_url }}" class="text-decoration-none">
                                                 {{ artwork.title|default:"Sans titre" }}
-                                            </h6>
-                                            <small class="text-muted">
-                                                {{ artwork.get_artists_display|default:"Artiste inconnu" }}
-                                            </small>
-                                        </div>
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted d-block">
+                                            {{ artwork.get_artists_display|default:"Artiste inconnu" }}
+                                        </small>
+                                        <small class="text-muted">
+                                            {{ artwork.created_at|date:"d/m/Y" }}
+                                        </small>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% endfor %}
                     {% else %}
                         <p class="text-muted text-center py-4">
                             <i class="bi bi-inbox display-4 d-block mb-2"></i>

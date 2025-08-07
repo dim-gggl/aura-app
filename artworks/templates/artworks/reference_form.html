@@ -1,0 +1,55 @@
+{% extends 'base_form.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Aura{% endblock %}
+
+{% block form_header %}
+    {% include 'includes/page_header.html' with title=title back_url=back_url %}
+{% endblock %}
+
+{% block form_content %}
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-tag"></i> {{ title }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label">
+                                Nom du {{ entity_name }} <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   name="name" 
+                                   value="{{ current_name|default:'' }}" 
+                                   required 
+                                   maxlength="100"
+                                   placeholder="Entrez le nom du {{ entity_name }}">
+                            <div class="form-text">
+                                Le nom doit être unique et contenir au maximum 100 caractères.
+                            </div>
+                        </div>
+                        
+                        {% include 'includes/form_actions.html' with cancel_url=back_url %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus sur le champ nom
+            document.getElementById('name').focus();
+        });
+    </script>
+{% endblock %}

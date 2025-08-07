@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Collections - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="fas fa-folder-open me-2"></i>
+                Mes Collections
+            </h1>
+        </div>
+    </div>
+
+    <!-- Barre de recherche et actions -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="get" class="d-flex">
+                <input type="search" name="search" value="{{ search }}" 
+                       class="form-control me-2" placeholder="Rechercher une collection...">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'artworks:collection_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Nouvelle collection
+            </a>
+        </div>
+    </div>
+
+    <!-- Liste des collections -->
+    <div class="row">
+        {% if page_obj %}
+            {% for collection in page_obj %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'artworks:collection_detail' collection.pk %}" class="text-decoration-none">
+                                    {{ collection.name }}
+                                </a>
+                            </h5>
+                            {% if collection.description %}
+                                <p class="card-text">{{ collection.description|truncatechars:100 }}</p>
+                            {% endif %}
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    {{ collection.artwork_count }} œuvre{{ collection.artwork_count|pluralize }}
+                                </small>
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'artworks:collection_detail' collection.pk %}" class="btn btn-outline-primary btn-sm me-1">
+                                <i class="fas fa-eye"></i> Voir
+                            </a>
+                            <a href="{% url 'artworks:collection_update' collection.pk %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <div class="col-12">
+                    {% include "includes/pagination.html" %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-folder-open text-muted mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="text-muted mb-3">Aucune collection trouvée</h3>
+                        {% if search %}
+                            <p class="text-muted mb-4">
+                                Aucune collection ne correspond à votre recherche "{{ search }}".
+                            </p>
+                            <a href="{% url 'artworks:collection_list' %}" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-times me-1"></i>
+                                Effacer la recherche
+                            </a>
+                        {% else %}
+                            <p class="text-muted mb-4">
+                                Organisez vos œuvres en créant des collections thématiques.
+                            </p>
+                        {% endif %}
+                        <a href="{% url 'artworks:collection_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>
+                            Créer une collection
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

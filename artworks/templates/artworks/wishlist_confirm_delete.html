@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Supprimer de la liste de souhaits - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="fas fa-trash text-danger me-2"></i>
+                Supprimer de la liste de souhaits
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention !</strong> Cette action est irréversible.
+                    </div>
+
+                    <div class="mb-4">
+                        <h4>Êtes-vous sûr de vouloir supprimer cette œuvre de votre liste de souhaits ?</h4>
+                        
+                        <div class="card bg-light mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.title }}</h5>
+                                
+                                {% if item.artist_name %}
+                                    <p class="card-text mb-2">
+                                        <strong>Artiste :</strong> {{ item.artist_name }}
+                                    </p>
+                                {% endif %}
+                                
+                                {% if item.estimated_price %}
+                                    <p class="card-text mb-2">
+                                        <strong>Prix estimé :</strong> {{ item.estimated_price|floatformat:0 }} €
+                                    </p>
+                                {% endif %}
+                                
+                                <p class="card-text mb-2">
+                                    <strong>Priorité :</strong>
+                                    {% if item.priority == 1 %}
+                                        <span class="badge bg-danger">Haute</span>
+                                    {% elif item.priority == 2 %}
+                                        <span class="badge bg-warning">Moyenne</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Basse</span>
+                                    {% endif %}
+                                </p>
+                                
+                                {% if item.notes %}
+                                    <p class="card-text mb-0">
+                                        <strong>Notes :</strong> {{ item.notes }}
+                                    </p>
+                                {% endif %}
+                                
+                                <small class="text-muted">
+                                    Ajoutée le {{ item.created_at|date:"d/m/Y à H:i" }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger me-2">
+                            <i class="fas fa-trash me-1"></i>
+                            Oui, supprimer
+                        </button>
+                    </form>
+                    
+                    <a href="{% url 'artworks:wishlist' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Annuler
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

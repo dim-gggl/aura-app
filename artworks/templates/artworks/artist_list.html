@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Artistes - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="fas fa-palette me-2"></i>
+                Artistes
+            </h1>
+        </div>
+    </div>
+
+    <!-- Barre de recherche et actions -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <form method="get" class="d-flex">
+                <input type="search" name="search" value="{{ search }}" 
+                       class="form-control me-2" placeholder="Rechercher un artiste...">
+                <button type="submit" class="btn btn-outline-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'artworks:artist_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>
+                Ajouter un artiste
+            </a>
+        </div>
+    </div>
+
+    <!-- Liste des artistes -->
+    <div class="row">
+        <div class="col-12">
+            {% if page_obj %}
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Nationalité</th>
+                                        <th>Période</th>
+                                        <th>Œuvres</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for artist in page_obj %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'artworks:artist_detail' artist.pk %}" class="text-decoration-none">
+                                                    <strong>{{ artist.name }}</strong>
+                                                </a>
+                                            </td>
+                                            <td>{{ artist.nationality|default:"Non spécifiée" }}</td>
+                                            <td>
+                                                {% if artist.birth_year %}
+                                                    {{ artist.birth_year }}
+                                                    {% if artist.death_year %}
+                                                        - {{ artist.death_year }}
+                                                    {% endif %}
+                                                {% else %}
+                                                    Non spécifiée
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ artist.artwork_count }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'artworks:artist_detail' artist.pk %}" class="btn btn-sm btn-outline-primary me-1" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'artworks:artist_update' artist.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                    {% include "includes/pagination.html" %}
+                {% endif %}
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-palette text-muted mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="text-muted mb-3">Aucun artiste trouvé</h3>
+                        {% if search %}
+                            <p class="text-muted mb-4">
+                                Aucun artiste ne correspond à votre recherche "{{ search }}".
+                            </p>
+                            <a href="{% url 'artworks:artist_list' %}" class="btn btn-outline-primary me-2">
+                                <i class="fas fa-times me-1"></i>
+                                Effacer la recherche
+                            </a>
+                        {% else %}
+                            <p class="text-muted mb-4">
+                                Commencez par ajouter des artistes à votre collection.
+                            </p>
+                        {% endif %}
+                        <a href="{% url 'artworks:artist_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>
+                            Ajouter un artiste
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

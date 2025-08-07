@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Liste de souhaits - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="fas fa-heart text-danger me-2"></i>
+                Ma liste de souhaits
+            </h1>
+        </div>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="row mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>
+                        Ajouter une œuvre convoitée
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-heart me-1"></i>
+                                Ajouter à mes souhaits
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des souhaits -->
+    <div class="row">
+        <div class="col-12">
+            {% if items %}
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Mes œuvres convoitées ({{ items.count }})
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Titre</th>
+                                        <th>Artiste</th>
+                                        <th>Prix estimé</th>
+                                        <th>Priorité</th>
+                                        <th>Date d'ajout</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ item.title }}</strong>
+                                                {% if item.notes %}
+                                                    <br>
+                                                    <small class="text-muted">{{ item.notes|truncatechars:50 }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ item.artist_name|default:"Non spécifié" }}</td>
+                                            <td>
+                                                {% if item.estimated_price %}
+                                                    {{ item.estimated_price|floatformat:0 }} €
+                                                {% else %}
+                                                    <span class="text-muted">Non estimé</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if item.priority == 1 %}
+                                                    <span class="badge bg-danger">Haute</span>
+                                                {% elif item.priority == 2 %}
+                                                    <span class="badge bg-warning">Moyenne</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Basse</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ item.created_at|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if item.source_url %}
+                                                    <a href="{{ item.source_url }}" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="Voir la source">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'artworks:wishlist_delete' item.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-heart text-muted mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="text-muted mb-3">Aucune œuvre dans votre liste de souhaits</h3>
+                        <p class="text-muted mb-4">
+                            Commencez par ajouter des œuvres que vous aimeriez acquérir.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

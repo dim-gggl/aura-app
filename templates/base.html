@@ -32,10 +32,46 @@
                                 <i class="bi bi-house"></i> Tableau de bord
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'artworks:list' %}">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-palette2"></i> Œuvres
                             </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'artworks:list' %}">
+                                    <i class="bi bi-palette2"></i> Mes œuvres
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:wishlist' %}">
+                                    <i class="bi bi-heart"></i> Liste de souhaits
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:random_suggestion' %}">
+                                    <i class="bi bi-shuffle"></i> Suggestion aléatoire
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Gestion</h6></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:artist_list' %}">
+                                    <i class="bi bi-person"></i> Artistes
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:collection_list' %}">
+                                    <i class="bi bi-collection"></i> Collections
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:exhibition_list' %}">
+                                    <i class="bi bi-calendar-event"></i> Expositions
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">Références</h6></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:arttype_list' %}">
+                                    <i class="bi bi-tag"></i> Types d'art
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:support_list' %}">
+                                    <i class="bi bi-layers"></i> Supports
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:technique_list' %}">
+                                    <i class="bi bi-brush"></i> Techniques
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'artworks:keyword_list' %}">
+                                    <i class="bi bi-tags"></i> Mots-clés
+                                </a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'contacts:list' %}">

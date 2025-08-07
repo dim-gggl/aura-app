@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ collection.name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h2 mb-4">
+                <i class="fas fa-folder-open me-2"></i>
+                {{ collection.name }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informations de la collection -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if collection.description %}
+                        <p class="mb-3">{{ collection.description|linebreaks }}</p>
+                    {% endif %}
+                    
+                    <p class="mb-2">
+                        <strong>Œuvres :</strong> {{ artworks.count }}
+                    </p>
+                    
+                    <p class="mb-3">
+                        <strong>Créée le :</strong> {{ collection.created_at|date:"d/m/Y" }}
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'artworks:collection_update' collection.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-1"></i>
+                            Modifier
+                        </a>
+                        <a href="{% url 'artworks:collection_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Œuvres de la collection -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-images me-2"></i>
+                        Œuvres de la collection
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if artworks %}
+                        <div class="row">
+                            {% for artwork in artworks %}
+                                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                                    {% include "includes/artwork_card.html" %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-images text-muted mb-3" style="font-size: 4rem;"></i>
+                            <h3 class="text-muted mb-3">Collection vide</h3>
+                            <p class="text-muted mb-4">
+                                Cette collection ne contient aucune œuvre pour le moment.
+                            </p>
+                            <a href="{% url 'artworks:list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                Ajouter des œuvres
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

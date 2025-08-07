@@ -1,0 +1,107 @@
+{% extends 'base_detail.html' %}
+{% load static %}
+
+{% block title %}{{ exhibition.name }} - Expositions - Aura{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'includes/page_header.html' with title=exhibition.name back_url="artworks:exhibition_list" back_text="Retour aux expositions" %}
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-calendar-event"></i> {{ exhibition.name }}
+                    </h5>
+                    
+                    <div class="row mb-3">
+                        {% if exhibition.location %}
+                            <div class="col-md-6">
+                                <strong>Lieu :</strong><br>
+                                <span class="text-muted">{{ exhibition.location }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if exhibition.start_date or exhibition.end_date %}
+                            <div class="col-md-6">
+                                <strong>Dates :</strong><br>
+                                <span class="text-muted">
+                                    {% if exhibition.start_date %}
+                                        Du {{ exhibition.start_date|date:"d/m/Y" }}
+                                    {% endif %}
+                                    {% if exhibition.end_date %}
+                                        {% if exhibition.start_date %} au {% else %}Jusqu'au {% endif %}
+                                        {{ exhibition.end_date|date:"d/m/Y" }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if exhibition.description %}
+                        <div class="mb-3">
+                            <strong>Description :</strong><br>
+                            <p class="text-muted">{{ exhibition.description|linebreaks }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <small class="text-muted">
+                        Créée le {{ exhibition.created_at|date:"d/m/Y à H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'artworks:exhibition_update' exhibition.pk %}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Modifier l'exposition
+                        </a>
+                        <a href="{% url 'artworks:exhibition_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour à la liste
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if artworks %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Œuvres exposées ({{ artworks.count }})</h3>
+                <div class="row">
+                    {% for artwork in artworks %}
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+                            {% include 'includes/artwork_card.html' with artwork=artwork %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-palette2 text-muted display-4 mb-3"></i>
+                        <h5>Aucune œuvre associée</h5>
+                        <p class="text-muted">Cette exposition ne contient pas encore d'œuvres.</p>
+                        <a href="{% url 'artworks:list' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle"></i> Associer des œuvres
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

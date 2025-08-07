@@ -232,6 +232,16 @@ class ArtworkPhoto(models.Model):
     def __str__(self):
         return f"Photo de {self.artwork}"
 
+    def save(self, *args, **kwargs):
+        # Si cette photo est définie comme principale
+        if self.is_primary:
+            # D'abord sauvegarder l'objet pour obtenir un pk
+            super().save(*args, **kwargs)
+            # Ensuite, désactiver toutes les autres photos principales de la même œuvre
+            ArtworkPhoto.objects.filter(artwork=self.artwork).exclude(pk=self.pk).update(is_primary=False)
+        else:
+            super().save(*args, **kwargs)
+
 
 class WishlistItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wishlist")

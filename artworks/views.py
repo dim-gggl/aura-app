@@ -146,25 +146,32 @@ def artwork_delete(request, pk):
 
 @login_required
 def random_suggestion(request):
-    # Œuvres non exposées depuis plus de 6 mois
-    six_months_ago = datetime.now().date() - timedelta(days=180)
-    
-    artworks = Artwork.objects.filter(
-        user=request.user,
-        current_location__in=["domicile", "stockage"]
-    ).filter(
-        Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
-    )
-    
-    if artworks.exists():
-        suggested_artwork = random.choice(artworks)
-        return render(request, "artworks/random_suggestion.html", {
-            "artwork": suggested_artwork
-        })
-    else:
-        return render(request, "artworks/random_suggestion.html", {
-            "no_suggestion": True
-        })
+    try:
+        # Œuvres non exposées depuis plus de 6 mois
+        six_months_ago = datetime.now().date() - timedelta(days=180)
+        
+        artworks = Artwork.objects.filter(
+            user=request.user,
+            current_location__in=["domicile", "stockage"]
+        ).filter(
+            Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
+        )
+        
+        if artworks.exists():
+            # Convertir en liste pour éviter les problèmes avec random.choice sur un queryset
+            artworks_list = list(artworks)
+            suggested_artwork = random.choice(artworks_list)
+            return render(request, "artworks/random_suggestion.html", {
+                "artwork": suggested_artwork
+            })
+        else:
+            return render(request, "artworks/random_suggestion.html", {
+                "no_suggestion": True
+            })
+    except Exception as e:
+        # En cas d'erreur, rediriger vers la liste des œuvres avec un message
+        messages.error(request, "Une erreur est survenue lors de la génération de la suggestion.")
+        return redirect("artworks:list")
 
 
 @login_required
@@ -206,29 +213,6 @@ def artwork_export_pdf(request, pk):
     response["Content-Disposition"] = f"attachment; filename='artwork_{artwork.pk}.pdf'"
     
     return response
-
-@login_required
-def random_suggestion(request):
-    # Œuvres non exposées depuis plus de 6 mois
-    six_months_ago = datetime.now().date() - timedelta(days=180)
-    
-    artworks = Artwork.objects.filter(
-        user=request.user,
-        current_location__in=["domicile", "stockage"]
-    ).filter(
-        Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
-    )
-    
-    if artworks.exists():
-        suggested_artwork = random.choice(artworks)
-        return render(request, "artworks/random_suggestion.html", {
-            "artwork": suggested_artwork
-        })
-    else:
-        return render(request, "artworks/random_suggestion.html", {
-            "no_suggestion": True
-        })
-
 
 @login_required
 def wishlist(request):
@@ -680,3 +664,409 @@ def keyword_create_ajax(request):
         })
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+
+# Vues pour la gestion des entités de référence
+
+@login_required
+def arttype_list(request):
+    """Liste des types d'art"""
+    art_types = ArtType.objects.all().annotate(
+        artwork_count=Count("artwork")
+    ).order_by("name")
+    
+    search = request.GET.get("search", "")
+    if search:
+        art_types = art_types.filter(name__icontains=search)
+    
+    paginator = Paginator(art_types, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        "page_obj": page_obj,
+        "search": search,
+        "entity_name": "Type d'art",
+        "entity_name_plural": "Types d'art",
+        "create_url": "artworks:arttype_create",
+    }
+    
+    return render(request, "artworks/reference_list.html", context)
+
+
+@login_required
+def arttype_create(request):
+    """Créer un nouveau type d'art"""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            art_type, created = ArtType.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, f"Type d'art '{name}' créé avec succès.")
+            else:
+                messages.info(request, f"Type d'art '{name}' existe déjà.")
+            return redirect("artworks:arttype_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Ajouter un type d'art",
+        "entity_name": "type d'art",
+        "back_url": "artworks:arttype_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def arttype_update(request, pk):
+    """Modifier un type d'art"""
+    art_type = get_object_or_404(ArtType, pk=pk)
+    
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            if name != art_type.name:
+                if ArtType.objects.filter(name=name).exists():
+                    messages.error(request, f"Un type d'art avec le nom '{name}' existe déjà.")
+                else:
+                    art_type.name = name
+                    art_type.save()
+                    messages.success(request, "Type d'art modifié avec succès.")
+                    return redirect("artworks:arttype_list")
+            else:
+                return redirect("artworks:arttype_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Modifier le type d'art",
+        "entity_name": "type d'art",
+        "current_name": art_type.name,
+        "back_url": "artworks:arttype_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def arttype_delete(request, pk):
+    """Supprimer un type d'art"""
+    art_type = get_object_or_404(ArtType, pk=pk)
+    
+    if request.method == "POST":
+        name = art_type.name
+        art_type.delete()
+        messages.success(request, f"Type d'art '{name}' supprimé avec succès.")
+        return redirect("artworks:arttype_list")
+    
+    context = {
+        "object": art_type,
+        "entity_name": "type d'art",
+        "back_url": "artworks:arttype_list",
+    }
+    
+    return render(request, "artworks/reference_confirm_delete.html", context)
+
+
+@login_required
+def support_list(request):
+    """Liste des supports"""
+    supports = Support.objects.all().annotate(
+        artwork_count=Count("artwork")
+    ).order_by("name")
+    
+    search = request.GET.get("search", "")
+    if search:
+        supports = supports.filter(name__icontains=search)
+    
+    paginator = Paginator(supports, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        "page_obj": page_obj,
+        "search": search,
+        "entity_name": "Support",
+        "entity_name_plural": "Supports",
+        "create_url": "artworks:support_create",
+    }
+    
+    return render(request, "artworks/reference_list.html", context)
+
+
+@login_required
+def support_create(request):
+    """Créer un nouveau support"""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            support, created = Support.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, f"Support '{name}' créé avec succès.")
+            else:
+                messages.info(request, f"Support '{name}' existe déjà.")
+            return redirect("artworks:support_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Ajouter un support",
+        "entity_name": "support",
+        "back_url": "artworks:support_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def support_update(request, pk):
+    """Modifier un support"""
+    support = get_object_or_404(Support, pk=pk)
+    
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            if name != support.name:
+                if Support.objects.filter(name=name).exists():
+                    messages.error(request, f"Un support avec le nom '{name}' existe déjà.")
+                else:
+                    support.name = name
+                    support.save()
+                    messages.success(request, "Support modifié avec succès.")
+                    return redirect("artworks:support_list")
+            else:
+                return redirect("artworks:support_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Modifier le support",
+        "entity_name": "support",
+        "current_name": support.name,
+        "back_url": "artworks:support_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def support_delete(request, pk):
+    """Supprimer un support"""
+    support = get_object_or_404(Support, pk=pk)
+    
+    if request.method == "POST":
+        name = support.name
+        support.delete()
+        messages.success(request, f"Support '{name}' supprimé avec succès.")
+        return redirect("artworks:support_list")
+    
+    context = {
+        "object": support,
+        "entity_name": "support",
+        "back_url": "artworks:support_list",
+    }
+    
+    return render(request, "artworks/reference_confirm_delete.html", context)
+
+
+@login_required
+def technique_list(request):
+    """Liste des techniques"""
+    techniques = Technique.objects.all().annotate(
+        artwork_count=Count("artwork")
+    ).order_by("name")
+    
+    search = request.GET.get("search", "")
+    if search:
+        techniques = techniques.filter(name__icontains=search)
+    
+    paginator = Paginator(techniques, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        "page_obj": page_obj,
+        "search": search,
+        "entity_name": "Technique",
+        "entity_name_plural": "Techniques",
+        "create_url": "artworks:technique_create",
+    }
+    
+    return render(request, "artworks/reference_list.html", context)
+
+
+@login_required
+def technique_create(request):
+    """Créer une nouvelle technique"""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            technique, created = Technique.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, f"Technique '{name}' créée avec succès.")
+            else:
+                messages.info(request, f"Technique '{name}' existe déjà.")
+            return redirect("artworks:technique_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Ajouter une technique",
+        "entity_name": "technique",
+        "back_url": "artworks:technique_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def technique_update(request, pk):
+    """Modifier une technique"""
+    technique = get_object_or_404(Technique, pk=pk)
+    
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            if name != technique.name:
+                if Technique.objects.filter(name=name).exists():
+                    messages.error(request, f"Une technique avec le nom '{name}' existe déjà.")
+                else:
+                    technique.name = name
+                    technique.save()
+                    messages.success(request, "Technique modifiée avec succès.")
+                    return redirect("artworks:technique_list")
+            else:
+                return redirect("artworks:technique_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Modifier la technique",
+        "entity_name": "technique",
+        "current_name": technique.name,
+        "back_url": "artworks:technique_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def technique_delete(request, pk):
+    """Supprimer une technique"""
+    technique = get_object_or_404(Technique, pk=pk)
+    
+    if request.method == "POST":
+        name = technique.name
+        technique.delete()
+        messages.success(request, f"Technique '{name}' supprimée avec succès.")
+        return redirect("artworks:technique_list")
+    
+    context = {
+        "object": technique,
+        "entity_name": "technique",
+        "back_url": "artworks:technique_list",
+    }
+    
+    return render(request, "artworks/reference_confirm_delete.html", context)
+
+
+@login_required
+def keyword_list(request):
+    """Liste des mots-clés"""
+    keywords = Keyword.objects.all().annotate(
+        artwork_count=Count("artwork")
+    ).order_by("name")
+    
+    search = request.GET.get("search", "")
+    if search:
+        keywords = keywords.filter(name__icontains=search)
+    
+    paginator = Paginator(keywords, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        "page_obj": page_obj,
+        "search": search,
+        "entity_name": "Mot-clé",
+        "entity_name_plural": "Mots-clés",
+        "create_url": "artworks:keyword_create",
+    }
+    
+    return render(request, "artworks/reference_list.html", context)
+
+
+@login_required
+def keyword_create(request):
+    """Créer un nouveau mot-clé"""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            keyword, created = Keyword.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, f"Mot-clé '{name}' créé avec succès.")
+            else:
+                messages.info(request, f"Mot-clé '{name}' existe déjà.")
+            return redirect("artworks:keyword_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Ajouter un mot-clé",
+        "entity_name": "mot-clé",
+        "back_url": "artworks:keyword_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def keyword_update(request, pk):
+    """Modifier un mot-clé"""
+    keyword = get_object_or_404(Keyword, pk=pk)
+    
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            if name != keyword.name:
+                if Keyword.objects.filter(name=name).exists():
+                    messages.error(request, f"Un mot-clé avec le nom '{name}' existe déjà.")
+                else:
+                    keyword.name = name
+                    keyword.save()
+                    messages.success(request, "Mot-clé modifié avec succès.")
+                    return redirect("artworks:keyword_list")
+            else:
+                return redirect("artworks:keyword_list")
+        else:
+            messages.error(request, "Le nom est requis.")
+    
+    context = {
+        "title": "Modifier le mot-clé",
+        "entity_name": "mot-clé",
+        "current_name": keyword.name,
+        "back_url": "artworks:keyword_list",
+    }
+    
+    return render(request, "artworks/reference_form.html", context)
+
+
+@login_required
+def keyword_delete(request, pk):
+    """Supprimer un mot-clé"""
+    keyword = get_object_or_404(Keyword, pk=pk)
+    
+    if request.method == "POST":
+        name = keyword.name
+        keyword.delete()
+        messages.success(request, f"Mot-clé '{name}' supprimé avec succès.")
+        return redirect("artworks:keyword_list")
+    
+    context = {
+        "object": keyword,
+        "entity_name": "mot-clé",
+        "back_url": "artworks:keyword_list",
+    }
+    
+    return render(request, "artworks/reference_confirm_delete.html", context)
