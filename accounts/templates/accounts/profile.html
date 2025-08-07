@@ -32,12 +32,8 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h2">Mon profil</h1>
-                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Retour au tableau de bord
-                </a>
-            </div>
+            {% url 'core:dashboard' as dashboard_url %}
+            {% include 'includes/page_header.html' with title="Mon profil" back_url=dashboard_url back_text="Retour au tableau de bord" %}
             
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -82,8 +78,14 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">
-                                    <label for="{{ form.theme.id_for_label }}" class="form-label">Thème</label>
-                                    {{ form.theme }}
+                                    <label for="id_theme" class="form-label">Thème</label>
+                                    <select name="theme" id="id_theme" class="form-select">
+                                        {% for value, name in theme_choices %}
+                                            <option value="{{ value }}" {% if form.instance.theme == value %}selected{% endif %}>
+                                                {{ name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Nouvelle photo de profil</label>
@@ -99,16 +101,7 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Boutons d'action -->
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check"></i> Mettre à jour le profil
-                    </button>
-                    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
-                        Annuler
-                    </a>
-                </div>
+                {% include 'includes/form_actions.html' with submit_text="Mettre à jour le profil" submit_icon="check" cancel_url=dashboard_url cancel_text="Annuler" %}
             </form>
         </div>
     </div>
@@ -116,48 +109,76 @@
 
 {% block extra_js %}
 <script>
+//  Wait for the DOM to be loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Get the file input, preview container, preview image, current picture, and remove button
     const fileInput = document.querySelector('input[type="file"]');
     const previewContainer = document.getElementById('new-picture-preview');
     const previewImage = previewContainer.querySelector('img');
     const currentPicture = document.getElementById('current-profile-picture');
     const removeButton = document.getElementById('remove-picture');
+    const themeSelect = document.querySelector('select[name="theme"]');
+    const form = document.querySelector('form');
     
+    // Apply theme immediately when changed
+    if (themeSelect) {
+        themeSelect.addEventListener('change', function() {
+            const selectedTheme = this.value;
+            console.log('Thème sélectionné:', selectedTheme);
+            console.log('Ancien data-theme:', document.documentElement.getAttribute('data-theme'));
+            
+            document.documentElement.setAttribute('data-theme', selectedTheme);
+            console.log('Nouveau data-theme:', document.documentElement.getAttribute('data-theme'));
+            
+            // Save to localStorage for immediate persistence
+            localStorage.setItem('aura-theme', selectedTheme);
+            console.log('Thème sauvegardé dans localStorage:', localStorage.getItem('aura-theme'));
+        });
+    }
+    
+    // If the file input is found, add an event listener to it to display the preview image
     if (fileInput) {
         fileInput.addEventListener('change', function() {
+            // If a file is selected
             if (this.files && this.files[0]) {
+                // Create a new FileReader to read the file
                 const reader = new FileReader();
+                // When the file is loaded,
                 reader.onload = function(e) {
+                    // Set the preview image source to the file
                     previewImage.src = e.target.result;
+                    // Show the preview container
                     previewContainer.style.display = 'block';
                 };
+                // Read the file as a data URL
                 reader.readAsDataURL(this.files[0]);
             } else {
+                // If no file is selected, hide the preview container
                 previewContainer.style.display = 'none';
             }
         });
     }
-    
+    // If the remove button is found, add an event listener to it to remove the picture
     if (removeButton) {
         removeButton.addEventListener('click', function() {
             if (confirm('Êtes-vous sûr de vouloir supprimer votre photo de profil ?')) {
-                // Créer un champ caché pour indiquer la suppression
+                // Create a hidden input to indicate the removal
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
                 hiddenInput.name = 'remove_picture';
                 hiddenInput.value = '1';
                 fileInput.parentNode.appendChild(hiddenInput);
                 
-                // Vider le champ de fichier
+                // Clear the file input
                 fileInput.value = '';
                 
-                // Masquer la prévisualisation
+                // Hide the preview
                 previewContainer.style.display = 'none';
                 
-                // Masquer le bouton de suppression
+                // Hide the remove button
                 this.style.display = 'none';
                 
-                // Masquer la photo actuelle
+                // Hide the current picture
                 if (currentPicture) {
                     currentPicture.style.display = 'none';
                 }

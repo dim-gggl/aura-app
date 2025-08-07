@@ -17,6 +17,16 @@ class UserProfile(models.Model):
         ('nature', 'Nature'),
         ('ocean', 'Océan'),
         ('gothic', 'Gothique'),
+        ('sunset', 'Coucher de soleil'),
+        ('forest', 'Forêt'),
+        ('desert', 'Désert'),
+        ('cyberpunk', 'Cyberpunk'),
+        ('steampunk', 'Steampunk'),
+        ('artdeco', 'Art Déco'),
+        ('noir', 'Noir'),
+        ('pastel', 'Pastel'),
+        ('solarized', 'Solarisé'),
+        ('vaporwave', 'Vaporwave'),
     ]
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title|default:object.name|default:object }} - {{ app_name|default:"Aura" }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    {% include 'includes/page_header.html' with title=object.title|default:object.name|default:object back_url=back_url back_text=back_text %}
+    
+    <div class="row">
+        <div class="col-lg-8">
+            {% include detail_content_template with object=object %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-gear"></i> Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% include 'includes/action_buttons.html' with 
+                        edit_url=edit_url 
+                        delete_url=delete_url 
+                        view_url=view_url 
+                        size=""
+                        show_view=False %}
+                </div>
+            </div>
+            
+            {% if sidebar_content %}
+                {% include sidebar_content with object=object %}
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if related_objects %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Éléments associés</h3>
+                <div class="row">
+                    {% for related_object in related_objects %}
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            {% include related_item_template with object=related_object %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

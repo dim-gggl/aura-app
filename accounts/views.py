@@ -48,7 +48,15 @@ def profile(request):
     else:
         form = UserProfileForm(instance=profile, user=request.user)
     
-    return render(request, 'accounts/profile.html', {'form': form})
+    # Force load of all theme choices
+    theme_choices = UserProfile.THEME_CHOICES
+    
+    context = {
+        'form': form,
+        'theme_choices': theme_choices
+    }
+    
+    return render(request, 'accounts/profile.html', context)
 
 @login_required
 def profile_test(request):

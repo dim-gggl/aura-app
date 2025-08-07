@@ -61,6 +61,9 @@ class UserProfileForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        # Forcer la mise à jour des choix de thème
+        self.fields['theme'].choices = UserProfile.THEME_CHOICES
+
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(

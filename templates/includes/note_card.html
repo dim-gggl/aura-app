@@ -1,0 +1,41 @@
+{% comment %}
+Snippet pour les cartes de notes
+
+Variables attendues :
+- note: L'objet note
+- show_actions: Boolean pour afficher les actions (optionnel, défaut: True)
+- show_details: Boolean pour afficher les détails (optionnel, défaut: True)
+{% endcomment %}
+
+<div class="card h-100">
+    <div class="card-body">
+        <h6 class="card-title">
+            {% if note.is_favorite %}
+                <i class="bi bi-star-fill text-warning"></i>
+            {% endif %}
+            {{ note.title }}
+        </h6>
+        
+        {% if show_details|default:True %}
+            <p class="card-text">
+                {{ note.content|truncatechars:100 }}
+            </p>
+            
+            <p class="card-text">
+                <small class="text-muted">
+                    Modifiée le {{ note.updated_at|date:"d/m/Y" }}
+                </small>
+            </p>
+        {% endif %}
+    </div>
+    
+    {% if show_actions|default:True %}
+        <div class="card-footer">
+            {% include 'includes/action_buttons.html' with 
+                view_url=url 'notes:detail' pk=note.pk 
+                edit_url=url 'notes:update' pk=note.pk 
+                delete_url=url 'notes:delete' pk=note.pk 
+                size="sm" %}
+        </div>
+    {% endif %}
+</div>

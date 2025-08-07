@@ -1,0 +1,67 @@
+{% comment %}
+Snippet pour les cartes d'œuvres d'art
+
+Variables attendues :
+- artwork: L'objet œuvre d'art
+- show_actions: Boolean pour afficher les actions (optionnel, défaut: True)
+- show_details: Boolean pour afficher les détails (optionnel, défaut: True)
+- size: Taille de la carte (optionnel, défaut: "normal")
+{% endcomment %}
+
+<div class="card h-100">
+    {% if artwork.photos.exists %}
+        <img src="{{ artwork.photos.first.image_thumbnail.url }}" 
+             class="card-img-top" 
+             alt="{{ artwork.title|default:'Œuvre' }}"
+             style="height: 200px; object-fit: cover;">
+    {% else %}
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+             style="height: 200px;">
+            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+        </div>
+    {% endif %}
+    
+    <div class="card-body">
+        <h6 class="card-title">
+            {% if artwork.title %}
+                {{ artwork.title }}
+            {% else %}
+                <em>Œuvre sans titre</em>
+            {% endif %}
+        </h6>
+        
+        {% if show_details|default:True %}
+            {% if artwork.artists.exists %}
+                <p class="card-text text-muted">
+                    <small>
+                        {% for artist in artwork.artists.all %}
+                            {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </small>
+                </p>
+            {% endif %}
+            
+            {% if artwork.creation_year %}
+                <p class="card-text">
+                    <small class="text-muted">{{ artwork.creation_year }}</small>
+                </p>
+            {% endif %}
+            
+            {% if artwork.art_type %}
+                <p class="card-text">
+                    <small class="text-muted">{{ artwork.art_type }}</small>
+                </p>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    {% if show_actions|default:True %}
+        <div class="card-footer">
+            {% include 'includes/action_buttons.html' with 
+                view_url=url 'artworks:detail' pk=artwork.pk 
+                edit_url=url 'artworks:update' pk=artwork.pk 
+                delete_url=url 'artworks:delete' pk=artwork.pk 
+                size="sm" %}
+        </div>
+    {% endif %}
+</div>

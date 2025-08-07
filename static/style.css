@@ -1,6 +1,7 @@
 /* 1. FONT IMPORTS */
 @import url('https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Dai+Banna+SIL:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Expletus+Sans:ital,wght@0,400..700;1,400..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almendra+SC&family=Josefin+Sans:wght@400;700&family=Orbitron:wght@400;700&family=Righteous&family=Special+Elite&display=swap');
 
 /* 2. ROOT & DEFAULT THEME (ÉLÉGANT) */
 :root {
@@ -47,9 +48,6 @@
 
 /* 3. FUTURISTIC THEME */
 :root[data-theme="futuristic"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
-    --font-family-headings: "Ancizar Sans", sans-serif;
-
     --theme-bg-color: #0d1117;
     --theme-text-color: #c9d1d9;
     --theme-primary-color: #0dd5fd;
@@ -70,10 +68,8 @@
 
 /* 4. PLAYFUL THEME */
 :root[data-theme="playful"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Expletus Sans", sans-serif;
     --font-family-logo: "Expletus Sans", sans-serif;
-
     --theme-bg-color: #fffbeb; /* Creamy yellow */
     --theme-text-color: #78350f; /* Dark brown */
     --theme-primary-color: #fb923c; /* Orange */
@@ -95,9 +91,6 @@
 
 /* MINIMALIST THEME */
 :root[data-theme="minimal"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
-    --font-family-headings: "Ancizar Sans", sans-serif;
-
     --theme-bg-color: #ffffff;
     --theme-text-color: #000000;
     --theme-primary-color: #222222;
@@ -120,7 +113,6 @@
     --font-family-body: var(--font-family-monospace);
     --font-family-headings: var(--font-family-monospace);
     --font-family-logo: var(--font-family-monospace);
-
     --theme-bg-color: #000000;
     --theme-text-color: #00ff00;
     --theme-primary-color: #00ff00;
@@ -141,9 +133,7 @@
 
 /* NATURE THEME */
 :root[data-theme="nature"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
-
     --theme-bg-color: #f5f5dc; /* Beige */
     --theme-text-color: #5d4037; /* Dark Brown */
     --theme-primary-color: #4caf50; /* Green */
@@ -163,9 +153,6 @@
 
 /* OCEAN THEME */
 :root[data-theme="ocean"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
-    --font-family-headings: "Ancizar Sans", sans-serif;
-
     --theme-bg-color: #e0f7fa; /* Light cyan */
     --theme-text-color: #004d40; /* Teal */
     --theme-primary-color: #0288d1; /* Blue */
@@ -185,9 +172,7 @@
 
 /* GOTHIC THEME */
 :root[data-theme="gothic"] {
-    --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
-
     --theme-bg-color: #121212;
     --theme-text-color: #e0e0e0;
     --theme-primary-color: #9a031e; /* Dark Red */
@@ -206,8 +191,219 @@
     --bs-secondary-color: #c72f4b;
 }
 
+/* SUNSET THEME */
+:root[data-theme="sunset"] {
+    --font-family-headings: "Josefin Sans", sans-serif;
+    --theme-bg-color: #2c1e3d;
+    --theme-text-color: #fdeed9;
+    --theme-primary-color: #ef476f;
+    --theme-secondary-color: #f79d65;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #ffd166;
+    --theme-card-bg: #3c2a4d;
+    --theme-card-border-color: #5b4a6b;
+    --theme-card-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --theme-border-radius: 0.5rem;
+    --theme-header-bg: #1f142b;
+    --theme-header-text-color: var(--theme-link-color);
+    --theme-alert-bg: #5b4a6b;
+    --theme-alert-border-color: var(--theme-secondary-color);
+    --theme-alert-text-color: #fdeed9;
+    --bs-secondary-color: #bfaabf;
+}
 
-/* 6. GENERIC STYLES using the variables */
+/* FOREST THEME */
+:root[data-theme="forest"] {
+    --font-family-headings: "Dai Banna SIL", serif;
+    --theme-bg-color: #f4f1e9;
+    --theme-text-color: #3d403a;
+    --theme-primary-color: #6a994e;
+    --theme-secondary-color: #a37b4b;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #386641;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #d4cdc3;
+    --theme-card-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --theme-border-radius: 0.3rem;
+    --theme-header-bg: #386641;
+    --theme-header-text-color: #f4f1e9;
+    --theme-alert-bg: #e6eedc;
+    --theme-alert-border-color: #c5d6b4;
+    --theme-alert-text-color: #386641;
+}
+
+/* DESERT THEME */
+:root[data-theme="desert"] {
+    --theme-bg-color: #fdf4e3;
+    --theme-text-color: #4a2c2a;
+    --theme-primary-color: #d77a61;
+    --theme-secondary-color: #74a4bc;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #c1664c;
+    --theme-card-bg: #fffbf2;
+    --theme-card-border-color: #e8dcb7;
+    --theme-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: var(--theme-primary-color);
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #fceae4;
+    --theme-alert-border-color: #f8c9bb;
+    --theme-alert-text-color: #a15541;
+}
+
+/* CYBERPUNK THEME */
+:root[data-theme="cyberpunk"] {
+    --font-family-body: "Orbitron", sans-serif;
+    --font-family-headings: "Orbitron", sans-serif;
+    --theme-bg-color: #000000;
+    --theme-text-color: #00ffff;
+    --theme-primary-color: #ff00ff;
+    --theme-secondary-color: #00bfff;
+    --theme-primary-text-color: #000000;
+    --theme-link-color: #39ff14;
+    --theme-card-bg: #0a0a0a;
+    --theme-card-border-color: var(--theme-primary-color);
+    --theme-card-shadow: 0 0 12px rgba(255, 0, 255, 0.5);
+    --theme-border-radius: 0;
+    --theme-header-bg: #111111;
+    --theme-header-text-color: var(--theme-primary-color);
+    --theme-alert-bg: #1a001a;
+    --theme-alert-border-color: var(--theme-primary-color);
+    --theme-alert-text-color: var(--theme-text-color);
+    --bs-secondary-color: var(--theme-secondary-color);
+}
+
+/* STEAMPUNK THEME */
+:root[data-theme="steampunk"] {
+    --font-family-headings: "Almendra SC", serif;
+    --theme-bg-color: #f5eeda;
+    --theme-text-color: #5a3d2b;
+    --theme-primary-color: #b99767;
+    --theme-secondary-color: #a05b3c;
+    --theme-primary-text-color: #3d2b1f;
+    --theme-link-color: #8c6f4a;
+    --theme-card-bg: #e8dbb5;
+    --theme-card-border-color: #8c6f4a;
+    --theme-card-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    --theme-border-radius: 0;
+    --theme-header-bg: #5a3d2b;
+    --theme-header-text-color: #f5eeda;
+    --theme-alert-bg: #dcd0a5;
+    --theme-alert-border-color: #b99767;
+    --theme-alert-text-color: #5a3d2b;
+}
+
+/* ART DECO THEME */
+:root[data-theme="artdeco"] {
+    --font-family-body: "Josefin Sans", sans-serif;
+    --font-family-headings: "Josefin Sans", sans-serif;
+    --font-family-logo: "Josefin Sans", sans-serif;
+    --theme-bg-color: #faf6f0;
+    --theme-text-color: #0a0a0a;
+    --theme-primary-color: #d4af37;
+    --theme-secondary-color: #004d40;
+    --theme-primary-text-color: #0a0a0a;
+    --theme-link-color: var(--theme-primary-color);
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #0a0a0a;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0;
+    --theme-header-bg: #0a0a0a;
+    --theme-header-text-color: var(--theme-primary-color);
+    --theme-alert-bg: #f2e9d8;
+    --theme-alert-border-color: #d4af37;
+    --theme-alert-text-color: #5c4d18;
+    --bs-secondary-color: #7e8c8b;
+}
+
+/* NOIR THEME */
+:root[data-theme="noir"] {
+    --font-family-body: "Special Elite", monospace;
+    --font-family-headings: "Special Elite", monospace;
+    --font-family-logo: "Special Elite", monospace;
+    --theme-bg-color: #ffffff;
+    --theme-text-color: #000000;
+    --theme-primary-color: #333333;
+    --theme-secondary-color: #888888;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #000000;
+    --theme-card-bg: #f5f5f5;
+    --theme-card-border-color: #000000;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0;
+    --theme-header-bg: #000000;
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: #cccccc;
+    --theme-alert-border-color: #999999;
+    --theme-alert-text-color: #000000;
+}
+
+/* PASTEL THEME */
+:root[data-theme="pastel"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Expletus Sans", sans-serif;
+    --theme-bg-color: #fff0f5;
+    --theme-text-color: #5b5b5b;
+    --theme-primary-color: #a8e6cf;
+    --theme-secondary-color: #ffd3b6;
+    --theme-primary-text-color: #4a4a4a;
+    --theme-link-color: #d8a7d8;
+    --theme-card-bg: #ffffff;
+    --theme-card-border-color: #f0e6f2;
+    --theme-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    --theme-border-radius: 1rem;
+    --theme-header-bg: #ffc2d1;
+    --theme-header-text-color: #5b5b5b;
+    --theme-alert-bg: #e0f2f1;
+    --theme-alert-border-color: #a8e6cf;
+    --theme-alert-text-color: #00796b;
+}
+
+/* SOLARIZED THEME */
+:root[data-theme="solarized"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Ancizar Sans", sans-serif;
+    --theme-bg-color: #002b36;
+    --theme-text-color: #839496;
+    --theme-primary-color: #268bd2;
+    --theme-secondary-color: #6c71c4;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: #2aa198;
+    --theme-card-bg: #073642;
+    --theme-card-border-color: #586e75;
+    --theme-card-shadow: none;
+    --theme-border-radius: 0.2rem;
+    --theme-header-bg: #073642;
+    --theme-header-text-color: var(--theme-text-color);
+    --theme-alert-bg: #0a4d5a;
+    --theme-alert-border-color: #586e75;
+    --theme-alert-text-color: #93a1a1;
+    --bs-secondary-color: #586e75;
+}
+
+/* VAPORWAVE THEME */
+:root[data-theme="vaporwave"] {
+    --font-family-body: "Ancizar Sans", sans-serif;
+    --font-family-headings: "Righteous", cursive;
+    --theme-bg-color: #211f42;
+    --theme-text-color: #ffd6ff;
+    --theme-primary-color: #ff37a6;
+    --theme-secondary-color: #00e5e5;
+    --theme-primary-text-color: #ffffff;
+    --theme-link-color: var(--theme-secondary-color);
+    --theme-card-bg: rgba(10, 5, 30, 0.5);
+    --theme-card-border-color: var(--theme-secondary-color);
+    --theme-card-shadow: 0 0 10px var(--theme-secondary-color);
+    --theme-border-radius: 0.5rem;
+    --theme-header-bg: #1a1834;
+    --theme-header-text-color: #ffffff;
+    --theme-alert-bg: rgba(0, 229, 229, 0.1);
+    --theme-alert-border-color: var(--theme-secondary-color);
+    --theme-alert-text-color: var(--theme-secondary-color);
+    --bs-secondary-color: #f7b2ff;
+}
+
+/* 7. GENERIC STYLES using the variables */
 body {
     background-color: var(--theme-bg-color);
     color: var(--theme-text-color);

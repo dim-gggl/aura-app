@@ -1,0 +1,25 @@
+{% comment %}
+Snippet pour les boutons d'action des formulaires
+
+Variables attendues :
+- submit_text: Texte du bouton de soumission (optionnel, défaut: "Enregistrer")
+- submit_icon: Icône du bouton de soumission (optionnel, défaut: "check")
+- cancel_url: URL d'annulation (optionnel)
+- cancel_text: Texte du bouton d'annulation (optionnel, défaut: "Annuler")
+- cancel_icon: Icône du bouton d'annulation (optionnel, défaut: "x")
+- show_cancel: Boolean pour afficher le bouton d'annulation (optionnel, défaut: True)
+- submit_class: Classes CSS pour le bouton de soumission (optionnel, défaut: "btn-primary")
+- cancel_class: Classes CSS pour le bouton d'annulation (optionnel, défaut: "btn-outline-secondary")
+{% endcomment %}
+
+<div class="d-flex justify-content-between">
+    <button type="submit" class="btn {{ submit_class|default:'btn-primary' }}">
+        <i class="bi bi-{{ submit_icon|default:'check' }}"></i> {{ submit_text|default:"Enregistrer" }}
+    </button>
+    
+    {% if show_cancel|default:True and cancel_url %}
+        <a href="{{ cancel_url }}" class="btn {{ cancel_class|default:'btn-outline-secondary' }}">
+            <i class="bi bi-{{ cancel_icon|default:'x' }}"></i> {{ cancel_text|default:"Annuler" }}
+        </a>
+    {% endif %}
+</div>

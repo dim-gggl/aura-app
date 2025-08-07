@@ -1,0 +1,38 @@
+{% comment %}
+Snippet pour les boutons d'action (modifier, supprimer, etc.)
+
+Variables attendues :
+- edit_url: URL pour modifier (optionnel)
+- delete_url: URL pour supprimer (optionnel)
+- view_url: URL pour voir les détails (optionnel)
+- edit_text: Texte du bouton modifier (optionnel, défaut: "Modifier")
+- delete_text: Texte du bouton supprimer (optionnel, défaut: "Supprimer")
+- view_text: Texte du bouton voir (optionnel, défaut: "Voir")
+- size: Taille des boutons (optionnel, défaut: "sm")
+- show_edit: Boolean pour afficher le bouton modifier (optionnel, défaut: True)
+- show_delete: Boolean pour afficher le bouton supprimer (optionnel, défaut: True)
+- show_view: Boolean pour afficher le bouton voir (optionnel, défaut: True)
+{% endcomment %}
+
+<div class="btn-group" role="group">
+    {% if show_view|default:True and view_url %}
+        <a href="{{ view_url }}" class="btn btn-outline-primary btn-{{ size|default:'sm' }}" title="{{ view_text|default:'Voir' }}">
+            <i class="bi bi-eye"></i>
+            {% if size != 'sm' %}{{ view_text|default:"Voir" }}{% endif %}
+        </a>
+    {% endif %}
+    
+    {% if show_edit|default:True and edit_url %}
+        <a href="{{ edit_url }}" class="btn btn-outline-secondary btn-{{ size|default:'sm' }}" title="{{ edit_text|default:'Modifier' }}">
+            <i class="bi bi-pencil"></i>
+            {% if size != 'sm' %}{{ edit_text|default:"Modifier" }}{% endif %}
+        </a>
+    {% endif %}
+    
+    {% if show_delete|default:True and delete_url %}
+        <a href="{{ delete_url }}" class="btn btn-outline-danger btn-{{ size|default:'sm' }}" title="{{ delete_text|default:'Supprimer' }}">
+            <i class="bi bi-trash"></i>
+            {% if size != 'sm' %}{{ delete_text|default:"Supprimer" }}{% endif %}
+        </a>
+    {% endif %}
+</div>

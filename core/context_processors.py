@@ -6,7 +6,13 @@ def theme_context(request):
         try:
             # page is a nullable OneToOneField → may be None
             profile = request.user.profile
-            theme = profile.theme if profile else default_theme
+            if profile and profile.theme:
+                theme = profile.theme
+            else:
+                # Create profile if it doesn't exist
+                from core.models import UserProfile
+                profile, created = UserProfile.objects.get_or_create(user=request.user)
+                theme = profile.theme if profile.theme else default_theme
         except AttributeError:
             theme = default_theme
     else:

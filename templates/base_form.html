@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title|default:"Formulaire" }} - {{ app_name|default:"Aura" }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% include 'includes/page_header.html' with title=title back_url=back_url back_text=back_text %}
+            
+            <form method="post" {% if enctype %}enctype="{{ enctype }}"{% endif %}>
+                {% csrf_token %}
+                
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <h5>Erreurs dans le formulaire :</h5>
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+                
+                <div class="card">
+                    <div class="card-body">
+                        {% crispy form %}
+                    </div>
+                </div>
+                
+                {% include 'includes/form_actions.html' with submit_text=submit_text submit_icon=submit_icon cancel_url=cancel_url %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

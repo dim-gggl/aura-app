@@ -1,0 +1,62 @@
+{% comment %}
+Snippet pour les cartes de contacts
+
+Variables attendues :
+- contact: L'objet contact
+- show_actions: Boolean pour afficher les actions (optionnel, défaut: True)
+- show_details: Boolean pour afficher les détails (optionnel, défaut: True)
+{% endcomment %}
+
+<div class="card h-100">
+    <div class="card-body">
+        <h6 class="card-title">{{ contact.name }}</h6>
+        
+        {% if show_details|default:True %}
+            {% if contact.contact_type %}
+                <p class="card-text">
+                    <span class="badge bg-primary">{{ contact.get_contact_type_display }}</span>
+                </p>
+            {% endif %}
+            
+            {% if contact.email %}
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-envelope"></i> {{ contact.email }}
+                    </small>
+                </p>
+            {% endif %}
+            
+            {% if contact.phone %}
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-telephone"></i> {{ contact.phone }}
+                    </small>
+                </p>
+            {% endif %}
+            
+            {% if contact.address %}
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt"></i> {{ contact.address|truncatechars:50 }}
+                    </small>
+                </p>
+            {% endif %}
+            
+            {% if contact.notes %}
+                <p class="card-text">
+                    <small class="text-muted">{{ contact.notes|truncatechars:100 }}</small>
+                </p>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    {% if show_actions|default:True %}
+        <div class="card-footer">
+            {% include 'includes/action_buttons.html' with 
+                view_url=url 'contacts:detail' pk=contact.pk 
+                edit_url=url 'contacts:update' pk=contact.pk 
+                delete_url=url 'contacts:delete' pk=contact.pk 
+                size="sm" %}
+        </div>
+    {% endif %}
+</div>
