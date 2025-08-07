@@ -35,6 +35,19 @@
         right: 0;
         z-index: 1000;
     }
+    
+    .photo-form {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background-color: #f8f9fa;
+    }
+    
+    .photo-form.deleted {
+        opacity: 0.5;
+        background-color: #e9ecef;
+    }
 </style>
 {% endblock %}
 
@@ -52,27 +65,10 @@
             
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {% if form.errors %}
-                  <div class="alert alert-danger">
-                    {{ form.errors }}
-                  </div>
-                {% endif %}
-             
-                {% if photo_formset.non_form_errors %}
-                  <div class="alert alert-danger">
-                    {{ photo_formset.non_form_errors }}
-                  </div>
-                {% endif %}
-             
-                {% for f in photo_formset %}
-                  {% if f.errors %}
-                    <div class="alert alert-danger">
-                      {{ f.errors }}
-                    </div>
-                  {% endif %}
-                {% endfor %}
-                  <div class="card">
-                      <div class="card-body">
+                
+                <!-- Formulaire principal -->
+                <div class="card">
+                    <div class="card-body">
                         {% crispy form %}
                     </div>
                 </div>
@@ -86,17 +82,47 @@
                     </div>
                     <div class="card-body">
                         {{ photo_formset.management_form }}
-                        {% for form in photo_formset %}
-                            <div class="photo-form mb-3 p-3 border rounded">
-                                {% if form.instance.image %}
-                                    <div class="mb-2">
-                                        <img src="{{ form.instance.image.url }}" class="photo-preview">
-                                    </div>
-                                {% endif %}
-                                {% crispy form %}
+                        
+                        {% if photo_formset.non_form_errors %}
+                            <div class="alert alert-danger">
+                                {{ photo_formset.non_form_errors }}
                             </div>
-                        {% endfor %}
+                        {% endif %}
+                        
+                        <div id="photo-forms">
+                            {% for form in photo_formset %}
+                                <div class="photo-form" data-form-index="{{ forloop.counter0 }}">
+                                    {% if form.instance.image %}
+                                        <div class="mb-2">
+                                            <img src="{{ form.instance.image.url }}" class="photo-preview">
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if form.errors %}
+                                        <div class="alert alert-danger">
+                                            {{ form.errors }}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% crispy form %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" id="add-photo">
+                            <i class="bi bi-plus"></i> Ajouter une photo
+                        </button>
                     </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check"></i> Enregistrer
+                    </button>
+                    <a href="{% if artwork %}{{ artwork.get_absolute_url }}{% else %}{% url 'artworks:list' %}{% endif %}" 
+                       class="btn btn-outline-secondary">
+                        Annuler
+                    </a>
                 </div>
             </form>
         </div>
@@ -108,9 +134,19 @@
 <script>
 // Gestion dynamique des formsets de photos
 document.addEventListener('DOMContentLoaded', function() {
-    const photoForms = document.querySelectorAll('.photo-form');
+    const photoFormsContainer = document.getElementById('photo-forms');
+    const addPhotoBtn = document.getElementById('add-photo');
+    const managementForm = document.querySelector('[name="photos-TOTAL_FORMS"]');
+    const maxForms = parseInt(document.querySelector('[name="photos-MAX_NUM_FORMS"]').value);
     
-    photoForms.forEach(function(form) {
+    // Fonction pour mettre à jour le nombre total de formulaires
+    function updateTotalForms() {
+        const totalForms = document.querySelectorAll('.photo-form:not(.deleted)').length;
+        managementForm.value = totalForms;
+    }
+    
+    // Fonction pour gérer la prévisualisation des images
+    function setupImagePreview(form) {
         const fileInput = form.querySelector('input[type="file"]');
         const deleteCheckbox = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
         
@@ -135,13 +171,75 @@ document.addEventListener('DOMContentLoaded', function() {
         if (deleteCheckbox) {
             deleteCheckbox.addEventListener('change', function() {
                 if (this.checked) {
-                    form.style.opacity = '0.5';
+                    form.classList.add('deleted');
                 } else {
-                    form.style.opacity = '1';
+                    form.classList.remove('deleted');
                 }
+                updateTotalForms();
             });
         }
-    });
+    }
+    
+    // Initialiser les formulaires existants
+    document.querySelectorAll('.photo-form').forEach(setupImagePreview);
+    
+    // Ajouter un nouveau formulaire
+    if (addPhotoBtn) {
+        addPhotoBtn.addEventListener('click', function() {
+            const currentForms = document.querySelectorAll('.photo-form:not(.deleted)').length;
+            
+            if (currentForms >= maxForms) {
+                alert('Nombre maximum de photos atteint');
+                return;
+            }
+            
+            // Cloner le premier formulaire
+            const firstForm = document.querySelector('.photo-form');
+            if (firstForm) {
+                const newForm = firstForm.cloneNode(true);
+                const newIndex = currentForms;
+                
+                // Mettre à jour les noms des champs
+                newForm.querySelectorAll('input, select, textarea').forEach(function(input) {
+                    if (input.name) {
+                        input.name = input.name.replace(/photos-\d+/, 'photos-' + newIndex);
+                        input.id = input.id.replace(/photos-\d+/, 'photos-' + newIndex);
+                    }
+                    if (input.name && input.name.includes('DELETE')) {
+                        input.checked = false;
+                    }
+                    if (input.type === 'file') {
+                        input.value = '';
+                    } else if (input.type !== 'checkbox') {
+                        input.value = '';
+                    }
+                });
+                
+                // Mettre à jour les labels
+                newForm.querySelectorAll('label').forEach(function(label) {
+                    if (label.getAttribute('for')) {
+                        label.setAttribute('for', label.getAttribute('for').replace(/photos-\d+/, 'photos-' + newIndex));
+                    }
+                });
+                
+                // Supprimer la prévisualisation existante
+                const existingPreview = newForm.querySelector('.photo-preview');
+                if (existingPreview) {
+                    existingPreview.remove();
+                }
+                
+                newForm.classList.remove('deleted');
+                newForm.setAttribute('data-form-index', newIndex);
+                
+                photoFormsContainer.appendChild(newForm);
+                setupImagePreview(newForm);
+                updateTotalForms();
+            }
+        });
+    }
+    
+    // Initialiser le compteur
+    updateTotalForms();
 });
 </script>
 {% endblock %}

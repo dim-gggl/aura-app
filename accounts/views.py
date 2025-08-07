@@ -34,7 +34,14 @@ def profile(request):
                                  request.FILES, 
                                  instance=profile, 
                                  user=request.user)
+        
         if form.is_valid():
+            # Gérer la suppression de la photo de profil
+            if request.POST.get('remove_picture'):
+                if profile.profile_picture:
+                    profile.profile_picture.delete(save=False)
+                profile.profile_picture = None
+            
             form.save()
             messages.success(request, 'Profil mis à jour avec succès.')
             return redirect('accounts:profile')
@@ -42,4 +49,37 @@ def profile(request):
         form = UserProfileForm(instance=profile, user=request.user)
     
     return render(request, 'accounts/profile.html', {'form': form})
+
+@login_required
+def profile_test(request):
+    # Make sure a profile exists for the user, create if not
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, 
+                                 request.FILES, 
+                                 instance=profile, 
+                                 user=request.user)
+        
+        # Débogage
+        print(f"POST data: {request.POST}")
+        print(f"FILES data: {request.FILES}")
+        print(f"Form is valid: {form.is_valid()}")
+        if not form.is_valid():
+            print(f"Form errors: {form.errors}")
+        
+        if form.is_valid():
+            # Gérer la suppression de la photo de profil
+            if request.POST.get('remove_picture'):
+                if profile.profile_picture:
+                    profile.profile_picture.delete(save=False)
+                profile.profile_picture = None
+            
+            form.save()
+            messages.success(request, 'Profil mis à jour avec succès.')
+            return redirect('accounts:profile_test')
+    else:
+        form = UserProfileForm(instance=profile, user=request.user)
+    
+    return render(request, 'accounts/profile_simple.html', {'form': form})
 

@@ -187,13 +187,17 @@
         </div>
     {% endif %}
     
-    {% if artwork.keywords or artwork.contextual_references or artwork.notes %}
+    {% if artwork.keywords.exists or artwork.contextual_references or artwork.notes %}
         <div class="info-section">
             <div class="section-title">Notes et références</div>
             
-            {% if artwork.keywords %}
+            {% if artwork.keywords.exists %}
                 <div class="info-label">Mots-clés:</div>
-                <p>{{ artwork.keywords }}</p>
+                <p>
+                    {% for keyword in artwork.keywords.all %}
+                        <span class="badge">{{ keyword }}</span>
+                    {% endfor %}
+                </p>
             {% endif %}
             
             {% if artwork.contextual_references %}

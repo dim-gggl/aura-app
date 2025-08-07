@@ -53,6 +53,7 @@ class ArtworkForm(forms.ModelForm):
         self.fields['technique'].queryset = Technique.objects.all()
         
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             Fieldset(
                 'Informations générales',
@@ -121,7 +122,7 @@ class ArtworkForm(forms.ModelForm):
                 'contextual_references',
                 'notes',
             ),
-            Submit('submit', 'Enregistrer', css_class='btn btn-primary')
+            # Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
     
     def save(self, commit=True):
@@ -235,9 +236,35 @@ class WishlistItemForm(forms.ModelForm):
         )
 
 # Formset pour les photos
+class ArtworkPhotoForm(forms.ModelForm):
+    class Meta:
+        model = ArtworkPhoto
+        fields = ['image', 'caption', 'is_primary']
+        widgets = {
+            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'caption': forms.TextInput(attrs={'class': 'form-control'}),
+            'is_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('image', css_class='form-group col-md-6 mb-0'),
+                Column('caption', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
+                Column('is_primary', css_class='form-group col-md-12 mb-0'),
+                css_class='form-row'
+            ),
+        )
+
 ArtworkPhotoFormSet = inlineformset_factory(
     Artwork, ArtworkPhoto,
-    fields=['image', 'caption', 'is_primary'],
+    form=ArtworkPhotoForm,
     extra=3,
     can_delete=True
 )

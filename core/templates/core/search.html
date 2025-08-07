@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Recherche - {{ query }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">
+                    <i class="bi bi-search"></i> Résultats de recherche
+                </h1>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+                </a>
+            </div>
+
+            {% if query %}
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">Recherche pour : "{{ query }}"</h5>
+                    <p class="mb-0">
+                        {% with total_results=results.artworks|length|add:results.contacts|length|add:results.notes|length %}
+                            {{ total_results }} résultat{{ total_results|pluralize }} trouvé{{ total_results|pluralize }}
+                        {% endwith %}
+                    </p>
+                </div>
+
+                <!-- Résultats des œuvres -->
+                {% if results.artworks %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-palette"></i> Œuvres d'art ({{ results.artworks|length }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for artwork in results.artworks %}
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100">
+                                            {% if artwork.photos.exists %}
+                                                <img src="{{ artwork.photos.first.image_thumbnail.url }}" 
+                                                     class="card-img-top" 
+                                                     alt="{{ artwork.title|default:'Œuvre' }}"
+                                                     style="height: 200px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                                     style="height: 200px;">
+                                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    {% if artwork.title %}
+                                                        {{ artwork.title }}
+                                                    {% else %}
+                                                        <em>Œuvre sans titre</em>
+                                                    {% endif %}
+                                                </h6>
+                                                {% if artwork.artists.exists %}
+                                                    <p class="card-text text-muted">
+                                                        <small>
+                                                            {% for artist in artwork.artists.all %}
+                                                                {{ artist.name }}{% if not forloop.last %}, {% endif %}
+                                                            {% endfor %}
+                                                        </small>
+                                                    </p>
+                                                {% endif %}
+                                                {% if artwork.creation_year %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">{{ artwork.creation_year }}</small>
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="{% url 'artworks:detail' pk=artwork.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> Voir
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Résultats des contacts -->
+                {% if results.contacts %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-person-lines-fill"></i> Contacts ({{ results.contacts|length }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for contact in results.contacts %}
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ contact.name }}</h6>
+                                                {% if contact.contact_type %}
+                                                    <p class="card-text">
+                                                        <span class="badge bg-primary">{{ contact.get_contact_type_display }}</span>
+                                                    </p>
+                                                {% endif %}
+                                                {% if contact.email %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-envelope"></i> {{ contact.email }}
+                                                        </small>
+                                                    </p>
+                                                {% endif %}
+                                                {% if contact.phone %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-telephone"></i> {{ contact.phone }}
+                                                        </small>
+                                                    </p>
+                                                {% endif %}
+                                                {% if contact.address %}
+                                                    <p class="card-text">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-geo-alt"></i> {{ contact.address|truncatechars:50 }}
+                                                        </small>
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="{% url 'contacts:detail' pk=contact.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> Voir
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Résultats des notes -->
+                {% if results.notes %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-journal-text"></i> Notes ({{ results.notes|length }})
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for note in results.notes %}
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">
+                                                    {% if note.is_favorite %}
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                    {% endif %}
+                                                    {{ note.title }}
+                                                </h6>
+                                                <p class="card-text">
+                                                    {{ note.content|truncatechars:100 }}
+                                                </p>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        Modifiée le {{ note.updated_at|date:"d/m/Y" }}
+                                                    </small>
+                                                </p>
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="{% url 'notes:detail' pk=note.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> Voir
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Aucun résultat -->
+                {% if not results.artworks and not results.contacts and not results.notes %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3 text-muted">Aucun résultat trouvé</h4>
+                        <p class="text-muted">
+                            Aucune œuvre, contact ou note ne correspond à votre recherche "{{ query }}".
+                        </p>
+                        <div class="mt-4">
+                            <a href="{% url 'core:dashboard' %}" class="btn btn-primary">
+                                <i class="bi bi-house"></i> Retour au tableau de bord
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <!-- Formulaire de recherche -->
+                <div class="text-center py-5">
+                    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3">Recherche globale</h4>
+                    <p class="text-muted">
+                        Recherchez dans vos œuvres d'art, contacts et notes.
+                    </p>
+                    
+                    <form method="get" action="{% url 'core:search' %}" class="mt-4">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           class="form-control form-control-lg" 
+                                           name="q" 
+                                           placeholder="Tapez votre recherche..."
+                                           value="{{ query }}">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="bi bi-search"></i> Rechercher
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

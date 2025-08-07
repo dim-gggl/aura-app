@@ -48,6 +48,13 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['theme', 'profile_picture']
+        widgets = {
+            'profile_picture': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'theme': forms.Select(attrs={'class': 'form-select'})
+        }
 
     
     def __init__(self, *args, **kwargs):
@@ -55,8 +62,9 @@ class UserProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
+        self.helper.form_tag = False
         self.helper.layout = Layout(
             'theme',
             'profile_picture',
-            Submit('submit', 'Mettre à jour', css_class='btn btn-primary')
+            # Submit('submit', 'Mettre à jour', css_class='btn btn-primary')
         )

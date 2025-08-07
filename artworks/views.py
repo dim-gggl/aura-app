@@ -11,10 +11,29 @@ import json
 import random
 from datetime import datetime, timedelta
 
-from .models import Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, ArtType, Support, Technique, Keyword
-from .forms import ArtworkForm, ArtistForm, CollectionForm, ExhibitionForm, ArtworkPhotoFormSet, WishlistItemForm
+from .models import (
+    Artwork, 
+    Artist, 
+    Collection, 
+    Exhibition, 
+    ArtworkPhoto, 
+    WishlistItem, 
+    ArtType, 
+    Support, 
+    Technique, 
+    Keyword
+)
+from .forms import (
+    ArtworkForm, 
+    ArtistForm, 
+    CollectionForm, 
+    ExhibitionForm, 
+    ArtworkPhotoFormSet, 
+    WishlistItemForm
+)
 from .widgets import SelectOrCreateWidget, TagWidget
 from .filters import ArtworkFilter
+
 
 @login_required
 def artwork_list(request):
@@ -40,6 +59,7 @@ def artwork_list(request):
     
     return render(request, "artworks/artwork_list.html", context)
 
+
 @login_required
 def artwork_detail(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
@@ -52,28 +72,25 @@ def artwork_detail(request, pk):
     
     return render(request, "artworks/artwork_detail.html", context)
 
+
 @login_required
 def artwork_create(request):
     if request.method == "POST":
-        form = ArtworkForm(request.POST, user=request.user)
+        form = ArtworkForm(request.POST, request.FILES, user=request.user)
+        photo_formset = ArtworkPhotoFormSet(request.POST, request.FILES)
         
-        
-        if form.is_valid():
+        if form.is_valid() and photo_formset.is_valid():
             artwork = form.save(commit=False)
             artwork.user = request.user
             artwork.save()
             form.save_m2m()
             
-            photo_formset = ArtworkPhotoFormSet(
-                request.POST, request.FILES, instance=artwork
-            )
-            if photo_formset.is_valid():
-                photo_formset.save()
-                messages.success(request, "Oeuvre ajoutée avec succès.")
-                return redirect("artworks:detail", pk=artwork.pk)
-        else:
-            photo_formset = ArtworkPhotoFormSet(request.POST, request.FILES)
+            # Sauvegarder le formset avec l'instance de l'œuvre
+            photo_formset.instance = artwork
+            photo_formset.save()
             
+            messages.success(request, "Oeuvre ajoutée avec succès.")
+            return redirect("artworks:detail", pk=artwork.pk)
     else:
         form = ArtworkForm(user=request.user)
         photo_formset = ArtworkPhotoFormSet()
@@ -85,6 +102,7 @@ def artwork_create(request):
     }
     
     return render(request, "artworks/artwork_form.html", context)
+
 
 @login_required
 def artwork_update(request, pk):
@@ -113,6 +131,7 @@ def artwork_update(request, pk):
     
     return render(request, "artworks/artwork_form.html", context)
 
+
 @login_required
 def artwork_delete(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
@@ -123,6 +142,30 @@ def artwork_delete(request, pk):
         return redirect("artworks:list")
     
     return render(request, "artworks/artwork_confirm_delete.html", {"artwork": artwork})
+
+
+@login_required
+def random_suggestion(request):
+    # Œuvres non exposées depuis plus de 6 mois
+    six_months_ago = datetime.now().date() - timedelta(days=180)
+    
+    artworks = Artwork.objects.filter(
+        user=request.user,
+        current_location__in=["domicile", "stockage"]
+    ).filter(
+        Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
+    )
+    
+    if artworks.exists():
+        suggested_artwork = random.choice(artworks)
+        return render(request, "artworks/random_suggestion.html", {
+            "artwork": suggested_artwork
+        })
+    else:
+        return render(request, "artworks/random_suggestion.html", {
+            "no_suggestion": True
+        })
+
 
 @login_required
 def artwork_export_html(request, pk):
@@ -137,6 +180,7 @@ def artwork_export_html(request, pk):
     response["Content-Disposition"] = f"attachment; filename='artwork_{artwork.pk}.html'"
     
     return response
+
 
 @login_required
 def artwork_export_pdf(request, pk):
@@ -185,6 +229,7 @@ def random_suggestion(request):
             "no_suggestion": True
         })
 
+
 @login_required
 def wishlist(request):
     items = WishlistItem.objects.filter(user=request.user)
@@ -207,7 +252,7 @@ def wishlist(request):
     
     return render(request, "artworks/wishlist.html", context)
 
-# Vues Artistes
+
 @login_required
 def artist_list(request):
     artists = Artist.objects.filter(artwork__user=request.user).distinct().annotate(
@@ -229,6 +274,7 @@ def artist_list(request):
     
     return render(request, "artworks/artist_list.html", context)
 
+
 @login_required
 def artist_detail(request, pk):
     artist = get_object_or_404(Artist, pk=pk)
@@ -240,6 +286,7 @@ def artist_detail(request, pk):
     }
     
     return render(request, "artworks/artist_detail.html", context)
+
 
 @login_required
 def artist_create(request):
@@ -258,6 +305,7 @@ def artist_create(request):
     }
     
     return render(request, "artworks/artist_form.html", context)
+
 
 @login_required
 def artist_update(request, pk):
@@ -279,6 +327,7 @@ def artist_update(request, pk):
     }
     
     return render(request, "artworks/artist_form.html", context)
+
 
 @require_POST
 @login_required
@@ -326,6 +375,7 @@ def collection_list(request):
     
     return render(request, "artworks/collection_list.html", context)
 
+
 @login_required
 def collection_detail(request, pk):
     collection = get_object_or_404(Collection, pk=pk, user=request.user)
@@ -337,6 +387,7 @@ def collection_detail(request, pk):
     }
     
     return render(request, "artworks/collection_detail.html", context)
+
 
 @login_required
 def collection_create(request):
@@ -357,6 +408,7 @@ def collection_create(request):
     }
     
     return render(request, "artworks/collection_form.html", context)
+
 
 @login_required
 def collection_update(request, pk):
@@ -379,7 +431,7 @@ def collection_update(request, pk):
     
     return render(request, "artworks/collection_form.html", context)
 
-# Vues Expositions
+
 @login_required
 def exhibition_list(request):
     exhibitions = Exhibition.objects.filter(user=request.user).annotate(
@@ -405,6 +457,7 @@ def exhibition_list(request):
     
     return render(request, "artworks/exhibition_list.html", context)
 
+
 @login_required
 def exhibition_detail(request, pk):
     exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
@@ -416,6 +469,7 @@ def exhibition_detail(request, pk):
     }
     
     return render(request, "artworks/exhibition_detail.html", context)
+
 
 @login_required
 def exhibition_create(request):
@@ -437,6 +491,7 @@ def exhibition_create(request):
     
     return render(request, "artworks/exhibition_form.html", context)
 
+
 @login_required
 def exhibition_update(request, pk):
     exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
@@ -457,6 +512,7 @@ def exhibition_update(request, pk):
     }
     
     return render(request, "artworks/exhibition_form.html", context)
+
 
 @login_required
 def wishlist_delete(request, pk):

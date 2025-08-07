@@ -3,12 +3,168 @@
 
 {% block title %}Mon profil{% endblock %}
 
+{% block extra_css %}
+<style>
+    .profile-picture {
+        max-width: 150px;
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #dee2e6;
+    }
+    
+    .profile-picture-preview {
+        max-width: 150px;
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #dee2e6;
+    }
+    
+    .profile-picture-container {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-  <h1 class="mb-4">Mon profil</h1>
-  <form method="post">
-    {% csrf_token %}
-    {% crispy form %}
-  </form>
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">Mon profil</h1>
+                <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+                </a>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Photo de profil actuelle -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-person-circle"></i> Photo de profil
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="profile-picture-container">
+                            {% if form.instance.profile_picture %}
+                                <img src="{{ form.instance.profile_picture.url }}" 
+                                     alt="Photo de profil actuelle" 
+                                     class="profile-picture mb-3"
+                                     id="current-profile-picture">
+                            {% else %}
+                                <div class="profile-picture mb-3 bg-light d-flex align-items-center justify-content-center mx-auto" 
+                                     style="width: 150px; height: 150px; border-radius: 50%; border: 3px solid #dee2e6;">
+                                    <i class="bi bi-person text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <p class="text-muted">
+                                {% if form.instance.profile_picture %}
+                                    Photo de profil actuelle
+                                {% else %}
+                                    Aucune photo de profil
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Prévisualisation de la nouvelle photo -->
+                        <div class="text-center mb-3" id="new-picture-preview" style="display: none;">
+                            <img src="" alt="Nouvelle photo" class="profile-picture-preview mb-2">
+                            <p class="text-muted">Aperçu de la nouvelle photo</p>
+                        </div>
+                        
+                        <!-- Champ de fichier -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="{{ form.theme.id_for_label }}" class="form-label">Thème</label>
+                                    {{ form.theme }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Nouvelle photo de profil</label>
+                                    {{ form.profile_picture }}
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-danger" id="remove-picture" 
+                                        {% if not form.instance.profile_picture %}style="display: none;"{% endif %}>
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check"></i> Mettre à jour le profil
+                    </button>
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-outline-secondary">
+                        Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.querySelector('input[type="file"]');
+    const previewContainer = document.getElementById('new-picture-preview');
+    const previewImage = previewContainer.querySelector('img');
+    const currentPicture = document.getElementById('current-profile-picture');
+    const removeButton = document.getElementById('remove-picture');
+    
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        });
+    }
+    
+    if (removeButton) {
+        removeButton.addEventListener('click', function() {
+            if (confirm('Êtes-vous sûr de vouloir supprimer votre photo de profil ?')) {
+                // Créer un champ caché pour indiquer la suppression
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'remove_picture';
+                hiddenInput.value = '1';
+                fileInput.parentNode.appendChild(hiddenInput);
+                
+                // Vider le champ de fichier
+                fileInput.value = '';
+                
+                // Masquer la prévisualisation
+                previewContainer.style.display = 'none';
+                
+                // Masquer le bouton de suppression
+                this.style.display = 'none';
+                
+                // Masquer la photo actuelle
+                if (currentPicture) {
+                    currentPicture.style.display = 'none';
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
 {% endblock %}

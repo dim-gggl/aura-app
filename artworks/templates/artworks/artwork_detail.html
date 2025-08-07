@@ -219,7 +219,7 @@
             </div>
         {% endif %}
         
-        {% if artwork.keywords or artwork.contextual_references or artwork.notes %}
+        {% if artwork.keywords.exists or artwork.contextual_references or artwork.notes %}
             <div class="col-lg-6 mb-3">
                 <div class="card">
                     <div class="card-header">
@@ -228,11 +228,11 @@
                         </h6>
                     </div>
                     <div class="card-body">
-                        {% if artwork.keywords %}
+                        {% if artwork.keywords.exists %}
                             <h6>Mots-clés:</h6>
                             <p>
-                                {% for keyword in artwork.keywords %}
-                                    <span class="badge bg-light text-dark me-1">{{ keyword|strip }}</span>
+                                {% for keyword in artwork.keywords.all %}
+                                    <span class="badge bg-light text-dark me-1">{{ keyword }}</span>
                                 {% endfor %}
                             </p>
                         {% endif %}
