@@ -39,7 +39,6 @@ from .models import (
     ArtType, 
     Support, 
     Technique, 
-    Keyword
 )
 # Import forms for handling user input
 from .forms import (
@@ -50,7 +49,7 @@ from .forms import (
     ArtworkPhotoFormSet, 
     WishlistItemForm
 )
-from .widgets import SelectOrCreateWidget, TagWidget
+from .widgets import SelectOrCreateWidget
 from .filters import ArtworkFilter
 
 
@@ -91,7 +90,8 @@ def artwork_list(request):
     # Limit artist choices to only those relevant to this user
     artwork_filter.form.fields['artists'].queryset = artist_queryset
     
-    # Implement pagination for better performance and UX
+    # Use filtered queryset for pagination
+    artworks = artwork_filter.qs.prefetch_related("artists", "photos")
     paginator = Paginator(artworks, 12)  # 12 artworks per page for grid layout
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -299,7 +299,7 @@ def artwork_export_pdf(request, pk):
     except (ImportError, OSError) as e:
         messages.error(request, 
             "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.")
-        return redirect("artworks:artwork_detail", pk=pk)
+        return redirect("artworks:detail", pk=pk)
     
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
     
@@ -314,6 +314,117 @@ def artwork_export_pdf(request, pk):
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f"attachment; filename='artwork_{artwork.pk}.pdf'"
     
+    return response
+
+
+@login_required
+def artist_export_html(request, pk):
+    artist = get_object_or_404(Artist, pk=pk)
+    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    html_content = render_to_string("artworks/artist_export.html", {
+        "artist": artist,
+        "artworks": artworks,
+    })
+    response = HttpResponse(html_content, content_type="text/html")
+    response["Content-Disposition"] = f"attachment; filename='artist_{artist.pk}.html'"
+    return response
+
+
+@login_required
+def artist_export_pdf(request, pk):
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        messages.error(
+            request,
+            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
+        )
+        return redirect("artworks:artist_detail", pk=pk)
+
+    artist = get_object_or_404(Artist, pk=pk)
+    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    html_content = render_to_string("artworks/artist_export.html", {
+        "artist": artist,
+        "artworks": artworks,
+        "is_pdf": True,
+    })
+    pdf = HTML(string=html_content).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f"attachment; filename='artist_{artist.pk}.pdf'"
+    return response
+
+
+@login_required
+def collection_export_html(request, pk):
+    collection = get_object_or_404(Collection, pk=pk, user=request.user)
+    artworks = collection.artwork_set.all()
+    html_content = render_to_string("artworks/collection_export.html", {
+        "collection": collection,
+        "artworks": artworks,
+    })
+    response = HttpResponse(html_content, content_type="text/html")
+    response["Content-Disposition"] = f"attachment; filename='collection_{collection.pk}.html'"
+    return response
+
+
+@login_required
+def collection_export_pdf(request, pk):
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        messages.error(
+            request,
+            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
+        )
+        return redirect("artworks:collection_detail", pk=pk)
+
+    collection = get_object_or_404(Collection, pk=pk, user=request.user)
+    artworks = collection.artwork_set.all()
+    html_content = render_to_string("artworks/collection_export.html", {
+        "collection": collection,
+        "artworks": artworks,
+        "is_pdf": True,
+    })
+    pdf = HTML(string=html_content).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f"attachment; filename='collection_{collection.pk}.pdf'"
+    return response
+
+
+@login_required
+def exhibition_export_html(request, pk):
+    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
+    artworks = exhibition.artwork_set.all()
+    html_content = render_to_string("artworks/exhibition_export.html", {
+        "exhibition": exhibition,
+        "artworks": artworks,
+    })
+    response = HttpResponse(html_content, content_type="text/html")
+    response["Content-Disposition"] = f"attachment; filename='exhibition_{exhibition.pk}.html'"
+    return response
+
+
+@login_required
+def exhibition_export_pdf(request, pk):
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        messages.error(
+            request,
+            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
+        )
+        return redirect("artworks:exhibition_detail", pk=pk)
+
+    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
+    artworks = exhibition.artwork_set.all()
+    html_content = render_to_string("artworks/exhibition_export.html", {
+        "exhibition": exhibition,
+        "artworks": artworks,
+        "is_pdf": True,
+    })
+    pdf = HTML(string=html_content).write_pdf()
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f"attachment; filename='exhibition_{exhibition.pk}.pdf'"
     return response
 
 @login_required
@@ -792,46 +903,11 @@ def technique_create_ajax(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-
-@login_required
-def keyword_autocomplete(request):
-    """Auto-complétion pour les mots-clés"""
-    term = request.GET.get("term", "").strip()
-    
-    if len(term) < 2:
-        return JsonResponse({"results": []})
-    
-    keywords = Keyword.objects.filter(name__icontains=term)[:10]
-    
-    results = [{"id": kw.pk, "text": kw.name} for kw in keywords]
-    
-    return JsonResponse({"results": results})
-
-@require_POST
-@login_required
-def keyword_create_ajax(request):
-    """Créer un nouveau mot-clé via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        keyword, created = Keyword.objects.get_or_create(name=name)
-        return JsonResponse({
-            "success": True,
-            "id": keyword.pk,
-            "name": keyword.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-
-
 # ========================================
 # REFERENCE ENTITY MANAGEMENT VIEWS
 # ========================================
 # These views handle CRUD operations for reference entities like
-# ArtType, Support, Technique, and Keyword that are shared across users
+# ArtType, Support, and Technique that are shared across users
 
 @login_required
 def arttype_list(request):
@@ -1146,107 +1222,6 @@ def technique_delete(request, pk):
         "object": technique,
         "entity_name": "technique",
         "back_url": "artworks:technique_list",
-    }
-    
-    return render(request, "artworks/reference_confirm_delete.html", context)
-
-
-@login_required
-def keyword_list(request):
-    """Liste des mots-clés"""
-    keywords = Keyword.objects.all().annotate(
-        artwork_count=Count("artwork")
-    ).order_by("name")
-    
-    search = request.GET.get("search", "")
-    if search:
-        keywords = keywords.filter(name__icontains=search)
-    
-    paginator = Paginator(keywords, 20)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        "page_obj": page_obj,
-        "search": search,
-        "entity_name": "Mot-clé",
-        "entity_name_plural": "Mots-clés",
-        "create_url": "artworks:keyword_create",
-    }
-    
-    return render(request, "artworks/reference_list.html", context)
-
-
-@login_required
-def keyword_create(request):
-    """Créer un nouveau mot-clé"""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            keyword, created = Keyword.objects.get_or_create(name=name)
-            if created:
-                messages.success(request, f"Mot-clé '{name}' créé avec succès.")
-            else:
-                messages.info(request, f"Mot-clé '{name}' existe déjà.")
-            return redirect("artworks:keyword_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Ajouter un mot-clé",
-        "entity_name": "mot-clé",
-        "back_url": "artworks:keyword_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def keyword_update(request, pk):
-    """Modifier un mot-clé"""
-    keyword = get_object_or_404(Keyword, pk=pk)
-    
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            if name != keyword.name:
-                if Keyword.objects.filter(name=name).exists():
-                    messages.error(request, f"Un mot-clé avec le nom '{name}' existe déjà.")
-                else:
-                    keyword.name = name
-                    keyword.save()
-                    messages.success(request, "Mot-clé modifié avec succès.")
-                    return redirect("artworks:keyword_list")
-            else:
-                return redirect("artworks:keyword_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Modifier le mot-clé",
-        "entity_name": "mot-clé",
-        "current_name": keyword.name,
-        "back_url": "artworks:keyword_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def keyword_delete(request, pk):
-    """Supprimer un mot-clé"""
-    keyword = get_object_or_404(Keyword, pk=pk)
-    
-    if request.method == "POST":
-        name = keyword.name
-        keyword.delete()
-        messages.success(request, f"Mot-clé '{name}' supprimé avec succès.")
-        return redirect("artworks:keyword_list")
-    
-    context = {
-        "object": keyword,
-        "entity_name": "mot-clé",
-        "back_url": "artworks:keyword_list",
     }
     
     return render(request, "artworks/reference_confirm_delete.html", context)

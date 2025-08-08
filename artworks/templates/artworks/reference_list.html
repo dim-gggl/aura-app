@@ -93,14 +93,7 @@
                                                 <i class="bi bi-trash"></i>
                                             </a>
                                         {% elif entity_lower == "mot-clé" %}
-                                            <a href="{% url 'artworks:keyword_update' object.pk %}" 
-                                               class="btn btn-outline-primary" title="Modifier">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a href="{% url 'artworks:keyword_delete' object.pk %}" 
-                                               class="btn btn-outline-danger" title="Supprimer">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            
                                         {% endif %}
                                     {% endwith %}
                                 </div>

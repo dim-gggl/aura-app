@@ -11,7 +11,7 @@ search interface that helps users find specific artworks in their collection.
 
 import django_filters
 from .models import Artwork, Artist
-
+from taggit.models import Tag
 
 class ArtworkFilter(django_filters.FilterSet):
     """
@@ -53,6 +53,13 @@ class ArtworkFilter(django_filters.FilterSet):
         help_text="Sélectionnez un ou plusieurs artistes"
     )
 
+    # Explicit filter for TaggableManager using Tag model
+    tags = django_filters.ModelMultipleChoiceFilter(
+        field_name='tags',
+        queryset=Tag.objects.all(),
+        label='Mots-clés'
+    )
+
     class Meta:
         model = Artwork
         fields = [
@@ -70,7 +77,7 @@ class ArtworkFilter(django_filters.FilterSet):
             'price',            # Exact price match
             
             # Categorization filters
-            'keywords',         # Multiple choice from Keyword model
+            'tags',              # Multiple choice from taggit Tag model
             'collections',      # Multiple choice - filtered by user in view
             'exhibitions',      # Multiple choice - filtered by user in view
             'parent_artwork',   # Select from user's artworks

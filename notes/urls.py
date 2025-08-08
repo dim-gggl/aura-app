@@ -40,6 +40,10 @@ urlpatterns = [
     # Shows creation/update timestamps, word count, and favorite status
     path('<int:pk>/', views.note_detail, name='detail'),
     
+    # Export endpoints
+    path('<int:pk>/export/html/', views.note_export_html, name='export_html'),
+    path('<int:pk>/export/pdf/', views.note_export_pdf, name='export_pdf'),
+    
     # Note editing form
     # POST: Update note, GET: Display edit form with current data
     path('<int:pk>/edit/', views.note_update, name='update'),

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exhibition.name }} - Fiche exposition</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .section-title { font-size: 18px; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin: 20px 0 10px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+        .badge { background-color: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 5px; }
+        {% if is_pdf %}
+        @page { margin: 2cm; }
+        {% endif %}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">{{ exhibition.name }}</div>
+    </div>
+
+    <div class="section">
+        <div class="info-grid">
+            {% if exhibition.location %}
+            <div>Lieu</div><div>{{ exhibition.location }}</div>
+            {% endif %}
+            {% if exhibition.start_date %}
+            <div>Début</div><div>{{ exhibition.start_date|date:"d/m/Y" }}</div>
+            {% endif %}
+            {% if exhibition.end_date %}
+            <div>Fin</div><div>{{ exhibition.end_date|date:"d/m/Y" }}</div>
+            {% endif %}
+        </div>
+        {% if exhibition.description %}
+            <div class="section-title">Description</div>
+            <p>{{ exhibition.description|linebreaks }}</p>
+        {% endif %}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Œuvres exposées ({{ artworks.count }})</div>
+        {% if artworks %}
+            <ul>
+                {% for artwork in artworks %}
+                    <li>{{ artwork.title|default:"Sans titre" }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Aucune œuvre associée.</p>
+        {% endif %}
+    </div>
+
+    <div class="footer" style="margin-top:40px; border-top:1px solid #ccc; padding-top:10px; text-align:center; color:#666; font-size:12px;">
+        Fiche générée le {{ "now"|date:"d/m/Y à H:i" }} depuis l'application Catalogue
+    </div>
+</body>
+</html>
+
+

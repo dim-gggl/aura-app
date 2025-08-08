@@ -19,8 +19,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
+from django.template.loader import render_to_string
 
 from .models import Note
 from .forms import NoteForm
@@ -159,6 +160,35 @@ def note_detail(request, pk):
     }
     
     return render(request, 'notes/note_detail.html', context)
+
+
+@login_required
+def note_export_html(request, pk):
+    note = get_object_or_404(Note, pk=pk, user=request.user)
+    html_content = render_to_string('notes/note_export.html', {
+        'note': note,
+    })
+    response = HttpResponse(html_content, content_type='text/html')
+    response['Content-Disposition'] = f"attachment; filename='note_{note.pk}.html'"
+    return response
+
+
+@login_required
+def note_export_pdf(request, pk):
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        messages.error(request, "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.")
+        return redirect('notes:detail', pk=pk)
+    note = get_object_or_404(Note, pk=pk, user=request.user)
+    html_content = render_to_string('notes/note_export.html', {
+        'note': note,
+        'is_pdf': True,
+    })
+    pdf = HTML(string=html_content).write_pdf()
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f"attachment; filename='note_{note.pk}.pdf'"
+    return response
 
 
 @login_required

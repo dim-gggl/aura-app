@@ -10,6 +10,8 @@ from django.urls import reverse
 import uuid
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
+from taggit.managers import TaggableManager
+from taggit.models import Tag, GenericUUIDTaggedItemBase
 
 from core.models import User
 
@@ -151,26 +153,6 @@ class Technique(models.Model):
         return self.name
 
 
-class Keyword(models.Model):
-    """
-    Model representing keywords/tags for categorizing artworks.
-    
-    Keywords provide a flexible tagging system for artworks, allowing
-    users to add custom descriptive terms. Keywords are unique and shared.
-    """
-    name = models.CharField(max_length=100, unique=True, verbose_name="Mot-clé")
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        ordering = ["name"]  # Order keywords alphabetically
-        verbose_name = "Mot-clé"
-        verbose_name_plural = "Mots-clés"
-    
-    def __str__(self):
-        """Return the keyword name as string representation."""
-        return self.name
-
-
 class Artwork(models.Model):
     """
     Model representing an artwork in a user's collection.
@@ -252,7 +234,8 @@ class Artwork(models.Model):
     owners = models.CharField(max_length=500, blank=True, verbose_name="Propriétaire(s)")
     
     # === ADDITIONAL INFORMATION ===
-    keywords = models.ManyToManyField(Keyword, blank=True, verbose_name="Mots-clés")
+    # Use a custom through model compatible with UUID primary keys
+    tags = TaggableManager(verbose_name="Mots-clés", blank=True, through='UUIDTaggedItem')
     contextual_references = models.TextField(blank=True, verbose_name="Références contextuelles")
     notes = models.TextField(blank=True, verbose_name="Notes libres")
     
@@ -399,3 +382,11 @@ class WishlistItem(models.Model):
     def __str__(self):
         """Return the wishlist item's title as string representation."""
         return self.title
+
+
+class UUIDTaggedItem(GenericUUIDTaggedItemBase):
+    tag = models.ForeignKey(
+        Tag,
+        related_name="artworks_%(app_label)s_%(class)s_items",
+        on_delete=models.CASCADE,
+    )

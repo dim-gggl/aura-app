@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact : {{ contact.name }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; }
+    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+    .title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+    {% if is_pdf %}
+    @page { margin: 2cm; }
+    {% endif %}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">{{ contact.name }}</div>
+  </div>
+  <div class="info-grid">
+    <div>Type</div><div>{{ contact.get_contact_type_display }}</div>
+    {% if contact.email %}<div>Email</div><div>{{ contact.email }}</div>{% endif %}
+    {% if contact.phone %}<div>Téléphone</div><div>{{ contact.phone }}</div>{% endif %}
+    {% if contact.address %}<div>Adresse</div><div>{{ contact.address|linebreaks }}</div>{% endif %}
+    {% if contact.website %}<div>Site web</div><div>{{ contact.website }}</div>{% endif %}
+  </div>
+  {% if contact.notes %}
+    <h3>Notes</h3>
+    <p>{{ contact.notes|linebreaks }}</p>
+  {% endif %}
+  <div class="footer" style="margin-top:40px; border-top:1px solid #ccc; padding-top:10px; text-align:center; color:#666; font-size:12px;">
+    Fiche générée le {{ "now"|date:"d/m/Y à H:i" }} depuis l'application Catalogue
+  </div>
+</body>
+</html>
+
+

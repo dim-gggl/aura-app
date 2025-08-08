@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "imagekit",
     "rest_framework",
     "rest_framework_simplejwt",
+    "taggit",
 
     # local apps
     "core",

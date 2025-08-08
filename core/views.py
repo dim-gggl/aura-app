@@ -158,7 +158,7 @@ def search(request):
     - Searches only user's own data for privacy and performance
     
     Search fields by entity:
-    - Artworks: title, artist names, keywords, notes
+    - Artworks: title, artist names, tags, notes
     - Contacts: name, address, notes
     - Notes: title, content
     
@@ -181,13 +181,13 @@ def search(request):
     # Only perform search if query is provided
     if query:
         # === ARTWORK SEARCH ===
-        # Search across title, artist names, keywords, and notes fields
+        # Search across title, artist names, tags, and notes fields
         results['artworks'] = Artwork.objects.filter(
             user=request.user
         ).filter(
             Q(title__icontains=query) |                    # Title contains query
             Q(artists__name__icontains=query) |            # Artist name contains query
-            Q(keywords__name__icontains=query) |           # Keyword contains query
+            Q(tags__name__icontains=query) |               # Tag contains query
             Q(notes__icontains=query)                      # Notes contain query
         ).select_related('art_type').prefetch_related(
             'artists', 'photos'

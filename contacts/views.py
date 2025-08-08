@@ -19,6 +19,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 from .models import Contact
 from .forms import ContactForm
@@ -158,6 +160,35 @@ def contact_detail(request, pk):
     }
     
     return render(request, 'contacts/contact_detail.html', context)
+
+
+@login_required
+def contact_export_html(request, pk):
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    html_content = render_to_string('contacts/contact_export.html', {
+        'contact': contact,
+    })
+    response = HttpResponse(html_content, content_type='text/html')
+    response['Content-Disposition'] = f"attachment; filename='contact_{contact.pk}.html'"
+    return response
+
+
+@login_required
+def contact_export_pdf(request, pk):
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        messages.error(request, "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.")
+        return redirect('contacts:detail', pk=pk)
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    html_content = render_to_string('contacts/contact_export.html', {
+        'contact': contact,
+        'is_pdf': True,
+    })
+    pdf = HTML(string=html_content).write_pdf()
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f"attachment; filename='contact_{contact.pk}.pdf'"
+    return response
 
 
 @login_required

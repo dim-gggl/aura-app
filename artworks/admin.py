@@ -87,7 +87,7 @@ class ArtworkAdmin(admin.ModelAdmin):
         'provenance', 'origin_country', 'acquisition_place'
     ]
     # Horizontal filter widgets for better UX with many-to-many fields
-    filter_horizontal = ['artists', 'collections', 'exhibitions', 'keywords']
+    filter_horizontal = ['artists', 'collections', 'exhibitions']
     inlines = [ArtworkPhotoInline]
     readonly_fields = ['id', 'created_at', 'updated_at']
     
@@ -117,7 +117,7 @@ class ArtworkAdmin(admin.ModelAdmin):
             'description': 'Grouping and exhibition history'
         }),
         ('Additional Information', {
-            'fields': ('keywords', 'contextual_references', 'notes'),
+            'fields': ('tags', 'contextual_references', 'notes'),
             'description': 'Supplementary documentation and notes'
         }),
         ('System Metadata', {

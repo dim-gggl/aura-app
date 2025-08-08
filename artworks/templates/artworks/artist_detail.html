@@ -49,10 +49,16 @@
                         </div>
                     {% endif %}
                     
-                    <div class="mt-3">
+                    <div class="mt-3 d-flex flex-wrap gap-2">
                         <a href="{% url 'artworks:artist_update' artist.pk %}" class="btn btn-outline-primary">
                             <i class="fas fa-edit me-1"></i>
                             Modifier
+                        </a>
+                        <a href="{% url 'artworks:artist_export_html' artist.pk %}" class="btn btn-outline-info">
+                            <i class="bi bi-file-code"></i> Export HTML
+                        </a>
+                        <a href="{% url 'artworks:artist_export_pdf' artist.pk %}" class="btn btn-outline-info">
+                            <i class="bi bi-file-pdf"></i> Export PDF
                         </a>
                         <a href="{% url 'artworks:artist_list' %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i>

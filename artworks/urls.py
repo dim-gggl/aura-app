@@ -37,6 +37,13 @@ urlpatterns = [
     # Export functionality
     path("<uuid:pk>/export/html/", views.artwork_export_html, name="export_html"),
     path("<uuid:pk>/export/pdf/", views.artwork_export_pdf, name="export_pdf"),
+    # Exports for other entities
+    path("artists/<int:pk>/export/html/", views.artist_export_html, name="artist_export_html"),
+    path("artists/<int:pk>/export/pdf/", views.artist_export_pdf, name="artist_export_pdf"),
+    path("collections/<int:pk>/export/html/", views.collection_export_html, name="collection_export_html"),
+    path("collections/<int:pk>/export/pdf/", views.collection_export_pdf, name="collection_export_pdf"),
+    path("exhibitions/<int:pk>/export/html/", views.exhibition_export_html, name="exhibition_export_html"),
+    path("exhibitions/<int:pk>/export/pdf/", views.exhibition_export_pdf, name="exhibition_export_pdf"),
     
     # Special features
     path("suggestion/", views.random_suggestion, name="random_suggestion"),
@@ -89,12 +96,7 @@ urlpatterns = [
     path("techniques/create/", views.technique_create, name="technique_create"),
     path("techniques/<int:pk>/edit/", views.technique_update, name="technique_update"),
     path("techniques/<int:pk>/delete/", views.technique_delete, name="technique_delete"),
-    
-    # Keywords/Tags for flexible categorization
-    path("keywords/", views.keyword_list, name="keyword_list"),
-    path("keywords/create/", views.keyword_create, name="keyword_create"),
-    path("keywords/<int:pk>/edit/", views.keyword_update, name="keyword_update"),
-    path("keywords/<int:pk>/delete/", views.keyword_delete, name="keyword_delete"),
+
     
     # ========================================
     # AJAX ENDPOINTS
@@ -107,9 +109,5 @@ urlpatterns = [
     path("ajax/exhibition/create/", views.exhibition_create_ajax, name="exhibition_create_ajax"),
     path("ajax/arttype/create/", views.arttype_create_ajax, name="arttype_create_ajax"),
     path("ajax/support/create/", views.support_create_ajax, name="support_create_ajax"),
-    path("ajax/technique/create/", views.technique_create_ajax, name="technique_create_ajax"),
-    path("ajax/keyword/create/", views.keyword_create_ajax, name="keyword_create_ajax"),
-    
-    # Special AJAX endpoint for keyword autocomplete functionality
-    path("ajax/keyword/autocomplete/", views.keyword_autocomplete, name="keyword_autocomplete"),
+    path("ajax/technique/create/", views.technique_create_ajax, name="technique_create_ajax")
 ]

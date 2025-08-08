@@ -23,9 +23,9 @@ from crispy_forms.layout import Layout, Field, Fieldset, Row, Column, Submit, Di
 
 from .models import (
     Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, 
-    ArtType, Support, Technique, Keyword
+    ArtType, Support, Technique
 )
-from .widgets import SelectOrCreateWidget, SelectMultipleOrCreateWidget, TagWidget
+from .widgets import SelectOrCreateWidget, SelectMultipleOrCreateWidget
 
 
 class ArtworkForm(forms.ModelForm):
@@ -34,28 +34,19 @@ class ArtworkForm(forms.ModelForm):
     
     This form handles all aspects of artwork data including basic information,
     dimensions, acquisition details, location, and relationships with other entities.
-    Features custom keyword handling and dynamic widget integration.
+    Features dynamic widget integration.
     
     Key features:
     - Organized into logical fieldsets using Crispy Forms
-    - Custom keyword text field with autocomplete functionality
     - SelectOrCreate widgets for dynamic entity creation
     - User-specific querysets for collections and exhibitions
     - Responsive layout with Bootstrap grid system
     """
     
-    # Custom field for keyword management with autocomplete
-    keywords_text = forms.CharField(
-        required=False,
-        widget=TagWidget(),
-        label="Mots-clés",
-        help_text="Tapez pour voir les suggestions ou créer de nouveaux mots-clés"
-    )
-    
     class Meta:
         model = Artwork
         # Exclude fields that are auto-managed or set programmatically
-        exclude = ['user', 'id', 'created_at', 'updated_at', 'keywords']
+        exclude = ['user', 'id', 'created_at', 'updated_at']
         widgets = {
             # Date inputs with HTML5 date picker
             'acquisition_date': forms.DateInput(attrs={'type': 'date'}),
@@ -90,16 +81,14 @@ class ArtworkForm(forms.ModelForm):
             self.fields['collections'].queryset = Collection.objects.filter(user=user)
             self.fields['exhibitions'].queryset = Exhibition.objects.filter(user=user)
         
-        # Populate keyword field with existing keywords for editing
-        if self.instance and self.instance.pk:
-            keywords = self.instance.keywords.all()
-            self.fields['keywords_text'].initial = ', '.join([kw.name for kw in keywords])
         
         # Set querysets for reference entities (available to all users)
         self.fields['artists'].queryset = Artist.objects.all()
         self.fields['art_type'].queryset = ArtType.objects.all()
         self.fields['support'].queryset = Support.objects.all()
         self.fields['technique'].queryset = Technique.objects.all()
+        self.fields['tags'].label = "Mots-clés"
+        self.fields['tags'].help_text = "Séparez par des virgules"
         
         # Configure Crispy Forms helper for layout
         self.helper = FormHelper()
@@ -177,45 +166,14 @@ class ArtworkForm(forms.ModelForm):
             Fieldset(
                 'Informations complémentaires',
                 'parent_artwork',
-                'keywords_text',
+                'tags',
                 'contextual_references',
                 'notes',
             ),
         )
     
     def save(self, commit=True):
-        """
-        Save the artwork and handle keyword processing.
-        
-        Processes the keywords_text field to create/associate Keyword objects.
-        Keywords are created automatically if they don't exist.
-        
-        Args:
-            commit: Whether to save to database immediately
-            
-        Returns:
-            Artwork: The saved artwork instance
-        """
-        instance = super().save(commit=commit)
-        
-        if commit:
-            # Process keywords from the text field
-            keywords_text = self.cleaned_data.get('keywords_text', '')
-            if keywords_text:
-                # Split by comma and clean up whitespace
-                keyword_names = [name.strip() for name in keywords_text.split(',') if name.strip()]
-                keywords = []
-                # Create keywords if they don't exist
-                for name in keyword_names:
-                    keyword, created = Keyword.objects.get_or_create(name=name)
-                    keywords.append(keyword)
-                # Set the many-to-many relationship
-                instance.keywords.set(keywords)
-            else:
-                # Clear keywords if field is empty
-                instance.keywords.clear()
-        
-        return instance
+        return super().save(commit=commit)
 
 
 class ArtistForm(forms.ModelForm):

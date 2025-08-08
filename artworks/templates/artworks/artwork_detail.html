@@ -219,7 +219,7 @@
             </div>
         {% endif %}
         
-        {% if artwork.keywords.exists or artwork.contextual_references or artwork.notes %}
+        {% if artwork.tags.exists or artwork.contextual_references or artwork.notes %}
             <div class="col-lg-6 mb-3">
                 <div class="card">
                     <div class="card-header">
@@ -228,13 +228,15 @@
                         </h6>
                     </div>
                     <div class="card-body">
-                        {% if artwork.keywords.exists %}
-                            <h6>Mots-clés:</h6>
-                            <p>
-                                {% for keyword in artwork.keywords.all %}
-                                    <span class="badge bg-light text-dark me-1">{{ keyword }}</span>
-                                {% endfor %}
-                            </p>
+                        
+                        {% if artwork.tags.exists %}
+                          <h6>Mots-clés:</h6>
+                          <p>
+                            {% for tag in artwork.tags.all %}
+                              <a class="badge bg-light text-dark me-1"
+                                 href="{% url 'artworks:list' %}?tags={{ tag.id }}">{{ tag.name }}</a>
+                            {% endfor %}
+                          </p>
                         {% endif %}
                         
                         {% if artwork.contextual_references %}

@@ -41,6 +41,14 @@
                             <i class="fas fa-edit me-1"></i>
                             Modifier
                         </a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'artworks:collection_export_html' collection.pk %}" class="btn btn-outline-info">
+                                <i class="bi bi-file-code"></i> Export HTML
+                            </a>
+                            <a href="{% url 'artworks:collection_export_pdf' collection.pk %}" class="btn btn-outline-info">
+                                <i class="bi bi-file-pdf"></i> Export PDF
+                            </a>
+                        </div>
                         <a href="{% url 'artworks:collection_list' %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i>
                             Retour

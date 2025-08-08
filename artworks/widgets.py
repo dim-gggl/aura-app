@@ -9,7 +9,7 @@ provide a seamless user experience.
 Widgets included:
 - SelectOrCreateWidget: Single selection with "add new" functionality
 - SelectMultipleOrCreateWidget: Multiple selection with "add new" functionality  
-- TagWidget: Text input with autocomplete for keywords/tags
+ - TagWidget: (legacy) Text input for keywords/tags [no longer used]
 
 All widgets require corresponding JavaScript functionality in select_or_create.js
 to handle the dynamic behavior and AJAX communication.
@@ -155,85 +155,5 @@ class SelectMultipleOrCreateWidget(forms.SelectMultiple):
 
 
 class TagWidget(forms.TextInput):
-    """
-    Enhanced text input widget for keyword/tag management with autocomplete.
-    
-    This widget provides an intelligent text input for managing keywords:
-    - Autocomplete suggestions based on existing keywords
-    - Ability to create new keywords on-the-fly
-    - Comma-separated input for multiple keywords
-    - Real-time suggestions dropdown
-    
-    The widget integrates with keyword autocomplete and creation AJAX endpoints
-    to provide a smooth user experience for tag management.
-    
-    Usage:
-        widget = TagWidget()
-    
-    Features:
-        - Real-time autocomplete as user types
-        - Dropdown suggestions with existing keywords
-        - Automatic keyword creation for new terms
-        - Comma-separated multi-keyword input
-        - Responsive dropdown positioning
-    """
-    
-    def __init__(self, *args, **kwargs):
-        """
-        Initialize the tag widget with autocomplete functionality.
-        
-        Sets up CSS classes and data attributes needed for JavaScript
-        integration with autocomplete and creation endpoints.
-        """
-        super().__init__(*args, **kwargs)
-        self.attrs.update({
-            "class": "form-control keyword-input",
-            # URL for fetching autocomplete suggestions
-            "data-autocomplete-url": reverse_lazy("artworks:keyword_autocomplete"),
-            # URL for creating new keywords via AJAX
-            "data-create-url": reverse_lazy("artworks:keyword_create_ajax"),
-            "placeholder": "Commencez à taper pour voir les suggestions..."
-        })
-    
-    def render(self, name, value, attrs=None, renderer=None):
-        """
-        Render the tag input widget with autocomplete dropdown container.
-        
-        Handles various input value formats (ManyToMany querysets, lists, strings)
-        and converts them to comma-separated strings for display.
-        
-        Args:
-            name: Field name
-            value: Current field value (can be queryset, list, or string)
-            attrs: HTML attributes dictionary
-            renderer: Django form renderer
-            
-        Returns:
-            str: Safe HTML string with input field and suggestions container
-        """
-        if attrs is None:
-            attrs = {}
-        
-        # Handle different value types from Django forms
-        if hasattr(value, "all"):
-            # ManyToMany queryset - convert to comma-separated string
-            value = ", ".join([kw.name for kw in value.all()])
-        elif isinstance(value, list):
-            # List of objects or strings
-            value = ", ".join([str(v) for v in value])
-        
-        # Merge widget attributes with provided attributes
-        attrs.update(self.attrs)
-        
-        # Render the standard text input
-        input_html = super().render(name, value, attrs, renderer)
-        
-        # Add container for autocomplete suggestions dropdown
-        suggestions_html = """
-        <div class="keyword-suggestions" style="display: none;">
-            <ul class="list-group position-absolute w-100" style="z-index: 1000;"></ul>
-        </div>
-        """
-        
-        # Wrap input and suggestions in positioned container
-        return mark_safe(f"<div class='keyword-input-wrapper position-relative'>{input_html}{suggestions_html}</div>")
+    """Legacy keyword input (kept for backwards compatibility). Not used with taggit."""
+    pass

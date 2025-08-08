@@ -37,6 +37,8 @@ urlpatterns = [
     # Contact detail view - comprehensive contact information display
     # Shows all contact fields and metadata
     path('<int:pk>/', views.contact_detail, name='detail'),
+    path('<int:pk>/export/html/', views.contact_export_html, name='export_html'),
+    path('<int:pk>/export/pdf/', views.contact_export_pdf, name='export_pdf'),
     
     # Contact editing form
     # POST: Update contact, GET: Display edit form with current data
