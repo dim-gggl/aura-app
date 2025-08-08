@@ -652,7 +652,7 @@ def exhibition_update(request, pk):
     context = {
         "form": form,
         "exhibition": exhibition,
-        "title": "Modifier l\"exposition",
+        "title": "Modifier l'exposition",
         "cancel_url": "artworks:exhibition_detail",
     }
     

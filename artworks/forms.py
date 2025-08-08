@@ -19,7 +19,7 @@ All forms use Crispy Forms for consistent Bootstrap styling and responsive layou
 from django import forms
 from django.forms import inlineformset_factory
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Row, Column, Submit, Div, HTML
+from crispy_forms.layout import Layout, Field, Fieldset, Row, Column, Submit, Div, HTML
 
 from .models import (
     Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, 
@@ -298,14 +298,14 @@ class ExhibitionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            'name',
-            'location',
+            Field('name', placeholder="Nom de l'exposition"),
+            Field('location', placeholder="Lieu de l'exposition"),
             Row(
                 Column('start_date', css_class='form-group col-md-6 mb-0'),
                 Column('end_date', css_class='form-group col-md-6 mb-0'),
                 css_class='form-row'
             ),
-            'description',
+            Field('description', placeholder="Description de l'exposition"),
             Submit('submit', 'Enregistrer', css_class='btn btn-primary')
         )
 

@@ -12,6 +12,7 @@ timestamps for tracking note creation and modification history.
 
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 
 from core.models import User
 
@@ -180,8 +181,8 @@ class Note(models.Model):
         Returns:
             QuerySet: Recent notes within the timeframe
         """
-        from datetime import datetime, timedelta
-        cutoff_date = datetime.now() - timedelta(days=days)
+        from datetime import timedelta
+        cutoff_date = timezone.now() - timedelta(days=days)
         
         return cls.objects.filter(
             user=user,
@@ -198,6 +199,6 @@ class Note(models.Model):
         Returns:
             bool: True if note was updated within the specified timeframe
         """
-        from datetime import datetime, timedelta
-        cutoff_time = datetime.now() - timedelta(hours=hours)
+        from datetime import timedelta
+        cutoff_time = timezone.now() - timedelta(hours=hours)
         return self.updated_at >= cutoff_time

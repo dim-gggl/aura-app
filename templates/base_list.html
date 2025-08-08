@@ -4,7 +4,9 @@
 
 {% block content %}
 <div class="container py-4">
-    {% include 'includes/page_header.html' with title=title back_url=back_url back_text=back_text %}
+    {% block list_header %}
+        {% include 'includes/page_header.html' with title=title back_url=back_url back_text=back_text %}
+    {% endblock %}
     
     {% if filter_form %}
         <div class="card mb-4">
@@ -31,18 +33,22 @@
         </div>
     {% endif %}
     
-    {% if object_list %}
-        <div class="row">
-            {% for object in object_list %}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    {% include item_template with object=object %}
-                </div>
-            {% endfor %}
-        </div>
-        
-        {% include 'includes/pagination.html' with page_obj=page_obj %}
-    {% else %}
-        {% include 'includes/empty_state.html' with icon=empty_icon title=empty_title message=empty_message action_url=action_url action_text=action_text %}
-    {% endif %}
+    {% block search_form %}{% endblock %}
+    
+    {% block list_content %}
+        {% if object_list %}
+            <div class="row">
+                {% for object in object_list %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        {% include item_template with object=object %}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% include 'includes/pagination.html' with page_obj=page_obj %}
+        {% else %}
+            {% include 'includes/empty_state.html' with icon=empty_icon title=empty_title message=empty_message action_url=action_url action_text=action_text %}
+        {% endif %}
+    {% endblock %}
 </div>
 {% endblock %}
