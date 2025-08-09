@@ -12,10 +12,12 @@ Key features:
 - Custom validation and field handling
 """
 
+from cProfile import label
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit
+from crispy_forms.layout import Layout, Submit, Field
+from django.utils.translation import gettext_lazy as _
 
 from core.models import UserProfile, User
 
@@ -46,11 +48,13 @@ class CustomUserCreationForm(UserCreationForm):
         help_text="Adresse email pour la communication et la récupération de compte"
     )
     first_name = forms.CharField(
+        label=_("Prénom"),
         max_length=30, 
         required=True,
         help_text="Prénom pour personnaliser votre expérience"
     )
     last_name = forms.CharField(
+        label=_("Nom"),
         max_length=30, 
         required=True,
         help_text="Nom de famille pour l'identification complète"
@@ -79,13 +83,13 @@ class CustomUserCreationForm(UserCreationForm):
         # Configure Crispy Forms helper
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            'username',
-            'first_name',
-            'last_name',
-            'email',
-            'password1',
-            'password2',
-            Submit('submit', 'Créer le compte', css_class='btn btn-primary')
+            Field('username', label=_("Nom d'utilisateur")),
+            Field('first_name', label=_("Prénom")),
+            Field('last_name', label=_("Nom")),
+            Field('email', label=_("Email")),
+            Field('password1', label=_("Mot de passe")),
+            Field('password2', label=_("Confirmation du mot de passe")),
+            Submit('submit', _('Créer le compte'), css_class='btn btn-primary')
         )
     
     def save(self, commit=True):
@@ -141,12 +145,12 @@ class UserProfileForm(forms.ModelForm):
             'profile_picture': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*',  # Restrict to image files only
-                'help_text': 'Formats supportés: JPG, PNG, GIF'
+                'help_text': _('Formats supportés: JPG, PNG, GIF')
             }),
             # Select widget with Bootstrap styling
             'theme': forms.Select(attrs={
                 'class': 'form-select',
-                'help_text': 'Choisissez votre thème préféré pour personnaliser l\'interface'
+                'help_text': _('Choisissez votre thème préféré pour personnaliser l\'interface')
             })
         }
 
@@ -193,7 +197,7 @@ class UserProfileForm(forms.ModelForm):
             # Check file size (limit to 5MB)
             if picture.size > 5 * 1024 * 1024:
                 raise forms.ValidationError(
-                    "La taille de l'image ne doit pas dépasser 5MB."
+                    _("La taille de l'image ne doit pas dépasser 5MB.")
                 )
             
             # Check file format by examining the file extension
@@ -202,7 +206,49 @@ class UserProfileForm(forms.ModelForm):
             
             if file_extension not in allowed_types:
                 raise forms.ValidationError(
-                    f"Format de fichier non supporté. Utilisez: {', '.join(allowed_types)}"
+                    _(f"Format de fichier non supporté. Utilisez: {', '.join(allowed_types)}")
                 )
         
         return picture
+
+
+class UserUpdateForm(forms.ModelForm):
+    """
+    Formulaire pour modifier les informations personnelles de l'utilisateur.
+    
+    Permet de mettre à jour le prénom, le nom et l'email sur la page profil.
+    Le rendu est laissé au template, le helper crispy est configuré sans balises <form>.
+    """
+
+    email = forms.EmailField(
+        required=False,
+        label=_("Email"),
+        help_text=_("Adresse email associée à votre compte")
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Labels en français et classes bootstrap
+        self.fields['first_name'].label = _("Prénom")
+        self.fields['last_name'].label = _("Nom")
+
+        for field_name in ['first_name', 'last_name', 'email']:
+            self.fields[field_name].widget.attrs.setdefault('class', 'form-control')
+
+        # Helper crispy sans <form>
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            'first_name',
+            'last_name',
+            'email',
+        )

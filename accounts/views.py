@@ -15,11 +15,14 @@ Key features:
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.translation import gettext_lazy as _
 
-from .forms import CustomUserCreationForm, UserProfileForm
+from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
 from core.models import UserProfile
 
 
@@ -58,7 +61,7 @@ def register(request):
             login(request, user)
             
             # Provide success feedback and redirect to main application
-            messages.success(request, 'Compte créé avec succès. Bienvenue!')
+            messages.success(request, _('Compte créé avec succès. Bienvenue!'))
             return redirect('core:dashboard')
     else:
         # GET request - display empty registration form
@@ -99,41 +102,60 @@ def profile(request):
     )
 
     if request.method == 'POST':
-        # Process profile update form
-        form = UserProfileForm(
-            request.POST, 
-            request.FILES,  # Include files for profile picture upload
-            instance=profile, 
-            user=request.user
-        )
-        
-        if form.is_valid():
-            # Handle profile picture removal if requested
-            if request.POST.get('remove_picture'):
-                if profile.profile_picture:
-                    # Delete the actual file from storage
-                    profile.profile_picture.delete(save=False)
-                # Clear the profile picture field
-                profile.profile_picture = None
-            
-            # Save the form data
-            updated_profile = form.save()
-            # Persist theme in session for immediate application on next request
-            request.session['current_theme'] = updated_profile.theme
-            
-            # Provide success feedback
-            messages.success(request, 'Profil mis à jour avec succès.')
-            return redirect('accounts:profile')
+        submitted_form = request.POST.get('form', 'profile')
+
+        if submitted_form == 'password':
+            # Changement de mot de passe
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            user_form = UserUpdateForm(instance=request.user)
+            profile_form = UserProfileForm(instance=profile, user=request.user)
+
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, _('Votre mot de passe a été modifié.'))
+                return redirect('accounts:profile')
+        else:
+            # Mise à jour infos personnelles + préférences (thème, photo)
+            user_form = UserUpdateForm(request.POST, instance=request.user)
+            profile_form = UserProfileForm(
+                request.POST,
+                request.FILES,
+                instance=profile,
+                user=request.user,
+            )
+
+            if user_form.is_valid() and profile_form.is_valid():
+                # Suppression éventuelle de la photo
+                if request.POST.get('remove_picture'):
+                    if profile.profile_picture:
+                        profile.profile_picture.delete(save=False)
+                    profile.profile_picture = None
+
+                user_form.save()
+                updated_profile = profile_form.save()
+                request.session['current_theme'] = updated_profile.theme
+                messages.success(request, _('Profil mis à jour avec succès.'))
+                return redirect('accounts:profile')
+
+        # Si on arrive ici, au moins un des formulaires n'est pas valide
+        # S'assurer que les trois formulaires existent pour le rendu
+        if submitted_form != 'password':
+            password_form = PasswordChangeForm(user=request.user)
     else:
-        # GET request - display current profile data in form
-        form = UserProfileForm(instance=profile, user=request.user)
-    
-    # Prepare context with form and theme choices for template
+        # GET request - display current data in forms
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = UserProfileForm(instance=profile, user=request.user)
+        password_form = PasswordChangeForm(user=request.user)
+
+    # Prepare context with forms and theme choices for template
     context = {
-        'form': form,
-        'theme_choices': UserProfile.THEME_CHOICES,  # All available themes
+        'form': profile_form,  # conserver la clé existante utilisée par le template
+        'user_form': user_form,
+        'password_form': password_form,
+        'theme_choices': UserProfile.THEME_CHOICES,
     }
-    
+
     return render(request, 'accounts/profile.html', context)
 
 
@@ -187,7 +209,7 @@ def profile_test(request):
                 profile.profile_picture = None
             
             form.save()
-            messages.success(request, 'Profil mis à jour avec succès.')
+            messages.success(request, _('Profil mis à jour avec succès.'))
             return redirect('accounts:profile_test')
     else:
         form = UserProfileForm(instance=profile, user=request.user)

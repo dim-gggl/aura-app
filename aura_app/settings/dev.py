@@ -16,3 +16,14 @@ CACHES = {
         "LOCATION": "aura-dev",
     }
 }
+
+# CSP (nouveau format django-csp >= 4) en mode rapport uniquement
+CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "style-src": ("'self'", "'unsafe-inline'"),
+        "script-src": ("'self'",),
+        "img-src": ("'self'", "data:"),
+        "object-src": ("'none'",),
+    }
+}

@@ -16,7 +16,7 @@ urlpatterns = [
     # ========================================
     # Django admin interface for site administration
     # Accessible only to staff/superuser accounts
-    path("admin/", admin.site.urls),
+    path(getattr(settings, "ADMIN_URL", "admin/"), admin.site.urls),
     
     # ========================================
     # APPLICATION URL INCLUDES

@@ -50,25 +50,31 @@ class ContactForm(forms.ModelForm):
             # Multi-line textarea for addresses
             "address": forms.Textarea(attrs={
                 "rows": 3,
-                "placeholder": "Adresse complète avec code postal et ville"
+                "placeholder": "Adresse complète avec code postal et ville",
+                "label": "Adresse"
             }),
             # Larger textarea for notes
             "notes": forms.Textarea(attrs={
                 "rows": 4,
-                "placeholder": "Notes, spécialités, détails de la relation..."
+                "placeholder": "Notes, spécialités, détails de la relation...",
+                "label": "Notes"
             }),
             # Enhanced input widgets with placeholders
             "name": forms.TextInput(attrs={
-                "placeholder": "Nom de la personne ou de l'organisation"
+                "placeholder": "Nom de la personne ou de l'organisation",
+                "label": "Nom"
             }),
             "phone": forms.TextInput(attrs={
-                "placeholder": "+33 1 23 45 67 89"
+                "placeholder": "+33 1 23 45 67 89",
+                "label": "Téléphone"
             }),
             "email": forms.EmailInput(attrs={
-                "placeholder": "contact@example.com"
+                "placeholder": "contact@example.com",
+                "label": "Email"
             }),
             "website": forms.URLInput(attrs={
-                "placeholder": "https://www.example.com"
+                "placeholder": "https://www.example.com",
+                "label": "Site web"
             }),
         }
     

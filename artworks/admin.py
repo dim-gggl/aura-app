@@ -146,7 +146,7 @@ class CollectionAdmin(admin.ModelAdmin):
     list_display = ['name', 'user', 'created_at']
     list_filter = ['user', 'created_at']
     search_fields = ['name', 'description']
-    ordering = ['name']
+    ordering = ['name', 'created_at']
     
     fieldsets = (
         ('Collection Details', {
@@ -171,8 +171,10 @@ class ExhibitionAdmin(admin.ModelAdmin):
     list_display = ['name', 'location', 'start_date', 'end_date', 'user']
     list_filter = ['user', 'start_date', 'end_date']
     search_fields = ['name', 'location', 'description']
-    date_hierarchy = 'start_date'  # Adds date navigation at top of list
-    ordering = ['-start_date']  # Most recent exhibitions first
+    # Adds date navigation at top of list
+    date_hierarchy = 'start_date'
+    # Most recent exhibitions first
+    ordering = ['-start_date', 'created_at', 'end_date']  
     
     fieldsets = (
         ('Exhibition Details', {
@@ -208,8 +210,8 @@ class WishlistItemAdmin(admin.ModelAdmin):
     ]
     list_filter = ['priority', 'user', 'created_at']
     search_fields = ['title', 'artist_name', 'notes', 'source_url']
-    ordering = ['priority', '-created_at']  # High priority first, then newest
-    
+    # High priority first, then newest
+    ordering = ['priority', '-created_at']
     fieldsets = (
         ('Wishlist Item', {
             'fields': ('user', 'title', 'artist_name')

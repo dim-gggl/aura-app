@@ -1,6 +1,8 @@
 from pathlib import Path
 import environ
 import os
+from django.core.exceptions import ImproperlyConfigured
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -30,7 +32,12 @@ if ENV_FILE.exists():
 
 DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY") or "change-me-now"
+if not DEBUG and (not SECRET_KEY or SECRET_KEY == "change-me-now"):
+    raise ImproperlyConfigured("SECRET_KEY must be set in production")
+
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+if not DEBUG and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production")
 
 # Applications
 INSTALLED_APPS = [
@@ -49,7 +56,9 @@ INSTALLED_APPS = [
     "imagekit",
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "taggit",
+    "csp",
 
     # local apps
     "core",
@@ -61,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -141,19 +151,42 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ),
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "50/min",
+        "user": "200/min",
+    },
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
+# SIMPLE JWT hardening
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
+# Upload/data limits
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
+
+
 SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
 SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
 CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
-SECURE_HSTS_SECONDS = 60 * 60 * 24 * 7 
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# HSTS configured in production settings
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "core.User"
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "core:dashboard"
+LOGOUT_REDIRECT_URL = "core:home"

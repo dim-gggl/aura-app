@@ -4,6 +4,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Almendra+SC&family=Josefin+Sans:wght@400;700&family=Orbitron:wght@400;700&family=Righteous&family=Special+Elite&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aladin&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 /* 2. ROOT & DEFAULT THEME (ÉLÉGANT) */
 :root {
@@ -17,7 +19,7 @@
     --theme-bg-color: #f8f9fa;
     --theme-text-color: #212529;
     --theme-primary-color: #4a5568; /* Sophisticated gray */
-    --theme-secondary-color: #718096;
+    --theme-secondary-color: #4e3579;
     --theme-primary-text-color: #ffffff;
     --theme-link-color: #2b6cb0;
     --theme-card-bg: #ffffff;
@@ -436,8 +438,8 @@
     --font-family-headings: "Josefin Sans", sans-serif;
     --theme-bg-color: #000000;
     --theme-text-color: #e5e5e5;
-    --theme-primary-color: #d4d4d4;
-    --theme-secondary-color: #a3a3a3;
+    --theme-primary-color: #adadad;
+    --theme-secondary-color: #727272;
     --theme-primary-text-color: #000000;
     --theme-link-color: #ffffff;
     --theme-card-bg: #171717;
@@ -646,6 +648,13 @@
     --bs-secondary-color: #d1a7c7;
 }
 
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 /* 8. GENERIC STYLES using the variables */
 body {
     background-color: var(--theme-bg-color);
@@ -662,6 +671,11 @@ a {
 }
 
 /* Components */
+.bg-primary {
+    background-color: var(--theme-primary-color) !important;
+    color: var(--theme-primary-text-color) !important;
+}
+
 .navbar {
     background-color: var(--theme-header-bg);
 }
@@ -830,4 +844,63 @@ a {
     margin-right: 0.25rem;
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
+}
+
+/* HERO SECTION */
+/* ———————————— */
+/* BIENVENUE SUR */
+p.display-4 {
+    font-family: "Urbanist", sans-serif;
+    font-weight: 100;
+    font-size: 2.89rem;
+    line-height:28px;
+    margin-bottom: 0;
+}
+
+/* AURA */
+h1.display-4 {
+	font-family: var(--font-family-logo);
+	font-style: italic;
+	font-size: 6.9rem;
+	margin-top: -41px;
+	font-weight: bold;
+	letter-spacing: -7px;
+	margin-left: 33px;
+}
+
+/* ———————————— */
+/* BACKGROUND */
+div.hero-section {
+    background: #001e26;
+    min-width: 100vw;
+    margin-inline: -15px
+}
+
+/* ———————————— */
+/* ICON */
+.bi.bi-palette.display-1 {
+	min-width: 9vw;
+	padding: 0vw;
+	font-size: 9rem;
+	margin-left: -76px;
+}
+
+/* ———————————— */
+
+
+i.text-secondary{
+	color: var(--theme-secondary-color);
+}
+
+
+@media (max-width: 968px) {
+    .bi.bi-palette.display-1 {
+        margin-left: 43px
+    }
+}
+
+@media (max-width: 768px) {
+    .bi.bi-palette.display-1 {
+        display: none;
+    }
 }

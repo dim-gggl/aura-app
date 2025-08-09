@@ -50,12 +50,14 @@ class NoteForm(forms.ModelForm):
             'content': forms.Textarea(attrs={
                 'rows': 10,
                 'placeholder': 'Écrivez votre note ici...',
-                'class': 'form-control'
+                'class': 'form-control',
+                'label': 'Contenu'
             }),
             # Enhanced title input
             'title': forms.TextInput(attrs={
                 'placeholder': 'Titre de la note',
-                'class': 'form-control'
+                'class': 'form-control',
+                'label': 'Titre'
             }),
             # Styled checkbox for favorite status
             'is_favorite': forms.CheckboxInput(attrs={

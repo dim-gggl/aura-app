@@ -4,25 +4,20 @@
 <div class="hero-section bg-primary text-white py-5">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
-                    Gérez votre collection d'art avec élégance
-                </h1>
-                <p class="lead mb-4">
-                    Aura vous permet de répertorier, organiser et suivre toutes vos œuvres d'art 
-                    en un seul endroit. Parfait pour les collectionneurs passionnés.
-                </p>
+            <div class="col-sm-4">
+                <p class="display-4">Bienvenue<br>sur</p>
+                <h1 class="display-4 mb-4">Aura</h1>
                 <div class="d-flex gap-3">
                     <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
-                        <i class="bi bi-person-plus"></i> Commencer gratuitement
+                        <i class="bi bi-person-plus"></i> S'inscrire
                     </a>
-                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-lg">
                         <i class="bi bi-box-arrow-in-right"></i> Se connecter
                     </a>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="text-center">
+            <div class="col-sm-8">
+                <div class="text-start">
                     <i class="bi bi-palette display-1"></i>
                 </div>
             </div>
@@ -32,13 +27,14 @@
 
 <div class="container py-5">
     <div class="row">
+        <p class="col-1g-12 text-center">Ici, tu peux...</p>
         <div class="col-lg-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
-                    <i class="bi bi-collection text-primary display-4 mb-3"></i>
-                    <h5 class="card-title">Gestion complète</h5>
+                    <i class="bi bi-collection text-secondary display-4 mb-3"></i>
+                    <h5 class="card-title">Gérer ta collection</h5>
                     <p class="card-text">
-                        Répertoriez toutes vos œuvres avec leurs détails complets : artiste, 
+                        Répertoriez toutes tes œuvres avec leurs détails complets : artiste, 
                         dimensions, provenance, localisation actuelle...
                     </p>
                 </div>
@@ -48,8 +44,8 @@
         <div class="col-lg-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
-                    <i class="bi bi-search text-primary display-4 mb-3"></i>
-                    <h5 class="card-title">Recherche avancée</h5>
+                    <i class="bi bi-search text-secondary display-4 mb-3"></i>
+                    <h5 class="card-title">Rechercher une œuvre</h5>
                     <p class="card-text">
                         Trouvez rapidement n'importe quelle œuvre grâce à notre système 
                         de recherche et de filtrage sophistiqué.
@@ -61,10 +57,10 @@
         <div class="col-lg-4 mb-4">
             <div class="card h-100 text-center">
                 <div class="card-body">
-                    <i class="bi bi-file-earmark-pdf text-primary display-4 mb-3"></i>
-                    <h5 class="card-title">Export & Documentation</h5>
+                    <i class="bi bi-file-earmark-pdf text-secondary display-4 mb-3"></i>
+                    <h5 class="card-title">Exporter des fiches</h5>
                     <p class="card-text">
-                        Exportez les fiches de vos œuvres en PDF ou HTML pour vos 
+                        Exportez les fiches de tes œuvres en PDF ou HTML pour tes 
                         assurances, expositions ou ventes.
                     </p>
                 </div>
