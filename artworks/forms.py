@@ -80,10 +80,21 @@ class ArtworkForm(forms.ModelForm):
         if user:
             self.fields['collections'].queryset = Collection.objects.filter(user=user)
             self.fields['exhibitions'].queryset = Exhibition.objects.filter(user=user)
+            # Limit parent artwork choices to the user's own artworks
+            if 'parent_artwork' in self.fields:
+                self.fields['parent_artwork'].queryset = Artwork.objects.filter(user=user)
         
         
-        # Set querysets for reference entities (available to all users)
-        self.fields['artists'].queryset = Artist.objects.all()
+        # Set querysets
+        # - Artists suggestions should be scoped to the current user's usage
+        if user:
+            self.fields['artists'].queryset = (
+                Artist.objects.filter(artwork__user=user).distinct()
+            )
+        else:
+            # No user context: do not expose global artists in suggestions
+            self.fields['artists'].queryset = Artist.objects.none()
+        # - Reference entities remain global/common
         self.fields['art_type'].queryset = ArtType.objects.all()
         self.fields['support'].queryset = Support.objects.all()
         self.fields['technique'].queryset = Technique.objects.all()

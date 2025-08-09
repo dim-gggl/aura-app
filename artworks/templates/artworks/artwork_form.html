@@ -310,8 +310,16 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 // Éditeur de tags (chips) pour Taggit: empêche Enter de soumettre, autocomplétion
 document.addEventListener('DOMContentLoaded', function () {
-  const hiddenInput = document.querySelector('input[name="tags"]');
-  if (!hiddenInput) return;
+  if (window.__auraTagsEditorInitialized) return;
+  window.__auraTagsEditorInitialized = true;
+
+  const inputs = document.querySelectorAll('input[name="tags"]');
+  if (!inputs.length) return;
+  // Taggit utilise un input texte; s'il y en a plusieurs, on les masque tous et on ne garde que le premier pour la valeur
+  inputs.forEach(inp => { inp.style.display = 'none'; });
+  const hiddenInput = inputs[0];
+  // Au cas où il existerait un select résiduel
+  document.querySelectorAll('select[name="tags"]').forEach(sel => sel.style.display = 'none');
 
   // Masquer l'input natif (CSV attendu par Taggit)
   hiddenInput.style.display = 'none';

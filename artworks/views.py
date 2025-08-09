@@ -40,6 +40,7 @@ from .models import (
     ArtType, 
     Support, 
     Technique, 
+    UUIDTaggedItem,
 )
 # Import forms for handling user input
 from .forms import (
@@ -88,8 +89,20 @@ def artwork_list(request):
         request.GET, 
         queryset=artworks
     )
-    # Limit artist choices to only those relevant to this user
+    # Limit filter dropdowns to current user's data
     artwork_filter.form.fields['artists'].queryset = artist_queryset
+    if 'collections' in artwork_filter.form.fields:
+        artwork_filter.form.fields['collections'].queryset = Collection.objects.filter(user=request.user)
+    if 'exhibitions' in artwork_filter.form.fields:
+        artwork_filter.form.fields['exhibitions'].queryset = Exhibition.objects.filter(user=request.user)
+    if 'parent_artwork' in artwork_filter.form.fields:
+        artwork_filter.form.fields['parent_artwork'].queryset = Artwork.objects.filter(user=request.user)
+    if 'tags' in artwork_filter.form.fields:
+        artwork_filter.form.fields['tags'].queryset = Tag.objects.filter(
+            pk__in=UUIDTaggedItem.objects.filter(
+                content_object__user=request.user
+            ).values("tag_id")
+        ).distinct().order_by("name")
     
     # Use filtered queryset for pagination
     artworks = artwork_filter.qs.prefetch_related("artists", "photos")
@@ -464,8 +477,8 @@ def artist_list(request):
     - Ajoute `artwork_count` = nombre d'œuvres de l'utilisateur courant liées à l'artiste
     - Permet une recherche par nom
     """
-    # Annoter chaque artiste avec le nombre d'œuvres appartenant à l'utilisateur courant
-    artists = Artist.objects.all().annotate(
+    # Restreindre aux artistes liés à au moins une œuvre de l'utilisateur
+    artists = Artist.objects.filter(artwork__user=request.user).distinct().annotate(
         artwork_count=Count("artwork", filter=Q(artwork__user=request.user))
     ).order_by("name")
     
@@ -1271,13 +1284,18 @@ def technique_delete(request, pk):
 @login_required
 def tags_autocomplete(request):
     """
-    Retourne une liste JSON de tags existants filtrés par ?q= pour l'autocomplétion.
+    Autocomplétion de mots-clés limitée aux tags utilisés par l'utilisateur courant.
     Format: [{"value": name, "text": name}, ...]
     """
     q = request.GET.get("q", "").strip()
-    tags_qs = Tag.objects.all()
+    # Restreindre aux tags réellement utilisés sur les oeuvres de l'utilisateur
+    user_tags = Tag.objects.filter(
+        pk__in=UUIDTaggedItem.objects.filter(
+            content_object__user=request.user
+        ).values("tag_id")
+    ).distinct()
     if q:
-        tags_qs = tags_qs.filter(name__icontains=q)
-    tags_qs = tags_qs.order_by("name")[:20]
-    data = [{"value": t.name, "text": t.name} for t in tags_qs]
+        user_tags = user_tags.filter(name__icontains=q)
+    user_tags = user_tags.order_by("name")[:20]
+    data = [{"value": t.name, "text": t.name} for t in user_tags]
     return JsonResponse(data, safe=False)

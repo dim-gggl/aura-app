@@ -6,7 +6,8 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            {% with title="Résultats de recherche" back_url=url 'core:dashboard' back_text="Retour au tableau de bord" %}
+            {% url 'core:dashboard' as dashboard_url %}
+            {% with title="Résultats de recherche" back_url=dashboard_url back_text="Retour au tableau de bord" %}
                 {% include 'includes/page_header.html' %}
             {% endwith %}
 
@@ -187,14 +188,6 @@
 
             {% else %}
                 <!-- Formulaire de recherche -->
-                {% with 
-                    icon="search" 
-                    title="Recherche globale" 
-                    message="Recherchez dans vos œuvres d'art, contacts et notes." 
-                    show_action=False %}
-                    {% include 'includes/empty_state.html' %}
-                {% endwith %}
-                
                 <form method="get" action="{% url 'core:search' %}" class="mt-4">
                     <div class="row justify-content-center">
                         <div class="col-md-6">
