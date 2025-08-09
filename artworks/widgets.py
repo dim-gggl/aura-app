@@ -65,7 +65,11 @@ class SelectOrCreateWidget(forms.Select):
             attrs = {}
         
         # Add CSS class and data attributes for JavaScript integration
-        attrs["class"] = attrs.get("class", "") + " select-or-create"
+        # Ensure Bootstrap styling for select
+        existing_class = attrs.get("class", "")
+        if "form-select" not in existing_class:
+            existing_class = (existing_class + " form-select").strip()
+        attrs["class"] = (existing_class + " select-or-create").strip()
         attrs["data-create-url"] = reverse_lazy(self.create_url_name)
         
         # Add a default "create new" option at the top
@@ -78,16 +82,21 @@ class SelectOrCreateWidget(forms.Select):
         # Render the standard select element
         select_html = super().render(name, value, attrs, renderer)
         
-        # Add button for creating new entities
+        # Add button for creating new entities (icon-only, tooltip, lighter visual weight)
         add_button_html = f"""
-        <button type="button" class="btn btn-sm btn-outline-primary add-new-btn" 
-                data-field-name="{name}" 
-                data-model-name="{self.model_class._meta.verbose_name}">
-            + Ajouter un.e nouvel.le {self.model_class._meta.verbose_name.lower()}
-        </button>
-        """
-        
-        return mark_safe(f"<div class='select-or-create-wrapper'>{select_html}{add_button_html}</div>")
+<button type=\"button\"
+        class=\"btn btn-outline-secondary add-new-btn\"
+        aria-label=\"Ajouter {self.model_class._meta.verbose_name}\"
+        data-bs-toggle=\"tooltip\"
+        data-bs-placement=\"top\"
+        title=\"Ajouter {self.model_class._meta.verbose_name.lower()}\"
+        data-field-name=\"{name}\"
+        data-model-name=\"{self.model_class._meta.verbose_name}\">
+  <i class=\"bi bi-plus-lg\"></i>
+</button>
+"""
+
+        return mark_safe(f"<div class='input-group select-or-create-wrapper'>{select_html}{add_button_html}</div>")
 
 
 class SelectMultipleOrCreateWidget(forms.SelectMultiple):
@@ -135,23 +144,32 @@ class SelectMultipleOrCreateWidget(forms.SelectMultiple):
             attrs = {}
         
         # Add CSS classes and data attributes for JavaScript integration
-        attrs["class"] = attrs.get("class", "") + " select-multiple-or-create"
+        # Ensure Bootstrap styling for select multiple
+        existing_class = attrs.get("class", "")
+        if "form-select" not in existing_class:
+            existing_class = (existing_class + " form-select").strip()
+        attrs["class"] = (existing_class + " select-multiple-or-create").strip()
         attrs["data-create-url"] = reverse_lazy(self.create_url_name)
         attrs["multiple"] = True  # Ensure multiple selection is enabled
         
         # Render the standard multiple select element
         select_html = super().render(name, value, attrs, renderer)
         
-        # Add button for creating new entities
+        # Add button for creating new entities (icon-only, tooltip, lighter visual weight)
         add_button_html = f"""
-        <button type="button" class="btn btn-sm btn-outline-primary add-new-multiple-btn" 
-                data-field-name="{name}" 
-                data-model-name="{self.model_class._meta.verbose_name}">
-            + Ajouter un.e nouvel.le {self.model_class._meta.verbose_name.lower()}
-        </button>
-        """
-        
-        return mark_safe(f"<div class='select-multiple-or-create-wrapper'>{select_html}{add_button_html}</div>")
+<button type=\"button\"
+        class=\"btn btn-outline-secondary add-new-multiple-btn\"
+        aria-label=\"Ajouter {self.model_class._meta.verbose_name}\"
+        data-bs-toggle=\"tooltip\"
+        data-bs-placement=\"top\"
+        title=\"Ajouter {self.model_class._meta.verbose_name.lower()}\"
+        data-field-name=\"{name}\"
+        data-model-name=\"{self.model_class._meta.verbose_name}\">
+  <i class=\"bi bi-plus-lg\"></i>
+</button>
+"""
+
+        return mark_safe(f"<div class='input-group select-multiple-or-create-wrapper'>{select_html}{add_button_html}</div>")
 
 
 class TagWidget(forms.TextInput):

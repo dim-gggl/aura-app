@@ -30,7 +30,18 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Prevent double-initialization if this script is loaded twice
+    if (window.__auraSelectOrCreateInitialized) {
+        return;
+    }
+    window.__auraSelectOrCreateInitialized = true;
     
+    // Clean up any pre-existing duplicates on page load
+    document.querySelectorAll('select.select-or-create, select.select-multiple-or-create').forEach(sel => {
+        deduplicateOptionsByValue(sel);
+        sel.addEventListener('change', () => deduplicateOptionsByValue(sel));
+    });
+
     // ========================================
     // MODAL INITIALIZATION AND SETUP
     // ========================================
@@ -84,6 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
         modalSaveButton.dataset.createUrl = createUrl;
         modalSaveButton.dataset.fieldName = fieldName;
         modalSaveButton.dataset.isMultiple = isMultiple;
+
+        // Remember the exact select element to update later
+        modalSaveButton.dataset.selectId = selectElement.id || '';
 
         // Display the modal
         creationModal.show();
@@ -173,20 +187,29 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Get the target select field
-                const select = document.querySelector(`[name="${fieldName}"]`);
-                
-                // Create new option element
-                // Parameters: text, value, defaultSelected, selected
-                const option = new Option(data.name, data.id, true, true);
-                
-                // Add the new option to the select field
-                select.add(option);
-                
-                // Trigger change event to notify any listeners
+                let select = null;
+                if (modalSaveButton.dataset.selectId) {
+                    select = document.getElementById(modalSaveButton.dataset.selectId);
+                }
+                if (!select) {
+                    select = document.querySelector(`[name="${fieldName}"]`);
+                }
+                if (!select) return;
+
+                // If option already exists (e.g., created=false), select it instead of adding a duplicate
+                const existing = select.querySelector(`option[value="${data.id}"]`);
+                if (existing) {
+                    select.value = String(data.id);
+                } else {
+                    const option = new Option(data.name, data.id, true, true);
+                    select.add(option);
+                }
+
+                // Safety: remove any duplicate options with the same value
+                deduplicateOptionsByValue(select);
+
                 select.dispatchEvent(new Event('change'));
             } else {
-                // Display error message if creation failed
                 alert(`Erreur : ${data.error}`);
             }
         })
@@ -219,21 +242,29 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Get the target select field
-                const select = document.querySelector(`[name="${fieldName}"]`);
-                
-                // Create new option element
-                // Parameters: text, value, defaultSelected, selected
-                // For multiple select: defaultSelected=false, selected=true
-                const option = new Option(data.name, data.id, false, true);
-                
-                // Add the new option to the select field
-                select.add(option);
-                
-                // Trigger change event to notify any listeners
+                let select = null;
+                if (modalSaveButton.dataset.selectId) {
+                    select = document.getElementById(modalSaveButton.dataset.selectId);
+                }
+                if (!select) {
+                    select = document.querySelector(`[name="${fieldName}"]`);
+                }
+                if (!select) return;
+
+                // If option exists (e.g., when created=false), just select it
+                let option = select.querySelector(`option[value="${data.id}"]`);
+                if (option) {
+                    option.selected = true;
+                } else {
+                    option = new Option(data.name, data.id, false, true);
+                    select.add(option);
+                }
+
+                // Safety: remove any duplicate options with the same value
+                deduplicateOptionsByValue(select);
+
                 select.dispatchEvent(new Event('change'));
             } else {
-                // Display error message if creation failed
                 alert(`Erreur : ${data.error}`);
             }
         })
@@ -241,6 +272,23 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Erreur AJAX:', error);
             alert('Une erreur est survenue lors de la création.');
         });
+    }
+
+    // ========================================
+    // UTILITIES
+    // ========================================
+    function deduplicateOptionsByValue(selectEl) {
+        const seen = new Set();
+        const toRemove = [];
+        for (const opt of selectEl.options) {
+            const val = String(opt.value);
+            if (seen.has(val) && val !== "") {
+                toRemove.push(opt);
+            } else {
+                seen.add(val);
+            }
+        }
+        toRemove.forEach(opt => opt.remove());
     }
 
     // No keyword input JS needed when using django-taggit

@@ -892,6 +892,17 @@ i.text-secondary{
 	color: var(--theme-secondary-color);
 }
 
+.artist-link {
+    color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
+}
+
+h5#creationModalLabel {
+    color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
+}
+
+.modal-body form div > label {
+    color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
+}
 
 @media (max-width: 968px) {
     .bi.bi-palette.display-1 {

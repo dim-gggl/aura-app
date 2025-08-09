@@ -57,6 +57,7 @@ urlpatterns = [
     path("artists/create/", views.artist_create, name="artist_create"),
     path("artists/<int:pk>/", views.artist_detail, name="artist_detail"),
     path("artists/<int:pk>/edit/", views.artist_update, name="artist_update"),
+    path("artists/<int:pk>/delete/", views.artist_delete, name="artist_delete"),
     
     # ========================================
     # COLLECTION MANAGEMENT URLS
@@ -65,6 +66,7 @@ urlpatterns = [
     path("collections/create/", views.collection_create, name="collection_create"),
     path("collections/<int:pk>/", views.collection_detail, name="collection_detail"),
     path("collections/<int:pk>/edit/", views.collection_update, name="collection_update"),
+    path("collections/<int:pk>/delete/", views.collection_delete, name="collection_delete"),
     
     # ========================================
     # EXHIBITION MANAGEMENT URLS
@@ -73,6 +75,7 @@ urlpatterns = [
     path("exhibitions/create/", views.exhibition_create, name="exhibition_create"),
     path("exhibitions/<int:pk>/", views.exhibition_detail, name="exhibition_detail"),
     path("exhibitions/<int:pk>/edit/", views.exhibition_update, name="exhibition_update"),
+    path("exhibitions/<int:pk>/delete/", views.exhibition_delete, name="exhibition_delete"),
     
     # ========================================
     # REFERENCE ENTITY URLS

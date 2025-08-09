@@ -5,49 +5,47 @@
 
 {% block extra_css %}
 <style>
-    .photo-preview {
-        max-width: 150px;
-        max-height: 150px;
-        object-fit: cover;
-        border-radius: 0.375rem;
-    }
-    
-    .select-or-create-wrapper,
-    .select-multiple-or-create-wrapper {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-    }
-    
-    .select-or-create,
-    .select-multiple-or-create {
-        flex: 1;
-    }
-    
-    .keyword-input-wrapper {
-        position: relative;
-    }
-    
-    .keyword-suggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-    }
-    
-    .photo-form {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        background-color: #f8f9fa;
-    }
-    
-    .photo-form.deleted {
-        opacity: 0.5;
-        background-color: #e9ecef;
-    }
+  .photo-preview {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+  }
+
+  /* Input-group sur toute la ligne */
+  .select-or-create-wrapper,
+  .select-multiple-or-create-wrapper {
+    width: 100%;
+  }
+
+  .select-or-create,
+  .select-multiple-or-create {
+    flex: 1 1 auto;
+  }
+
+  /* Espacements plus lisibles */
+  .form-row .form-group { margin-bottom: 1rem !important; }
+  fieldset { margin-bottom: 1.25rem; }
+  fieldset legend {
+    font-size: 1.05rem;
+    margin-bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+
+  .photo-form {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+  }
+
+  .photo-form.deleted {
+    opacity: 0.5;
+    background-color: #e9ecef;
+  }
 </style>
 {% endblock %}
 
@@ -240,6 +238,73 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialiser le compteur
     updateTotalForms();
+});
+</script>
+<script>
+// Tooltips Bootstrap
+document.addEventListener('DOMContentLoaded', function() {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+});
+
+// Repli des sections (fieldsets) pour aérer
+document.addEventListener('DOMContentLoaded', function () {
+  const collapseByDefault = new Set([
+    'Acquisition et provenance',
+    'Localisation et statut',
+    'Informations complémentaires'
+  ]);
+
+  const fieldsets = document.querySelectorAll('form fieldset');
+  let idx = 0;
+
+  fieldsets.forEach(fs => {
+    const legend = fs.querySelector('legend');
+    if (!legend) return;
+
+    const contentWrapper = document.createElement('div');
+    const collapseId = `fs-collapse-${idx++}`;
+    const shouldCollapse = collapseByDefault.has(legend.textContent.trim());
+
+    // Déplacer tout le contenu (sauf la légende) dans la div collapsable
+    const nodesToMove = [];
+    Array.from(fs.childNodes).forEach(n => {
+      if (n !== legend) nodesToMove.push(n);
+    });
+    contentWrapper.className = `collapse ${shouldCollapse ? '' : 'show'}`;
+    contentWrapper.id = collapseId;
+    nodesToMove.forEach(n => contentWrapper.appendChild(n));
+    fs.appendChild(contentWrapper);
+
+    // Bouton toggler à côté de la légende
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'btn btn-link p-0 text-decoration-none';
+    toggleBtn.setAttribute('data-bs-toggle', 'collapse');
+    toggleBtn.setAttribute('data-bs-target', `#${collapseId}`);
+    toggleBtn.setAttribute('aria-expanded', shouldCollapse ? 'false' : 'true');
+    toggleBtn.innerHTML = shouldCollapse ? '<i class="bi bi-caret-right-fill"></i>' : '<i class="bi bi-caret-down-fill"></i>';
+
+    // Mettre le libellé dans un conteneur cliquable
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = legend.textContent.trim();
+
+    legend.textContent = '';
+    legend.appendChild(toggleBtn);
+    legend.appendChild(labelSpan);
+
+    // Sync icône avec l’état du collapse
+    contentWrapper.addEventListener('shown.bs.collapse', () => {
+      toggleBtn.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+    });
+    contentWrapper.addEventListener('hidden.bs.collapse', () => {
+      toggleBtn.innerHTML = '<i class="bi bi-caret-right-fill"></i>';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    });
+  });
 });
 </script>
 {% endblock %}

@@ -57,11 +57,9 @@ Variables attendues :
     
     {% if show_actions|default:True %}
         <div class="card-footer">
-            {% include 'includes/action_buttons.html' with 
-                view_url=url 'artworks:detail' pk=artwork.pk 
-                edit_url=url 'artworks:update' pk=artwork.pk 
-                delete_url=url 'artworks:delete' pk=artwork.pk 
-                size="sm" %}
+            {% with view_url='artworks:artwork_detail' edit_url='artworks:artwork_update' delete_url='artworks:artwork_delete' pk=artwork.pk size="sm" %}
+                {% include 'includes/action_buttons.html' %}
+            {% endwith %}
         </div>
     {% endif %}
 </div>

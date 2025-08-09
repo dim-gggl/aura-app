@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer la collection - Aura{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+          <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirmer la suppression</h4>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            Cette action est irréversible. Les relations avec les œuvres seront supprimées.
+          </div>
+
+          <h5 class="mb-3">Collection à supprimer</h5>
+          <div class="mb-4">
+            <p class="mb-1"><strong>Nom :</strong> {{ collection.name }}</p>
+            {% if collection.description %}
+              <p class="mb-0"><strong>Description :</strong> {{ collection.description }}</p>
+            {% endif %}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'artworks:collection_detail' collection.pk %}" class="btn btn-outline-secondary">
+              <i class="bi bi-arrow-left"></i> Annuler
+            </a>
+            <form method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Supprimer définitivement
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>
+{% endblock %}
+
+

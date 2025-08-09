@@ -1,0 +1,16 @@
+<div class="input-group">
+    <select name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} class="form-select">
+      {% for group, options, index in widget.optgroups %}
+        {% if group %}<optgroup label="{{ group }}">{% endif %}
+        {% for option in options %}{{ option.tag }}{% endfor %}
+        {% if group %}</optgroup>{% endif %}
+      {% endfor %}
+    </select>
+    <button class="btn btn-outline-light border" type="button"
+            aria-label="Ajouter {{ widget.attrs.data-model-name }}"
+            data-model-name="{{ widget.attrs.data-model-name }}"
+            onclick="window.Aura.openSelectCreateModal(this)">
+      <i class="bi bi-plus-lg"></i>
+    </button>
+  </div>
+  

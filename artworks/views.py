@@ -457,22 +457,15 @@ def wishlist(request):
 @login_required
 def artist_list(request):
     """
-    Display a list of artists that have artworks in the user's collection.
+    Affiche la liste de tous les artistes, avec un compteur d'œuvres pour l'utilisateur.
     
-    Shows only artists associated with the current user's artworks, with
-    artwork count annotations and search functionality.
-    
-    Args:
-        request: The HTTP request object
-        
-    Returns:
-        HttpResponse: Rendered artist list page with pagination
+    - Montre tous les artistes (même sans œuvre)
+    - Ajoute `artwork_count` = nombre d'œuvres de l'utilisateur courant liées à l'artiste
+    - Permet une recherche par nom
     """
-    # Get artists that have artworks belonging to the current user
-    # distinct() prevents duplicates when artists have multiple artworks
-    # annotate with artwork count for display
-    artists = Artist.objects.filter(artwork__user=request.user).distinct().annotate(
-        artwork_count=Count("artwork")
+    # Annoter chaque artiste avec le nombre d'œuvres appartenant à l'utilisateur courant
+    artists = Artist.objects.all().annotate(
+        artwork_count=Count("artwork", filter=Q(artwork__user=request.user))
     ).order_by("name")
     
     # Handle search functionality
@@ -546,6 +539,30 @@ def artist_update(request, pk):
     }
     
     return render(request, "artworks/artist_form.html", context)
+
+
+@login_required
+def artist_delete(request, pk):
+    """
+    Supprimer un artiste après confirmation.
+    Si l'artiste est lié à des œuvres, ces liens seront supprimés (M2M),
+    les œuvres ne sont pas supprimées.
+    """
+    artist = get_object_or_404(Artist, pk=pk)
+    # Compter les œuvres de l'utilisateur courant liées à cet artiste (pour information)
+    linked_artworks_count = Artwork.objects.filter(artists=artist, user=request.user).count()
+
+    if request.method == "POST":
+        name = artist.name
+        artist.delete()
+        messages.success(request, f"Artiste '{name}' supprimé avec succès.")
+        return redirect("artworks:artist_list")
+
+    context = {
+        "artist": artist,
+        "linked_artworks_count": linked_artworks_count,
+    }
+    return render(request, "artworks/artist_confirm_delete.html", context)
 
 
 # ========================================
@@ -681,6 +698,16 @@ def collection_update(request, pk):
 
 
 @login_required
+def collection_delete(request, pk):
+    collection = get_object_or_404(Collection, pk=pk, user=request.user)
+    if request.method == "POST":
+        collection.delete()
+        messages.success(request, "Collection supprimée avec succès.")
+        return redirect("artworks:collection_list")
+    return render(request, "artworks/collection_confirm_delete.html", {"collection": collection})
+
+
+@login_required
 def exhibition_list(request):
     exhibitions = Exhibition.objects.filter(user=request.user).annotate(
         artwork_count=Count("artwork")
@@ -768,6 +795,16 @@ def exhibition_update(request, pk):
     }
     
     return render(request, "artworks/exhibition_form.html", context)
+
+
+@login_required
+def exhibition_delete(request, pk):
+    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
+    if request.method == "POST":
+        exhibition.delete()
+        messages.success(request, "Exposition supprimée avec succès.")
+        return redirect("artworks:exhibition_list")
+    return render(request, "artworks/exhibition_confirm_delete.html", {"exhibition": exhibition})
 
 
 @login_required

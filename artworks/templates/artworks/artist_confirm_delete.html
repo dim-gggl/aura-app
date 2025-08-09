@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer l'artiste - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-exclamation-triangle"></i>
+            Confirmation de suppression
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>Êtes-vous sûr de vouloir supprimer l'artiste <strong>{{ artist.name }}</strong> ?</p>
+
+          {% if linked_artworks_count > 0 %}
+          <div class="alert alert-warning">
+            <i class="bi bi-info-circle"></i>
+            Cet artiste est associé à <strong>{{ linked_artworks_count }}</strong> œuvre{% if linked_artworks_count > 1 %}s{% endif %} de votre collection. Les œuvres ne seront pas supprimées, seulement le lien artiste-œuvre.
+          </div>
+          {% endif %}
+
+          <form method="post" class="d-inline">
+            {% csrf_token %}
+            <div class="d-flex gap-2 justify-content-end">
+              <a href="{% url 'artworks:artist_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Annuler
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Confirmer la suppression
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
