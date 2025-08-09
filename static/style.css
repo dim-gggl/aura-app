@@ -77,7 +77,6 @@
 :root[data-theme="playful"] {
     --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Expletus Sans", sans-serif;
-    --font-family-logo: "Expletus Sans", sans-serif;
 
     --theme-bg-color: #fffbeb; /* Creamy yellow */
     --theme-text-color: #78350f; /* Dark brown */
@@ -124,7 +123,6 @@
 :root[data-theme="retro"] {
     --font-family-body: var(--font-family-monospace);
     --font-family-headings: var(--font-family-monospace);
-    --font-family-logo: var(--font-family-monospace);
 
     --theme-bg-color: #000000;
     --theme-text-color: #00ff00;
@@ -324,7 +322,6 @@
 :root[data-theme="artdeco"] {
     --font-family-body: "Josefin Sans", sans-serif;
     --font-family-headings: "Josefin Sans", sans-serif;
-    --font-family-logo: "Josefin Sans", sans-serif;
     --theme-bg-color: #faf6f0;
     --theme-text-color: #0a0a0a;
     --theme-primary-color: #d4af37;
@@ -347,7 +344,6 @@
 :root[data-theme="noir"] {
     --font-family-body: "Special Elite", monospace;
     --font-family-headings: "Special Elite", monospace;
-    --font-family-logo: "Special Elite", monospace;
     --theme-bg-color: #ffffff;
     --theme-text-color: #000000;
     --theme-primary-color: #333333;
@@ -886,22 +882,55 @@ div.hero-section {
 }
 
 /* ———————————— */
+/* ICI, TU PEUX... */
+p.col-1g-12.text-center {
+    font-size: 1.79rem;
+}
 
-
+/* ———————————— */
+/* ICONES PAGE D'ACCUEIL */
 i.text-secondary{
 	color: var(--theme-secondary-color);
 }
 
+/* ———————————— */
+/* ARTISTES */
 .artist-link {
     color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
 }
 
-h5#creationModalLabel {
+/* ———————————— */
+/* MODAL */
+#creationModalLabel {
     color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
 }
 
 .modal-body form div > label {
     color: var(--bs-table-color-state,var(--bs-table-color-type,var(--bs-table-color))) !important;
+}
+
+.border-0.flex-grow-1 {
+	background: transparent;
+    color: var(--bs-table-color-bg) !important;
+}
+
+span.badge.text-bg-primary.d-inline-flex.align-items-center {
+	background-color: var(--theme-text-color) !important;
+	opacity: 0.7;
+	color: var(--theme-bg-color) !important;
+}
+
+.btn-close.btn-close-white.btn-sm.ms-1 {
+	color: var(--theme-bg-color) !important;
+	filter: none;
+}
+
+.photo-form {
+	border: 0.5px solid var(--theme-card-border-color);
+	border-radius: 0.375rem;
+	padding: 1rem;
+	margin-bottom: 1rem;
+	background-color: transparent;
 }
 
 @media (max-width: 968px) {

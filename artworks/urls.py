@@ -113,4 +113,7 @@ urlpatterns = [
     path("ajax/arttype/create/", views.arttype_create_ajax, name="arttype_create_ajax"),
     path("ajax/support/create/", views.support_create_ajax, name="support_create_ajax"),
     path("ajax/technique/create/", views.technique_create_ajax, name="technique_create_ajax")
+    ,
+    # Tags autocomplete
+    path("ajax/tags/autocomplete/", views.tags_autocomplete, name="tags_autocomplete"),
 ]

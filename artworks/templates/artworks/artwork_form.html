@@ -307,5 +307,169 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
+<script>
+// Éditeur de tags (chips) pour Taggit: empêche Enter de soumettre, autocomplétion
+document.addEventListener('DOMContentLoaded', function () {
+  const hiddenInput = document.querySelector('input[name="tags"]');
+  if (!hiddenInput) return;
+
+  // Masquer l'input natif (CSV attendu par Taggit)
+  hiddenInput.style.display = 'none';
+
+  // État interne
+  let tags = hiddenInput.value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  // UI editor
+  const editor = document.createElement('div');
+  editor.className = 'form-control d-flex flex-wrap gap-2 align-items-center';
+  editor.style.minHeight = 'calc(2.5rem + 2px)';
+  editor.style.cursor = 'text';
+  editor.tabIndex = 0;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'border-0 flex-grow-1';
+  input.placeholder = 'Rechercher ou créer un mot-clé…';
+  input.style.outline = 'none';
+  input.style.minWidth = '10ch';
+  editor.appendChild(input);
+
+  hiddenInput.parentNode.insertBefore(editor, hiddenInput.nextSibling);
+
+  const help = document.createElement('div');
+  help.className = 'form-text mt-1';
+  help.textContent = 'Tapez pour chercher, Entrée pour ajouter, ⌫ pour retirer le dernier';
+  editor.parentNode.insertBefore(help, editor.nextSibling);
+
+  // Dropdown
+  const dropdown = document.createElement('div');
+  dropdown.className = 'list-group position-absolute w-100 shadow';
+  dropdown.style.zIndex = '1080';
+  dropdown.style.display = 'none';
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'relative';
+  editor.parentNode.insertBefore(wrapper, editor);
+  wrapper.appendChild(editor);
+  wrapper.appendChild(dropdown);
+
+  function syncHidden() {
+    hiddenInput.value = tags.join(', ');
+  }
+  function renderChips() {
+    Array.from(editor.querySelectorAll('span.badge')).forEach(n => n.remove());
+    tags.forEach(label => {
+      const chip = document.createElement('span');
+      chip.className = 'badge text-bg-primary d-inline-flex align-items-center';
+      chip.style.padding = '0.5rem 0.6rem';
+      chip.style.gap = '0.4rem';
+      chip.appendChild(document.createTextNode(label));
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-close btn-close-white btn-sm ms-1';
+      btn.ariaLabel = 'Retirer';
+      btn.addEventListener('click', () => {
+        tags = tags.filter(t => t !== label);
+        syncHidden();
+        renderChips();
+      });
+      chip.appendChild(btn);
+      editor.insertBefore(chip, input);
+    });
+  }
+  function addTag(value) {
+    const val = String(value).trim();
+    if (!val) return;
+    if (!tags.includes(val)) {
+      tags.push(val);
+      syncHidden();
+      renderChips();
+    }
+  }
+  renderChips();
+
+  // Focus
+  editor.addEventListener('click', () => input.focus());
+
+  // Empêcher Enter de soumettre le formulaire
+  const formEl = hiddenInput.closest('form');
+  if (formEl) {
+    formEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.activeElement === input) {
+        e.preventDefault();
+      }
+    });
+  }
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const q = input.value.trim();
+      if (q) {
+        addTag(q);
+        input.value = '';
+        hideDropdown();
+      }
+    } else if (e.key === 'Backspace' && input.value === '') {
+      const last = tags[tags.length - 1];
+      if (last) {
+        tags.pop();
+        syncHidden();
+        renderChips();
+      }
+    }
+  });
+
+  // Autocomplete
+  let suggestions = [];
+  let lastQuery = '';
+  function hideDropdown() { dropdown.style.display = 'none'; }
+  function renderDropdown(query) {
+    dropdown.innerHTML = '';
+    const q = String(query || '').trim().toLowerCase();
+    const items = suggestions
+      .filter(s => !q || (s.text || '').toLowerCase().includes(q))
+      .slice(0, 10);
+    if (q && !items.some(i => (i.text || '').toLowerCase() === q)) {
+      items.unshift({ value: q, text: `Ajouter "${q}"` });
+    }
+    if (!items.length) return hideDropdown();
+    items.forEach(item => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'list-group-item list-group-item-action';
+      b.textContent = item.text;
+      b.addEventListener('click', () => {
+        const v = item.value || item.text;
+        addTag(v);
+        input.value = '';
+        hideDropdown();
+        input.focus();
+      });
+      dropdown.appendChild(b);
+    });
+    dropdown.style.display = 'block';
+  }
+  function fetchSuggestions(query) {
+    const url = new URL('{% url "artworks:tags_autocomplete" %}', window.location.origin);
+    if (query) url.searchParams.set('q', query);
+    return fetch(url.toString(), { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(json => { suggestions = json || []; })
+      .catch(() => { suggestions = []; });
+  }
+  input.addEventListener('input', async () => {
+    const q = input.value.trim();
+    if (q === lastQuery) return renderDropdown(q);
+    lastQuery = q;
+    await fetchSuggestions(q);
+    renderDropdown(q);
+  });
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) hideDropdown();
+  });
+});
+</script>
 {% endblock %}
 {% endblock %}

@@ -23,7 +23,7 @@ def theme_context(request):
     
     Behavior:
     - For authenticated users: Returns their selected theme from UserProfile
-    - For anonymous users: Returns the default theme ('onyx')
+    - For anonymous users: Returns the default theme ('artdeco')
     - Auto-creates UserProfile if it doesn't exist for authenticated users
     - Handles errors gracefully with fallback to default theme
     
@@ -40,10 +40,10 @@ def theme_context(request):
         
     Example:
         In templates: <html data-theme="{{ current_theme }}">
-        In CSS: [data-theme="onyx"] { ... }
+        In CSS: [data-theme="artdeco"] { ... }
     """
     # Default theme for fallback situations
-    default_theme = 'onyx'
+    default_theme = 'artdeco'
 
     # If a theme is stored in session (set after profile update), use it directly
     session_theme = request.session.get('current_theme')

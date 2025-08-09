@@ -88,7 +88,8 @@ class ArtworkForm(forms.ModelForm):
         self.fields['support'].queryset = Support.objects.all()
         self.fields['technique'].queryset = Technique.objects.all()
         self.fields['tags'].label = "Mots-clés"
-        self.fields['tags'].help_text = "Séparez par des virgules"
+        # Retirer l'aide basée sur les virgules; l'UI sera gérée via JS (Tom Select-like)
+        self.fields['tags'].help_text = ""
         
         # Configure Crispy Forms helper for layout
         self.helper = FormHelper()

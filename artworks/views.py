@@ -27,6 +27,7 @@ from django.views.decorators.http import require_POST
 import json
 import random  # Used for random artwork suggestions
 from datetime import datetime, timedelta
+from taggit.models import Tag
 
 # Import all models used in the views
 from .models import (
@@ -1262,3 +1263,21 @@ def technique_delete(request, pk):
     }
     
     return render(request, "artworks/reference_confirm_delete.html", context)
+
+
+# ========================================
+# TAGS AUTOCOMPLETE (for a better tagging UX)
+# ========================================
+@login_required
+def tags_autocomplete(request):
+    """
+    Retourne une liste JSON de tags existants filtrés par ?q= pour l'autocomplétion.
+    Format: [{"value": name, "text": name}, ...]
+    """
+    q = request.GET.get("q", "").strip()
+    tags_qs = Tag.objects.all()
+    if q:
+        tags_qs = tags_qs.filter(name__icontains=q)
+    tags_qs = tags_qs.order_by("name")[:20]
+    data = [{"value": t.name, "text": t.name} for t in tags_qs]
+    return JsonResponse(data, safe=False)
