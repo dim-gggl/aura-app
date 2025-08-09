@@ -18,7 +18,10 @@
     <div class="title">{{ note.title }}</div>
   </div>
   <div>
-    <p>{{ note.content|linebreaks }}</p>
+    {% load markdown_extras %}
+    <div>
+      {{ note.content|markdownify }}
+    </div>
     <p class="text-muted" style="color:#666; font-size: 12px;">
       Créée le {{ note.created_at|date:"d/m/Y H:i" }} — Dernière modification le {{ note.updated_at|date:"d/m/Y H:i" }}
     </p>

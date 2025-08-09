@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load markdown_extras %}
 {% block title %}Note : {{ note.title }}{% endblock %}
 
 {% block content %}
@@ -23,7 +24,7 @@
 
   <div class="card">
     <div class="card-body">
-      <p class="mb-4">{{ note.content|linebreaks }}</p>
+      <div class="mb-4">{{ note.content|markdownify }}</div>
 
       <div class="text-muted small">
         Créée le {{ note.created_at|date:"d/m/Y H:i" }}<br>
