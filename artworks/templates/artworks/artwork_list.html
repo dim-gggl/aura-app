@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% load crispy_forms_tags %}
+{% load placeholder_extras %}
 
 {% block title %}Mes œuvres - Catalogue{% endblock %}
 
@@ -65,38 +66,12 @@
                 <div class="collapse" id="filtersCollapse">
                     <div class="card-body py-3">
                         <form method="get" class="row g-2">
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.title.id_for_label }}" class="form-label small">Titre</label>
-                                {{ filter.form.title }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.art_type.id_for_label }}" class="form-label small">Type d'art</label>
-                                {{ filter.form.art_type }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.location.id_for_label }}" class="form-label small">Localisation</label>
-                                {{ filter.form.location }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.creation_year.id_for_label }}" class="form-label small">Année</label>
-                                {{ filter.form.creation_year }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.artist.id_for_label }}" class="form-label small">Artiste</label>
-                                {{ filter.form.artist }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.medium.id_for_label }}" class="form-label small">Technique</label>
-                                {{ filter.form.medium }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.status.id_for_label }}" class="form-label small">Statut</label>
-                                {{ filter.form.status }}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="{{ filter.form.condition.id_for_label }}" class="form-label small">État</label>
-                                {{ filter.form.condition }}
-                            </div>
+                            {% for field in filter.form %}
+                                <div class="col-md-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label small">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
                             <div class="col-12 mt-2">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <i class="bi bi-funnel"></i> Filtrer
@@ -113,20 +88,17 @@
     </div>
     
     <!-- Indicateur de filtres actifs -->
-    {% if current_filters.title or current_filters.art_type or current_filters.location or current_filters.creation_year or current_filters.artist or current_filters.medium or current_filters.status or current_filters.condition %}
+    {% if current_filters %}
         <div class="row mb-3">
             <div class="col-12">
                 <div class="alert alert-info py-2">
                     <small>
                         <i class="bi bi-info-circle"></i> Filtres actifs : 
-                        {% if current_filters.title %}<span class="badge bg-primary me-1">Titre</span>{% endif %}
-                        {% if current_filters.art_type %}<span class="badge bg-primary me-1">Type</span>{% endif %}
-                        {% if current_filters.location %}<span class="badge bg-primary me-1">Localisation</span>{% endif %}
-                        {% if current_filters.creation_year %}<span class="badge bg-primary me-1">Année</span>{% endif %}
-                        {% if current_filters.artist %}<span class="badge bg-primary me-1">Artiste</span>{% endif %}
-                        {% if current_filters.medium %}<span class="badge bg-primary me-1">Technique</span>{% endif %}
-                        {% if current_filters.status %}<span class="badge bg-primary me-1">Statut</span>{% endif %}
-                        {% if current_filters.condition %}<span class="badge bg-primary me-1">État</span>{% endif %}
+                        {% for key, value in current_filters.items %}
+                            {% if value %}
+                                <span class="badge bg-primary me-1">{{ key }}: {{ value }}</span>
+                            {% endif %}
+                        {% endfor %}
                         <a href="{% url 'artworks:list' %}" class="text-decoration-none ms-2">
                             <i class="bi bi-x-circle"></i> Effacer tous les filtres
                         </a>
@@ -146,9 +118,9 @@
                             <img src="{{ artwork.photos.first.image_thumbnail.url }}" 
                                  class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover;">
                         {% else %}
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <i class="bi bi-image text-muted display-6"></i>
-                            </div>
+                            <img src="{% random_placeholder_url 300 200 forloop.counter0 %}"
+                                 class="card-img-top" alt="Image de remplacement"
+                                 style="height: 200px; object-fit: cover;">
                         {% endif %}
                         {% if artwork.is_featured %}
                             <div class="position-absolute top-0 end-0 m-2">
@@ -219,12 +191,12 @@
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page=1{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <a class="page-link" href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">
                                     <i class="bi bi-chevron-double-left"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
                                     <i class="bi bi-chevron-left"></i>
                                 </a>
                             </li>
@@ -238,12 +210,12 @@
                         
                         {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
                                     <i class="bi bi-chevron-right"></i>
                                 </a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in current_filters.items %}{% if value %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">
                                     <i class="bi bi-chevron-double-right"></i>
                                 </a>
                             </li>

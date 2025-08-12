@@ -90,6 +90,7 @@ TEMPLATES = [
         "OPTIONS": {
             "builtins": [
                 "notes.templatetags.markdown_extras",
+                "artworks.templatetags.placeholder_extras",
             ],
             "context_processors": [
                 "django.template.context_processors.debug",

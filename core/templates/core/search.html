@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load placeholder_extras %}
 
 {% block title %}Recherche - {{ query }}{% endblock %}
 
@@ -40,10 +41,10 @@
                                                      alt="{{ artwork.title|default:'Œuvre' }}"
                                                      style="height: 200px; object-fit: cover;">
                                             {% else %}
-                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
-                                                     style="height: 200px;">
-                                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                                                </div>
+                                                <img src="{% random_placeholder_url 300 200 forloop.counter0 %}"
+                                                     class="card-img-top" 
+                                                     alt="Image de remplacement"
+                                                     style="height: 200px; object-fit: cover;">
                                             {% endif %}
                                             <div class="card-body">
                                                 <h6 class="card-title">

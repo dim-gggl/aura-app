@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from artworks.models import ArtType, Support, Technique
-
+from setup.config import get_art_types, get_techniques, get_supports
 
 class Command(BaseCommand):
     
@@ -8,28 +8,19 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Types d'art initiaux
-        art_types = [
-            'Peinture', 'Sculpture', 'Photographie', 'Gravure', 
-            'Dessin', 'Bande dessinée', 'Illustration', 'Poésie', 'Autre'
-        ]
+        art_types = get_art_types()
         
         for art_type in art_types:
             ArtType.objects.get_or_create(name=art_type)
         
         # Supports initiaux
-        supports = [
-            'Toile', 'Papier', 'Bois', 'Métal', 'Verre', 'Céramique', 
-            'Pierre', 'Textile', 'Plastique', 'Carton'
-        ]
+        supports = get_supports()
         
         for support in supports:
             Support.objects.get_or_create(name=support)
         
         # Techniques initiales
-        techniques = [
-            'Huile', 'Acrylique', 'Aquarelle', 'Pastel', 'Encre', 
-            'Crayon', 'Fusain', 'Gouache', 'Tempera', 'Mixte'
-        ]
+        techniques = get_techniques()
         
         for technique in techniques:
             Technique.objects.get_or_create(name=technique)

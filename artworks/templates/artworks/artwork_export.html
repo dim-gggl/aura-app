@@ -121,7 +121,7 @@
             
             {% if artwork.art_type %}
                 <div class="info-label">Type d'art:</div>
-                <div>{{ artwork.get_art_type_display }}</div>
+                <div>{{ artwork.art_type }}</div>
             {% endif %}
             
             {% if artwork.support %}
@@ -214,7 +214,7 @@
     {% endif %}
     
     <div class="footer">
-        Fiche générée le {{ "now"|date:"d/m/Y à H:i" }} depuis l'application Catalogue
+        Fiche générée depuis l'application Aura
     </div>
 </body>
 </html>

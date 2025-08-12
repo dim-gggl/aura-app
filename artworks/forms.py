@@ -88,8 +88,9 @@ class ArtworkForm(forms.ModelForm):
         # Set querysets
         # - Artists suggestions should be scoped to the current user's usage
         if user:
+            # Limiter aux artistes de l'utilisateur (inclut ceux sans œuvres)
             self.fields['artists'].queryset = (
-                Artist.objects.filter(artwork__user=user).distinct()
+                Artist.objects.filter(user=user).order_by('name')
             )
         else:
             # No user context: do not expose global artists in suggestions
@@ -198,7 +199,7 @@ class ArtistForm(forms.ModelForm):
     
     class Meta:
         model = Artist
-        fields = '__all__'
+        exclude = ['user']
         widgets = {
             'biography': forms.Textarea(attrs={'rows': 4}),
         }
@@ -300,7 +301,7 @@ class WishlistItemForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            'title',
+            Field('title', placeholder="Titre de l'œuvre"),
             Row(
                 Column('artist_name', css_class='form-group col-md-6 mb-0'),
                 Column('estimated_price', css_class='form-group col-md-6 mb-0'),
@@ -336,8 +337,14 @@ class ArtworkPhotoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Initialize form with Crispy Forms layout for inline display."""
         super().__init__(*args, **kwargs)
+        # Allow editing metadata without re-uploading the image
+        if 'image' in self.fields:
+            self.fields['image'].required = False
         self.helper = FormHelper()
         self.helper.form_tag = False  # Used within a formset
+        self.helper.render_unmentioned_fields = True  # Render id, DELETE, etc.
+        # Ensure hidden fields (like the inline formset 'id') are rendered
+        self.helper.render_hidden_fields = True
         self.helper.layout = Layout(
             Row(
                 Column('image', css_class='form-group col-md-6 mb-0'),
@@ -353,9 +360,10 @@ class ArtworkPhotoForm(forms.ModelForm):
 
 # Inline formset for managing multiple photos per artwork
 ArtworkPhotoFormSet = inlineformset_factory(
-    Artwork,           # Parent model
-    ArtworkPhoto,      # Child model
+    Artwork,
+    ArtworkPhoto,
     form=ArtworkPhotoForm,
-    extra=3,           # Number of empty forms to display
-    can_delete=True    # Allow deletion of existing photos
-)
+    fields=["image", "caption", "is_primary"],
+    extra=3,
+    can_delete=True,
+) 

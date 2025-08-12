@@ -1,0 +1,702 @@
+[
+  {
+    "name": "Nicolas Noël",
+    "birth_year": 1982,
+    "death_year": null,
+    "nationality": "Argentine",
+    "biography": "Nicolas Noël est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Delphine David",
+    "birth_year": 1868,
+    "death_year": null,
+    "nationality": "Japonaise",
+    "biography": "Delphine David est un artiste japonaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Catherine Chevalier",
+    "birth_year": 1980,
+    "death_year": 2034,
+    "nationality": "Mexicaine",
+    "biography": "Catherine Chevalier est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Alain Fournier",
+    "birth_year": 1943,
+    "death_year": 2013,
+    "nationality": "Brésilienne",
+    "biography": "Alain Fournier est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Paul Dubois",
+    "birth_year": 1872,
+    "death_year": null,
+    "nationality": "Suisse",
+    "biography": "Paul Dubois est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Marie Perrin",
+    "birth_year": 1926,
+    "death_year": 1974,
+    "nationality": "Mexicaine",
+    "biography": "Marie Perrin est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Thomas Lucas",
+    "birth_year": 1978,
+    "death_year": null,
+    "nationality": "Japonaise",
+    "biography": "Thomas Lucas est un artiste japonaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Louis Martel",
+    "birth_year": 1995,
+    "death_year": null,
+    "nationality": "Japonaise",
+    "biography": "Louis Martel est un artiste japonaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Victor Lefèvre",
+    "birth_year": 1876,
+    "death_year": null,
+    "nationality": "Belge",
+    "biography": "Victor Lefèvre est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Catherine Baron",
+    "birth_year": 1945,
+    "death_year": null,
+    "nationality": "Argentine",
+    "biography": "Catherine Baron est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Paul Pottier",
+    "birth_year": 1939,
+    "death_year": null,
+    "nationality": "Américaine",
+    "biography": "Paul Pottier est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élodie Adam",
+    "birth_year": 1886,
+    "death_year": 1968,
+    "nationality": "Argentine",
+    "biography": "Élodie Adam est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Chloé David",
+    "birth_year": 1999,
+    "death_year": null,
+    "nationality": "Portugaise",
+    "biography": "Chloé David est un artiste portugaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Mathieu Marchand",
+    "birth_year": 1900,
+    "death_year": 1965,
+    "nationality": "Française",
+    "biography": "Mathieu Marchand est un artiste française connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Anne Moreau",
+    "birth_year": 1924,
+    "death_year": null,
+    "nationality": "Portugaise",
+    "biography": "Anne Moreau est un artiste portugaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Georges Collet",
+    "birth_year": 1913,
+    "death_year": null,
+    "nationality": "Italienne",
+    "biography": "Georges Collet est un artiste italienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Chloé Aubert",
+    "birth_year": 1905,
+    "death_year": 1980,
+    "nationality": "Australienne",
+    "biography": "Chloé Aubert est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Lucie Prieur",
+    "birth_year": 1866,
+    "death_year": null,
+    "nationality": "Canadienne",
+    "biography": "Lucie Prieur est un artiste canadienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Pierre Leclerc",
+    "birth_year": 1909,
+    "death_year": null,
+    "nationality": "Japonaise",
+    "biography": "Pierre Leclerc est un artiste japonaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "André Bertrand",
+    "birth_year": 1973,
+    "death_year": 2022,
+    "nationality": "Belge",
+    "biography": "André Bertrand est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claude Royer",
+    "birth_year": 1941,
+    "death_year": null,
+    "nationality": "Italienne",
+    "biography": "Claude Royer est un artiste italienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Aline Lefèvre",
+    "birth_year": 1918,
+    "death_year": null,
+    "nationality": "Mexicaine",
+    "biography": "Aline Lefèvre est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Victor David",
+    "birth_year": 1911,
+    "death_year": null,
+    "nationality": "Suisse",
+    "biography": "Victor David est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Adrien Descamps",
+    "birth_year": 1975,
+    "death_year": null,
+    "nationality": "Belge",
+    "biography": "Adrien Descamps est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Antoine Martel",
+    "birth_year": 1926,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "Antoine Martel est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Jean Meunier",
+    "birth_year": 1981,
+    "death_year": null,
+    "nationality": "Américaine",
+    "biography": "Jean Meunier est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élodie Laporte",
+    "birth_year": 1870,
+    "death_year": null,
+    "nationality": "Belge",
+    "biography": "Élodie Laporte est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Marie Martel",
+    "birth_year": 1876,
+    "death_year": null,
+    "nationality": "Australienne",
+    "biography": "Marie Martel est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Jean Henry",
+    "birth_year": 1983,
+    "death_year": 2067,
+    "nationality": "Américaine",
+    "biography": "Jean Henry est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Nathalie Perrin",
+    "birth_year": 1872,
+    "death_year": null,
+    "nationality": "Suisse",
+    "biography": "Nathalie Perrin est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Nathalie Renard",
+    "birth_year": 1862,
+    "death_year": 1896,
+    "nationality": "Belge",
+    "biography": "Nathalie Renard est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élodie Barbier",
+    "birth_year": 1912,
+    "death_year": null,
+    "nationality": "Française",
+    "biography": "Élodie Barbier est un artiste française connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Delphine Perrot",
+    "birth_year": 1963,
+    "death_year": null,
+    "nationality": "Mexicaine",
+    "biography": "Delphine Perrot est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Pierre Marchand",
+    "birth_year": 1862,
+    "death_year": null,
+    "nationality": "Américaine",
+    "biography": "Pierre Marchand est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Alain Meunier",
+    "birth_year": 1952,
+    "death_year": null,
+    "nationality": "Néerlandaise",
+    "biography": "Alain Meunier est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Marie Lucas",
+    "birth_year": 1932,
+    "death_year": null,
+    "nationality": "Américaine",
+    "biography": "Marie Lucas est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Paul Barbier",
+    "birth_year": 1994,
+    "death_year": 2052,
+    "nationality": "Russe",
+    "biography": "Paul Barbier est un artiste russe connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Gustave Moulin",
+    "birth_year": 1931,
+    "death_year": 1972,
+    "nationality": "Française",
+    "biography": "Gustave Moulin est un artiste française connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Alain Adam",
+    "birth_year": 1947,
+    "death_year": null,
+    "nationality": "Mexicaine",
+    "biography": "Alain Adam est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Louise Chevalier",
+    "birth_year": 1864,
+    "death_year": 1896,
+    "nationality": "Marocaine",
+    "biography": "Louise Chevalier est un artiste marocaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Benoît Brunet",
+    "birth_year": 1970,
+    "death_year": null,
+    "nationality": "Russe",
+    "biography": "Benoît Brunet est un artiste russe connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Julien Descamps",
+    "birth_year": 1896,
+    "death_year": null,
+    "nationality": "Italienne",
+    "biography": "Julien Descamps est un artiste italienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Hélène Meunier",
+    "birth_year": 1863,
+    "death_year": null,
+    "nationality": "Argentine",
+    "biography": "Hélène Meunier est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Sylvie Pottier",
+    "birth_year": 1979,
+    "death_year": null,
+    "nationality": "Argentine",
+    "biography": "Sylvie Pottier est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claire Henry",
+    "birth_year": 1949,
+    "death_year": 1997,
+    "nationality": "Canadienne",
+    "biography": "Claire Henry est un artiste canadienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Vincent Dupuis",
+    "birth_year": 1927,
+    "death_year": 2010,
+    "nationality": "Chinoise",
+    "biography": "Vincent Dupuis est un artiste chinoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Bernard Brunet",
+    "birth_year": 1970,
+    "death_year": null,
+    "nationality": "Allemande",
+    "biography": "Bernard Brunet est un artiste allemande connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Henri Gaillard",
+    "birth_year": 1982,
+    "death_year": null,
+    "nationality": "Australienne",
+    "biography": "Henri Gaillard est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Paul Noël",
+    "birth_year": 1895,
+    "death_year": null,
+    "nationality": "Mexicaine",
+    "biography": "Paul Noël est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claire Noël",
+    "birth_year": 1997,
+    "death_year": null,
+    "nationality": "Allemande",
+    "biography": "Claire Noël est un artiste allemande connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Antoine Blanc",
+    "birth_year": 1981,
+    "death_year": 2015,
+    "nationality": "Britannique",
+    "biography": "Antoine Blanc est un artiste britannique connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Jacques Perrin",
+    "birth_year": 1896,
+    "death_year": 1974,
+    "nationality": "Japonaise",
+    "biography": "Jacques Perrin est un artiste japonaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Victor Rousseau",
+    "birth_year": 1877,
+    "death_year": null,
+    "nationality": "Espagnole",
+    "biography": "Victor Rousseau est un artiste espagnole connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Delphine Brunet",
+    "birth_year": 1957,
+    "death_year": 2047,
+    "nationality": "Suisse",
+    "biography": "Delphine Brunet est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Juliette Fontaine",
+    "birth_year": 2000,
+    "death_year": null,
+    "nationality": "Brésilienne",
+    "biography": "Juliette Fontaine est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Adrien Meunier",
+    "birth_year": 1911,
+    "death_year": null,
+    "nationality": "Brésilienne",
+    "biography": "Adrien Meunier est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Julien Barbier",
+    "birth_year": 1870,
+    "death_year": null,
+    "nationality": "Américaine",
+    "biography": "Julien Barbier est un artiste américaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Aline Lemoine",
+    "birth_year": 1870,
+    "death_year": null,
+    "nationality": "Australienne",
+    "biography": "Aline Lemoine est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Gustave Dubois",
+    "birth_year": 1851,
+    "death_year": null,
+    "nationality": "Brésilienne",
+    "biography": "Gustave Dubois est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claude Pottier",
+    "birth_year": 1905,
+    "death_year": 1983,
+    "nationality": "Britannique",
+    "biography": "Claude Pottier est un artiste britannique connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Lucie François",
+    "birth_year": 1851,
+    "death_year": null,
+    "nationality": "Suisse",
+    "biography": "Lucie François est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Sophie Aubert",
+    "birth_year": 1936,
+    "death_year": null,
+    "nationality": "Allemande",
+    "biography": "Sophie Aubert est un artiste allemande connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élodie Girard",
+    "birth_year": 1892,
+    "death_year": null,
+    "nationality": "Espagnole",
+    "biography": "Élodie Girard est un artiste espagnole connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Victor Lucas",
+    "birth_year": 1968,
+    "death_year": null,
+    "nationality": "Russe",
+    "biography": "Victor Lucas est un artiste russe connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Thomas Aubert",
+    "birth_year": 1992,
+    "death_year": null,
+    "nationality": "Allemande",
+    "biography": "Thomas Aubert est un artiste allemande connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Anne Chevalier",
+    "birth_year": 1907,
+    "death_year": 1964,
+    "nationality": "Chinoise",
+    "biography": "Anne Chevalier est un artiste chinoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Olivier Martel",
+    "birth_year": 1955,
+    "death_year": null,
+    "nationality": "Belge",
+    "biography": "Olivier Martel est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Bernard Perrin",
+    "birth_year": 1878,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "Bernard Perrin est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Juliette Boucher",
+    "birth_year": 1926,
+    "death_year": 2002,
+    "nationality": "Italienne",
+    "biography": "Juliette Boucher est un artiste italienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Mathieu Marchand",
+    "birth_year": 1862,
+    "death_year": null,
+    "nationality": "Canadienne",
+    "biography": "Mathieu Marchand est un artiste canadienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Chloé Masson",
+    "birth_year": 1878,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "Chloé Masson est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Juliette Laporte",
+    "birth_year": 1973,
+    "death_year": 2018,
+    "nationality": "Australienne",
+    "biography": "Juliette Laporte est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Sylvie David",
+    "birth_year": 1997,
+    "death_year": null,
+    "nationality": "Belge",
+    "biography": "Sylvie David est un artiste belge connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Juliette Fournier",
+    "birth_year": 1966,
+    "death_year": 2037,
+    "nationality": "Argentine",
+    "biography": "Juliette Fournier est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élisabeth Barbier",
+    "birth_year": 1909,
+    "death_year": null,
+    "nationality": "Espagnole",
+    "biography": "Élisabeth Barbier est un artiste espagnole connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claire Daumier",
+    "birth_year": 1852,
+    "death_year": null,
+    "nationality": "Néerlandaise",
+    "biography": "Claire Daumier est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Chloé Rousseau",
+    "birth_year": 1900,
+    "death_year": null,
+    "nationality": "Portugaise",
+    "biography": "Chloé Rousseau est un artiste portugaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Delphine Baudry",
+    "birth_year": 1953,
+    "death_year": null,
+    "nationality": "Espagnole",
+    "biography": "Delphine Baudry est un artiste espagnole connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Laurent Perrot",
+    "birth_year": 1851,
+    "death_year": 1915,
+    "nationality": "Mexicaine",
+    "biography": "Laurent Perrot est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Marc Chevalier",
+    "birth_year": 1980,
+    "death_year": 2013,
+    "nationality": "Néerlandaise",
+    "biography": "Marc Chevalier est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Damien Leclerc",
+    "birth_year": 1926,
+    "death_year": 1997,
+    "nationality": "Australienne",
+    "biography": "Damien Leclerc est un artiste australienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "André Meunier",
+    "birth_year": 1894,
+    "death_year": null,
+    "nationality": "Néerlandaise",
+    "biography": "André Meunier est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "René Barbier",
+    "birth_year": 1856,
+    "death_year": 1899,
+    "nationality": "Allemande",
+    "biography": "René Barbier est un artiste allemande connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claude Aubert",
+    "birth_year": 1914,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "Claude Aubert est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Henri Collet",
+    "birth_year": 1877,
+    "death_year": null,
+    "nationality": "Russe",
+    "biography": "Henri Collet est un artiste russe connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Alain Durand",
+    "birth_year": 1883,
+    "death_year": null,
+    "nationality": "Mexicaine",
+    "biography": "Alain Durand est un artiste mexicaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Victor Collet",
+    "birth_year": 1957,
+    "death_year": null,
+    "nationality": "Argentine",
+    "biography": "Victor Collet est un artiste argentine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Nicolas Poulain",
+    "birth_year": 1927,
+    "death_year": null,
+    "nationality": "Canadienne",
+    "biography": "Nicolas Poulain est un artiste canadienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Claire Robin",
+    "birth_year": 1870,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "Claire Robin est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Élodie Martel",
+    "birth_year": 1875,
+    "death_year": null,
+    "nationality": "Canadienne",
+    "biography": "Élodie Martel est un artiste canadienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Laurent Royer",
+    "birth_year": 1914,
+    "death_year": null,
+    "nationality": "Italienne",
+    "biography": "Laurent Royer est un artiste italienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Henri Garnier",
+    "birth_year": 1875,
+    "death_year": null,
+    "nationality": "Brésilienne",
+    "biography": "Henri Garnier est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Isabelle Rousseau",
+    "birth_year": 1882,
+    "death_year": null,
+    "nationality": "Néerlandaise",
+    "biography": "Isabelle Rousseau est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Damien Bertrand",
+    "birth_year": 1902,
+    "death_year": null,
+    "nationality": "Brésilienne",
+    "biography": "Damien Bertrand est un artiste brésilienne connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "André Boucher",
+    "birth_year": 1864,
+    "death_year": null,
+    "nationality": "Britannique",
+    "biography": "André Boucher est un artiste britannique connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Louise Henry",
+    "birth_year": 1901,
+    "death_year": null,
+    "nationality": "Marocaine",
+    "biography": "Louise Henry est un artiste marocaine connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "René François",
+    "birth_year": 1962,
+    "death_year": null,
+    "nationality": "Suédoise",
+    "biography": "René François est un artiste suédoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Hélène Lambert",
+    "birth_year": 1975,
+    "death_year": null,
+    "nationality": "Néerlandaise",
+    "biography": "Hélène Lambert est un artiste néerlandaise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Henri Lambert",
+    "birth_year": 1954,
+    "death_year": null,
+    "nationality": "Chinoise",
+    "biography": "Henri Lambert est un artiste chinoise connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  },
+  {
+    "name": "Isabelle Martel",
+    "birth_year": 1888,
+    "death_year": null,
+    "nationality": "Suisse",
+    "biography": "Isabelle Martel est un artiste suisse connu pour ses œuvres dans divers styles et techniques, actif principalement au XXe siècle."
+  }
+]

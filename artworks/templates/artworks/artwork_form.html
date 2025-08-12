@@ -90,6 +90,8 @@
                         <div id="photo-forms">
                             {% for form in photo_formset %}
                                 <div class="photo-form" data-form-index="{{ forloop.counter0 }}">
+                                    {{ form.id }}
+                                    {{ form.DELETE }}
                                     {% if form.instance.image %}
                                         <div class="mb-2">
                                             <img src="{{ form.instance.image.url }}" class="photo-preview">
@@ -135,11 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const photoFormsContainer = document.getElementById('photo-forms');
     const addPhotoBtn = document.getElementById('add-photo');
     const managementForm = document.querySelector('[name="photos-TOTAL_FORMS"]');
-    const maxForms = parseInt(document.querySelector('[name="photos-MAX_NUM_FORMS"]').value);
+    const maxFormsInput = document.querySelector('[name="photos-MAX_NUM_FORMS"]');
+    const maxForms = maxFormsInput ? parseInt(maxFormsInput.value) : 1000;
     
     // Fonction pour mettre à jour le nombre total de formulaires
     function updateTotalForms() {
-        const totalForms = document.querySelectorAll('.photo-form:not(.deleted)').length;
+        // TOTAL_FORMS doit refléter le nombre de formulaires rendus, supprimés inclus
+        const totalForms = document.querySelectorAll('.photo-form').length;
         managementForm.value = totalForms;
     }
     
@@ -173,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     form.classList.remove('deleted');
                 }
+                // Ne pas modifier TOTAL_FORMS en fonction des suppressions
                 updateTotalForms();
             });
         }
@@ -184,9 +189,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ajouter un nouveau formulaire
     if (addPhotoBtn) {
         addPhotoBtn.addEventListener('click', function() {
-            const currentForms = document.querySelectorAll('.photo-form:not(.deleted)').length;
-            
-            if (currentForms >= maxForms) {
+            const currentTotal = parseInt(managementForm.value || '0');
+
+            if (currentTotal >= maxForms) {
                 alert('Nombre maximum de photos atteint');
                 return;
             }
@@ -195,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const firstForm = document.querySelector('.photo-form');
             if (firstForm) {
                 const newForm = firstForm.cloneNode(true);
-                const newIndex = currentForms;
+                const newIndex = currentTotal;
                 
                 // Mettre à jour les noms des champs
                 newForm.querySelectorAll('input, select, textarea').forEach(function(input) {
@@ -207,6 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         input.checked = false;
                     }
                     if (input.type === 'file') {
+                        input.value = '';
+                    } else if (input.type === 'hidden' || /-id$/.test(input.name || '')) {
+                        // Important: l'ID du nouveau formulaire doit être vide
                         input.value = '';
                     } else if (input.type !== 'checkbox') {
                         input.value = '';
@@ -225,18 +233,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (existingPreview) {
                     existingPreview.remove();
                 }
+                // Supprimer les éventuels messages d'erreur copiés
+                const existingAlerts = newForm.querySelectorAll('.alert');
+                existingAlerts.forEach(a => a.remove());
                 
                 newForm.classList.remove('deleted');
                 newForm.setAttribute('data-form-index', newIndex);
                 
                 photoFormsContainer.appendChild(newForm);
                 setupImagePreview(newForm);
-                updateTotalForms();
+                // Incrémenter TOTAL_FORMS seulement à l'ajout
+                managementForm.value = currentTotal + 1;
             }
         });
     }
     
-    // Initialiser le compteur
+    // Initialiser le compteur au nombre réel de formulaires rendus
     updateTotalForms();
 });
 </script>

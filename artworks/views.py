@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.http import HttpResponse, JsonResponse
+from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
@@ -31,109 +32,337 @@ from taggit.models import Tag
 
 # Import all models used in the views
 from .models import (
-    Artwork, 
-    Artist, 
-    Collection, 
-    Exhibition, 
-    ArtworkPhoto, 
-    WishlistItem, 
-    ArtType, 
-    Support, 
-    Technique, 
-    UUIDTaggedItem,
+    Artwork,
+    Artist,
+    Collection,
+    Exhibition,
+    WishlistItem,
+    ArtType,
+    Support,
+    Technique,
 )
+
 # Import forms for handling user input
 from .forms import (
-    ArtworkForm, 
-    ArtistForm, 
-    CollectionForm, 
-    ExhibitionForm, 
-    ArtworkPhotoFormSet, 
-    WishlistItemForm
+    ArtworkForm,
+    ArtistForm,
+    CollectionForm,
+    ExhibitionForm,
+    ArtworkPhotoFormSet,
+    WishlistItemForm,
 )
 from .widgets import SelectOrCreateWidget
 from .filters import ArtworkFilter
 
+# ========================================
+# UTILITAIRES COMMUNS
+# ========================================
+
+def _export_response_from_template(
+    *,
+    request,
+    template_name: str,
+    context: dict,
+    filename_base: str,
+    as_pdf: bool = False,
+    redirect_response=None,
+):
+    """
+    Génère une réponse d'export (HTML ou PDF) à partir d'un template.
+
+    - Ajoute automatiquement `is_pdf` au contexte pour les templates.
+    - Gère l'import de WeasyPrint et le message d'erreur utilisateur.
+    """
+    if as_pdf:
+        try:
+            from weasyprint import HTML  # type: ignore
+        except (ImportError, OSError):
+            messages.error(
+                request,
+                (
+                    "L'export PDF n'est pas disponible. Les dépendances "
+                    "système de WeasyPrint ne sont pas installées."
+                ),
+            )
+            if redirect_response is not None:
+                return redirect_response
+            return redirect("artworks:list")
+
+        context = {**context, "is_pdf": True}
+        html_content = render_to_string(template_name, context)
+        pdf = HTML(string=html_content).write_pdf()
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = f"attachment; filename='{filename_base}.pdf'"
+        return response
+
+    # Export HTML
+    html_content = render_to_string(template_name, context)
+    response = HttpResponse(html_content, content_type="text/html")
+    response["Content-Disposition"] = f"attachment; filename='{filename_base}.html'"
+    return response
+
+
+def _reference_list(
+    request,
+    *,
+    model,
+    entity_name: str,
+    entity_name_plural: str,
+    create_url: str,
+):
+    """Vue générique de liste pour les entités de référence (nom + compteur d'œuvres)."""
+    items = model.objects.all().annotate(artwork_count=Count("artwork")).order_by("name")
+
+    search = request.GET.get("search", "")
+    if search:
+        items = items.filter(name__icontains=search)
+
+    paginator = Paginator(items, 20)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+        "search": search,
+        "entity_name": entity_name,
+        "entity_name_plural": entity_name_plural,
+        "create_url": create_url,
+    }
+
+    return render(request, "artworks/reference_list.html", context)
+
+
+def _reference_create(
+    request,
+    *,
+    model,
+    entity_label: str,
+    back_url_name: str,
+    title: str,
+):
+    """Vue générique de création pour entités Nom uniquement."""
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            obj, created = model.objects.get_or_create(name=name)
+            if created:
+                messages.success(request, f"{entity_label.capitalize()} '{name}' créé avec succès.")
+            else:
+                messages.info(request, f"{entity_label.capitalize()} '{name}' existe déjà.")
+            return redirect(back_url_name)
+        else:
+            messages.error(request, "Le nom est requis.")
+
+    context = {
+        "title": title,
+        "entity_name": entity_label,
+        "back_url": back_url_name,
+    }
+    return render(request, "artworks/reference_form.html", context)
+
+
+def _reference_update(
+    request,
+    pk,
+    *,
+    model,
+    entity_label: str,
+    back_url_name: str,
+    title: str,
+):
+    """Vue générique de modification pour entités Nom uniquement."""
+    obj = get_object_or_404(model, pk=pk)
+
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        if name:
+            if name != obj.name:
+                if model.objects.filter(name=name).exists():
+                    messages.error(
+                        request,
+                        f"Un {entity_label} avec le nom '{name}' existe déjà.",
+                    )
+                else:
+                    obj.name = name
+                    obj.save()
+                    messages.success(request, f"{entity_label.capitalize()} modifié avec succès.")
+                    return redirect(back_url_name)
+            else:
+                return redirect(back_url_name)
+        else:
+            messages.error(request, "Le nom est requis.")
+
+    context = {
+        "title": title,
+        "entity_name": entity_label,
+        "current_name": obj.name,
+        "back_url": back_url_name,
+    }
+    return render(request, "artworks/reference_form.html", context)
+
+
+def _reference_delete(
+    request,
+    pk,
+    *,
+    model,
+    entity_label: str,
+    back_url_name: str,
+):
+    """Vue générique de suppression pour entités Nom uniquement."""
+    obj = get_object_or_404(model, pk=pk)
+
+    if request.method == "POST":
+        name = obj.name
+        obj.delete()
+        messages.success(request, f"{entity_label.capitalize()} '{name}' supprimé avec succès.")
+        return redirect(back_url_name)
+
+    context = {
+        "object": obj,
+        "entity_name": entity_label,
+        "back_url": back_url_name,
+    }
+    return render(request, "artworks/reference_confirm_delete.html", context)
+
+
+def _create_by_name_ajax_impl(request, *, model, with_user: bool = False, defaults: dict | None = None):
+    """Logique générique de création via AJAX d'une entité identifiée par son nom."""
+    try:
+        data = json.loads(request.body)
+        name = data.get("name", "").strip()
+        if not name:
+            return JsonResponse({"error": "Le nom est requis"}, status=400)
+
+        kwargs = {"name": name}
+        if with_user:
+            kwargs["user"] = request.user
+
+        obj, created = model.objects.get_or_create(defaults=defaults or {}, **kwargs)
+        return JsonResponse(
+            {
+                "success": True,
+                "id": obj.pk,
+                "name": getattr(obj, "name", str(obj.pk)),
+                "created": created,
+            }
+        )
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON data"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 # ========================================
 # ARTWORK VIEWS
 # ========================================
+
+# LIST ================================
 
 
 @login_required
 def artwork_list(request):
     """
     Display a paginated and filterable list of the user's artworks.
-    
+
     This view provides the main artwork listing page with:
     - Filtering by various criteria (artist, type, location, etc.)
     - Search functionality
     - Pagination (12 items per page)
     - Optimized queries with prefetch_related for performance
-    
+
     Args:
         request: The HTTP request object
-        
+
     Returns:
         HttpResponse: Rendered artwork list page
     """
     # Get all user's artworks with optimized queries to reduce database hits
     # prefetch_related loads related artists and photos in separate queries
-    artworks = Artwork.objects.filter(user=request.user).prefetch_related("artists", "photos")
-    
+    artworks = Artwork.objects.filter(user=request.user).prefetch_related(
+        "artists", "photos"
+    )
+
     # Get artists that have artworks for this user (for filter dropdown)
     artist_queryset = Artist.objects.filter(artwork__user=request.user).distinct()
-    
+
     # Apply filters based on GET parameters
-    artwork_filter = ArtworkFilter(
-        request.GET, 
-        queryset=artworks
-    )
+    artwork_filter = ArtworkFilter(request.GET, queryset=artworks)
     # Limit filter dropdowns to current user's data
-    artwork_filter.form.fields['artists'].queryset = artist_queryset
-    if 'collections' in artwork_filter.form.fields:
-        artwork_filter.form.fields['collections'].queryset = Collection.objects.filter(user=request.user)
-    if 'exhibitions' in artwork_filter.form.fields:
-        artwork_filter.form.fields['exhibitions'].queryset = Exhibition.objects.filter(user=request.user)
-    if 'parent_artwork' in artwork_filter.form.fields:
-        artwork_filter.form.fields['parent_artwork'].queryset = Artwork.objects.filter(user=request.user)
-    if 'tags' in artwork_filter.form.fields:
-        artwork_filter.form.fields['tags'].queryset = Tag.objects.filter(
-            pk__in=UUIDTaggedItem.objects.filter(
-                content_object__user=request.user
-            ).values("tag_id")
-        ).distinct().order_by("name")
-    
+    artwork_fields = artwork_filter.form.fields
+    artwork_fields["artists"].queryset = artist_queryset
+    if "collections" in artwork_fields:
+        artwork_fields["collections"].queryset = Collection.objects.filter(
+            user=request.user
+        )
+
+    if "exhibitions" in artwork_fields:
+        artwork_fields["exhibitions"].queryset = Exhibition.objects.filter(
+            user=request.user
+        )
+
+    if "parent_artwork" in artwork_fields:
+        artwork_fields["parent_artwork"].queryset = Artwork.objects.filter(
+            user=request.user
+        )
+
+    if "tags" in artwork_fields:
+        artwork_ct = ContentType.objects.get_for_model(Artwork)
+        user_artwork_ids = Artwork.objects.filter(user=request.user).values_list(
+            "id", flat=True
+        )
+        artwork_fields["tags"].queryset = (
+            Tag.objects.filter(
+                artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
+                artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,
+            )
+            .distinct()
+            .order_by("name")
+        )
+
     # Use filtered queryset for pagination
     artworks = artwork_filter.qs.prefetch_related("artists", "photos")
     paginator = Paginator(artworks, 12)  # 12 artworks per page for grid layout
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # Build helpers for templates: active filters and querystring without page
+    # Keep multi-valued params intact for pagination links
+    get_params = request.GET.copy()
+    if "page" in get_params:
+        del get_params["page"]
+
+    current_filters = {k: ", ".join(get_params.getlist(k)) for k in get_params}
+    querystring = get_params.urlencode()
+
     context = {
         "filter": artwork_filter,
         "page_obj": page_obj,
+        "current_filters": current_filters,
+        "querystring": querystring,
     }
-    
+
     return render(request, "artworks/artwork_list.html", context)
+
+
+# DETAIL ================================
 
 
 @login_required
 def artwork_detail(request, pk):
     """
     Display detailed information about a specific artwork.
-    
+
     Shows comprehensive artwork information including photos, dimensions,
     acquisition details, and related entities. Only accessible to the
     artwork's owner for security.
-    
+
     Args:
         request: The HTTP request object
         pk: Primary key (UUID) of the artwork to display
-        
+
     Returns:
         HttpResponse: Rendered artwork detail page
-        
+
     Raises:
         Http404: If artwork doesn't exist or doesn't belong to current user
     """
@@ -141,34 +370,40 @@ def artwork_detail(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
     # Get all photos for this artwork, ordered by primary status
     photos = artwork.photos.all()
-    
+
     context = {
         "artwork": artwork,
         "photos": photos,
     }
-    
+
     return render(request, "artworks/artwork_detail.html", context)
+
+
+# CREATE ================================
 
 
 @login_required
 def artwork_create(request):
     """
     Handle creation of new artworks with photos.
-    
+
     This view manages both the artwork form and associated photo formset.
     On successful creation, the user is redirected to the artwork detail page.
-    
+
     Args:
         request: The HTTP request object
-        
+
     Returns:
-        HttpResponse: Rendered form page (GET) or redirect to detail page (POST success)
+        HttpResponse: Rendered form page (GET) or redirect to detail page
+        (POST success)
     """
     if request.method == "POST":
         # Initialize forms with POST data and files
         form = ArtworkForm(request.POST, request.FILES, user=request.user)
-        photo_formset = ArtworkPhotoFormSet(request.POST, request.FILES)
-        
+        photo_formset = ArtworkPhotoFormSet(
+            request.POST, request.FILES, prefix="photos"
+        )
+
         if form.is_valid() and photo_formset.is_valid():
             # Save artwork but don't commit to DB yet (need to set user)
             artwork = form.save(commit=False)
@@ -176,342 +411,227 @@ def artwork_create(request):
             artwork.save()
             # Save many-to-many relationships after the main object is saved
             form.save_m2m()
-            
+
             # Associate photo formset with the saved artwork and save photos
             photo_formset.instance = artwork
             photo_formset.save()
-            
+
             messages.success(request, "Oeuvre ajoutée avec succès.")
             return redirect("artworks:detail", pk=artwork.pk)
     else:
         # GET request: initialize empty forms
         form = ArtworkForm(user=request.user)
-        photo_formset = ArtworkPhotoFormSet()
-    
+        photo_formset = ArtworkPhotoFormSet(prefix="photos")
+
     context = {
         "form": form,
         "photo_formset": photo_formset,
         "title": "Ajouter une œuvre",
     }
-    
+
     return render(request, "artworks/artwork_form.html", context)
+
+
+# UPDATE ================================
 
 
 @login_required
 def artwork_update(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
-    
+
     if request.method == "POST":
         form = ArtworkForm(request.POST, instance=artwork, user=request.user)
-        photo_formset = ArtworkPhotoFormSet(request.POST, request.FILES, instance=artwork)
-        
+        photo_formset = ArtworkPhotoFormSet(
+            request.POST, request.FILES, instance=artwork, prefix="photos"
+        )
+
         if form.is_valid() and photo_formset.is_valid():
             form.save()
             photo_formset.save()
-            
+
             messages.success(request, "Œuvre modifiée avec succès.")
             return redirect("artworks:detail", pk=artwork.pk)
     else:
         form = ArtworkForm(instance=artwork, user=request.user)
-        photo_formset = ArtworkPhotoFormSet(instance=artwork)
-    
+        photo_formset = ArtworkPhotoFormSet(instance=artwork, prefix="photos")
+
     context = {
         "form": form,
         "photo_formset": photo_formset,
         "artwork": artwork,
-        "title": "Modifier l\"œuvre",
+        "title": 'Modifier l"œuvre',
     }
-    
+
     return render(request, "artworks/artwork_form.html", context)
+
+
+# DELETE ================================
 
 
 @login_required
 def artwork_delete(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
-    
+
     if request.method == "POST":
         artwork.delete()
         messages.success(request, "Œuvre supprimée avec succès.")
         return redirect("artworks:list")
-    
+
     return render(request, "artworks/artwork_confirm_delete.html", {"artwork": artwork})
+
+
+# EXPORT ================================
+
+
+@login_required
+def artwork_export_html(request, pk):
+    artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/artwork_export.html",
+        context={
+            "artwork": artwork,
+            "photos": artwork.photos.all(),
+        },
+        filename_base=f"artwork_{artwork.pk}",
+        as_pdf=False,
+    )
+
+
+@login_required
+def artwork_export_pdf(request, pk):
+    artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/artwork_export.html",
+        context={
+            "artwork": artwork,
+            "photos": artwork.photos.all(),
+        },
+        filename_base=f"artwork_{artwork.pk}",
+        as_pdf=True,
+        redirect_response=redirect("artworks:detail", pk=pk),
+    )
 
 
 # ========================================
 # RANDOM SUGGESTION FEATURE
 # ========================================
 
+
 @login_required
 def random_suggestion(request):
     """
     Suggest a random artwork for exhibition from user's collection.
-    
+
     This feature helps users discover artworks in their collection that haven't
     been exhibited recently (more than 6 months ago) or never exhibited.
     Only considers artworks currently at home or in storage.
-    
+
     Args:
         request: The HTTP request object
-        
+
     Returns:
         HttpResponse: Page with suggested artwork or "no suggestion" message
     """
     try:
         # Define "recently exhibited" as within the last 6 months
         six_months_ago = datetime.now().date() - timedelta(days=180)
-        
+
         # Find artworks that are available for exhibition:
         # - Located at home or in storage (not already on display/loan)
         # - Not exhibited recently or never exhibited
         artworks = Artwork.objects.filter(
             user=request.user,
-            current_location__in=["domicile", "stockage"]  # Available locations
+            current_location__in=["domicile", "stockage"],  # Available locations
         ).filter(
             # Either last exhibited more than 6 months ago OR never exhibited
-            Q(last_exhibited__lt=six_months_ago) | Q(last_exhibited__isnull=True)
+            Q(last_exhibited__lt=six_months_ago)
+            | Q(last_exhibited__isnull=True)
         )
-        
+
         if artworks.exists():
             # Convert queryset to list to avoid issues with random.choice on querysets
             # This loads all matching artworks into memory but improves reliability
             artworks_list = list(artworks)
             suggested_artwork = random.choice(artworks_list)
-            return render(request, "artworks/random_suggestion.html", {
-                "artwork": suggested_artwork
-            })
+            return render(
+                request,
+                "artworks/random_suggestion.html",
+                {"artwork": suggested_artwork},
+            )
         else:
             # No artworks available for suggestion
-            return render(request, "artworks/random_suggestion.html", {
-                "no_suggestion": True
-            })
+            return render(
+                request, "artworks/random_suggestion.html", {"no_suggestion": True}
+            )
     except Exception as e:
         # Graceful error handling - redirect with user-friendly message
-        messages.error(request, "Une erreur est survenue lors de la génération de la suggestion.")
+        messages.error(
+            request, "Une erreur est survenue lors de la génération de la suggestion."
+        )
         return redirect("artworks:list")
-
-
-@login_required
-def artwork_export_html(request, pk):
-    artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
-    
-    html_content = render_to_string("artworks/artwork_export.html", {
-        "artwork": artwork,
-        "photos": artwork.photos.all(),
-    })
-    
-    response = HttpResponse(html_content, content_type="text/html")
-    response["Content-Disposition"] = f"attachment; filename='artwork_{artwork.pk}.html'"
-    
-    return response
-
-
-@login_required
-def artwork_export_pdf(request, pk):
-    # Import WeasyPrint localement pour éviter les erreurs au chargement du module
-    try:
-        from weasyprint import HTML
-    except (ImportError, OSError) as e:
-        messages.error(request, 
-            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.")
-        return redirect("artworks:detail", pk=pk)
-    
-    artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
-    
-    html_content = render_to_string("artworks/artwork_export.html", {
-        "artwork": artwork,
-        "photos": artwork.photos.all(),
-        "is_pdf": True,
-    })
-    
-    pdf = HTML(string=html_content).write_pdf()
-    
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f"attachment; filename='artwork_{artwork.pk}.pdf'"
-    
-    return response
-
-
-@login_required
-def artist_export_html(request, pk):
-    artist = get_object_or_404(Artist, pk=pk)
-    artworks = Artwork.objects.filter(artists=artist, user=request.user)
-    html_content = render_to_string("artworks/artist_export.html", {
-        "artist": artist,
-        "artworks": artworks,
-    })
-    response = HttpResponse(html_content, content_type="text/html")
-    response["Content-Disposition"] = f"attachment; filename='artist_{artist.pk}.html'"
-    return response
-
-
-@login_required
-def artist_export_pdf(request, pk):
-    try:
-        from weasyprint import HTML
-    except (ImportError, OSError):
-        messages.error(
-            request,
-            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
-        )
-        return redirect("artworks:artist_detail", pk=pk)
-
-    artist = get_object_or_404(Artist, pk=pk)
-    artworks = Artwork.objects.filter(artists=artist, user=request.user)
-    html_content = render_to_string("artworks/artist_export.html", {
-        "artist": artist,
-        "artworks": artworks,
-        "is_pdf": True,
-    })
-    pdf = HTML(string=html_content).write_pdf()
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f"attachment; filename='artist_{artist.pk}.pdf'"
-    return response
-
-
-@login_required
-def collection_export_html(request, pk):
-    collection = get_object_or_404(Collection, pk=pk, user=request.user)
-    artworks = collection.artwork_set.all()
-    html_content = render_to_string("artworks/collection_export.html", {
-        "collection": collection,
-        "artworks": artworks,
-    })
-    response = HttpResponse(html_content, content_type="text/html")
-    response["Content-Disposition"] = f"attachment; filename='collection_{collection.pk}.html'"
-    return response
-
-
-@login_required
-def collection_export_pdf(request, pk):
-    try:
-        from weasyprint import HTML
-    except (ImportError, OSError):
-        messages.error(
-            request,
-            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
-        )
-        return redirect("artworks:collection_detail", pk=pk)
-
-    collection = get_object_or_404(Collection, pk=pk, user=request.user)
-    artworks = collection.artwork_set.all()
-    html_content = render_to_string("artworks/collection_export.html", {
-        "collection": collection,
-        "artworks": artworks,
-        "is_pdf": True,
-    })
-    pdf = HTML(string=html_content).write_pdf()
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f"attachment; filename='collection_{collection.pk}.pdf'"
-    return response
-
-
-@login_required
-def exhibition_export_html(request, pk):
-    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
-    artworks = exhibition.artwork_set.all()
-    html_content = render_to_string("artworks/exhibition_export.html", {
-        "exhibition": exhibition,
-        "artworks": artworks,
-    })
-    response = HttpResponse(html_content, content_type="text/html")
-    response["Content-Disposition"] = f"attachment; filename='exhibition_{exhibition.pk}.html'"
-    return response
-
-
-@login_required
-def exhibition_export_pdf(request, pk):
-    try:
-        from weasyprint import HTML
-    except (ImportError, OSError):
-        messages.error(
-            request,
-            "L'export PDF n'est pas disponible. Les dépendances système de WeasyPrint ne sont pas installées.",
-        )
-        return redirect("artworks:exhibition_detail", pk=pk)
-
-    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
-    artworks = exhibition.artwork_set.all()
-    html_content = render_to_string("artworks/exhibition_export.html", {
-        "exhibition": exhibition,
-        "artworks": artworks,
-        "is_pdf": True,
-    })
-    pdf = HTML(string=html_content).write_pdf()
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = f"attachment; filename='exhibition_{exhibition.pk}.pdf'"
-    return response
-
-@login_required
-def wishlist(request):
-    items = WishlistItem.objects.filter(user=request.user)
-    
-    if request.method == "POST":
-        form = WishlistItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-            item.user = request.user
-            item.save()
-            messages.success(request, "Œuvre ajoutée à la liste de souhaits.")
-            return redirect("artworks:wishlist")
-    else:
-        form = WishlistItemForm()
-    
-    context = {
-        "items": items,
-        "form": form,
-    }
-    
-    return render(request, "artworks/wishlist.html", context)
 
 
 # ========================================
 # ARTIST MANAGEMENT VIEWS
 # ========================================
 
+# LIST ================================
+
+
 @login_required
 def artist_list(request):
     """
     Affiche la liste de tous les artistes, avec un compteur d'œuvres pour l'utilisateur.
-    
+
     - Montre tous les artistes (même sans œuvre)
     - Ajoute `artwork_count` = nombre d'œuvres de l'utilisateur courant liées à l'artiste
     - Permet une recherche par nom
     """
-    # Restreindre aux artistes liés à au moins une œuvre de l'utilisateur
-    artists = Artist.objects.filter(artwork__user=request.user).distinct().annotate(
-        artwork_count=Count("artwork", filter=Q(artwork__user=request.user))
-    ).order_by("name")
-    
+    # Afficher uniquement les artistes de l'utilisateur et annoter le nombre d'œuvres
+    artists = (
+        Artist.objects.filter(user=request.user)
+        .annotate(artwork_count=Count("artwork", filter=Q(artwork__user=request.user)))
+        .order_by("name")
+    )
+
     # Handle search functionality
     search = request.GET.get("search", "")
     if search:
         # Case-insensitive search in artist names
         artists = artists.filter(name__icontains=search)
-    
+
     # Pagination with more items per page since artist list is simpler
     paginator = Paginator(artists, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         "page_obj": page_obj,
         "search": search,
     }
-    
+
     return render(request, "artworks/artist_list.html", context)
+
+
+# DETAIL ================================
 
 
 @login_required
 def artist_detail(request, pk):
-    artist = get_object_or_404(Artist, pk=pk)
+    artist = get_object_or_404(Artist, pk=pk, user=request.user)
     artworks = Artwork.objects.filter(artists=artist, user=request.user)
-    
+
     context = {
         "artist": artist,
         "artworks": artworks,
     }
-    
+
     return render(request, "artworks/artist_detail.html", context)
+
+
+# CREATE ================================
 
 
 @login_required
@@ -519,24 +639,29 @@ def artist_create(request):
     if request.method == "POST":
         form = ArtistForm(request.POST)
         if form.is_valid():
-            artist = form.save()
+            artist = form.save(commit=False)
+            artist.user = request.user
+            artist.save()
             messages.success(request, "Artiste ajouté avec succès.")
             return redirect("artworks:artist_detail", pk=artist.pk)
     else:
         form = ArtistForm()
-    
+
     context = {
         "form": form,
         "title": "Ajouter un artiste",
     }
-    
+
     return render(request, "artworks/artist_form.html", context)
+
+
+# UPDATE ================================
 
 
 @login_required
 def artist_update(request, pk):
-    artist = get_object_or_404(Artist, pk=pk)
-    
+    artist = get_object_or_404(Artist, pk=pk, user=request.user)
+
     if request.method == "POST":
         form = ArtistForm(request.POST, instance=artist)
         if form.is_valid():
@@ -545,14 +670,17 @@ def artist_update(request, pk):
             return redirect("artworks:artist_detail", pk=artist.pk)
     else:
         form = ArtistForm(instance=artist)
-    
+
     context = {
         "form": form,
         "artist": artist,
-        "title": "Modifier l\"artiste",
+        "title": 'Modifier l"artiste',
     }
-    
+
     return render(request, "artworks/artist_form.html", context)
+
+
+# DELETE ================================
 
 
 @login_required
@@ -563,9 +691,12 @@ def artist_delete(request, pk):
     les œuvres ne sont pas supprimées.
     """
     artist = get_object_or_404(Artist, pk=pk)
-    # Compter les œuvres de l'utilisateur courant liées à cet artiste (pour information)
-    linked_artworks_count = Artwork.objects.filter(artists=artist, user=request.user).count()
-
+    # Count the user's current artworks linked to this artist (for information)
+    linked_artworks_count = Artwork.objects.filter(
+        artists=artist, user=request.user
+    ).count()
+    # If the artist is linked to artworks, these links will be removed (M2M),
+    # but the artworks themselves will not be deleted.
     if request.method == "POST":
         name = artist.name
         artist.delete()
@@ -579,93 +710,86 @@ def artist_delete(request, pk):
     return render(request, "artworks/artist_confirm_delete.html", context)
 
 
+# EXPORT ================================
+
+
+@login_required
+def artist_export_html(request, pk):
+    artist = get_object_or_404(Artist, pk=pk)
+    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/artist_export.html",
+        context={"artist": artist, "artworks": artworks},
+        filename_base=f"artist_{artist.pk}",
+        as_pdf=False,
+    )
+
+
+@login_required
+def artist_export_pdf(request, pk):
+    artist = get_object_or_404(Artist, pk=pk)
+    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/artist_export.html",
+        context={"artist": artist, "artworks": artworks},
+        filename_base=f"artist_{artist.pk}",
+        as_pdf=True,
+        redirect_response=redirect("artworks:artist_detail", pk=pk),
+    )
+
+
 # ========================================
-# AJAX ENDPOINTS FOR DYNAMIC FUNCTIONALITY
+# COLLECTION MANAGEMENT VIEWS
 # ========================================
 
-@require_POST
-@login_required
-def artist_create_ajax(request):
-    """
-    Create a new artist via AJAX for dynamic form functionality.
-    
-    This endpoint is used by the SelectOrCreateWidget to allow users
-    to create new artists on-the-fly while filling out artwork forms.
-    Uses get_or_create to prevent duplicates.
-    
-    Args:
-        request: The HTTP request object with JSON body containing artist name
-        
-    Returns:
-        JsonResponse: Success response with artist data or error message
-        
-    Expected JSON payload:
-        {"name": "Artist Name"}
-        
-    Response format:
-        Success: {"success": True, "id": int, "name": str, "created": bool}
-        Error: {"error": str} with appropriate HTTP status code
-    """
-    try:
-        # Parse JSON data from request body
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        # Validate input
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        # Create artist or get existing one (prevents duplicates)
-        artist, created = Artist.objects.get_or_create(name=name)
-        
-        return JsonResponse({
-            "success": True,
-            "id": artist.pk,
-            "name": artist.name,
-            "created": created  # True if new artist, False if existing
-        })
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON data"}, status=400)
-    except Exception as e:
-        # Log error in production, return generic message to user
-        return JsonResponse({"error": str(e)}, status=500)
+# LIST ================================
 
 
 @login_required
 def collection_list(request):
-    collections = Collection.objects.filter(user=request.user).annotate(
-        artwork_count=Count("artwork")
-    ).order_by("name")
-    
+    collections = (
+        Collection.objects.filter(user=request.user)
+        .annotate(artwork_count=Count("artwork"))
+        .order_by("name")
+    )
+
     search = request.GET.get("search", "")
     if search:
         collections = collections.filter(
             Q(name__icontains=search) | Q(description__icontains=search)
         )
-    
+
     paginator = Paginator(collections, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         "page_obj": page_obj,
         "search": search,
     }
-    
+
     return render(request, "artworks/collection_list.html", context)
+
+
+# DETAIL ================================
 
 
 @login_required
 def collection_detail(request, pk):
     collection = get_object_or_404(Collection, pk=pk, user=request.user)
     artworks = collection.artwork_set.all()
-    
+
     context = {
         "collection": collection,
         "artworks": artworks,
     }
-    
+
     return render(request, "artworks/collection_detail.html", context)
+
+
+# CREATE ================================
 
 
 @login_required
@@ -680,19 +804,22 @@ def collection_create(request):
             return redirect("artworks:collection_detail", pk=collection.pk)
     else:
         form = CollectionForm()
-    
+
     context = {
         "form": form,
         "title": "Créer une collection",
     }
-    
+
     return render(request, "artworks/collection_form.html", context)
+
+
+# UPDATE ================================
 
 
 @login_required
 def collection_update(request, pk):
     collection = get_object_or_404(Collection, pk=pk, user=request.user)
-    
+
     if request.method == "POST":
         form = CollectionForm(request.POST, instance=collection)
         if form.is_valid():
@@ -701,14 +828,17 @@ def collection_update(request, pk):
             return redirect("artworks:collection_detail", pk=collection.pk)
     else:
         form = CollectionForm(instance=collection)
-    
+
     context = {
         "form": form,
         "collection": collection,
         "title": "Modifier la collection",
     }
-    
+
     return render(request, "artworks/collection_form.html", context)
+
+
+# DELETE ================================
 
 
 @login_required
@@ -718,46 +848,93 @@ def collection_delete(request, pk):
         collection.delete()
         messages.success(request, "Collection supprimée avec succès.")
         return redirect("artworks:collection_list")
-    return render(request, "artworks/collection_confirm_delete.html", {"collection": collection})
+    return render(
+        request, "artworks/collection_confirm_delete.html", {"collection": collection}
+    )
+
+
+# EXPORT ================================
+
+
+@login_required
+def collection_export_html(request, pk):
+    collection = get_object_or_404(Collection, pk=pk, user=request.user)
+    artworks = collection.artwork_set.all()
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/collection_export.html",
+        context={"collection": collection, "artworks": artworks},
+        filename_base=f"collection_{collection.pk}",
+        as_pdf=False,
+    )
+
+
+@login_required
+def collection_export_pdf(request, pk):
+    collection = get_object_or_404(Collection, pk=pk, user=request.user)
+    artworks = collection.artwork_set.all()
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/collection_export.html",
+        context={"collection": collection, "artworks": artworks},
+        filename_base=f"collection_{collection.pk}",
+        as_pdf=True,
+        redirect_response=redirect("artworks:collection_detail", pk=pk),
+    )
+
+
+# ========================================
+# EXHIBITION MANAGEMENT VIEWS
+# ========================================
+
+# LIST ================================
 
 
 @login_required
 def exhibition_list(request):
-    exhibitions = Exhibition.objects.filter(user=request.user).annotate(
-        artwork_count=Count("artwork")
-    ).order_by("-start_date")
-    
+    exhibitions = (
+        Exhibition.objects.filter(user=request.user)
+        .annotate(artwork_count=Count("artwork"))
+        .order_by("-start_date")
+    )
+
     search = request.GET.get("search", "")
     if search:
         exhibitions = exhibitions.filter(
-            Q(name__icontains=search) | 
-            Q(location__icontains=search) | 
-            Q(description__icontains=search)
+            Q(name__icontains=search)
+            | Q(location__icontains=search)
+            | Q(description__icontains=search)
         )
-    
+
     paginator = Paginator(exhibitions, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         "page_obj": page_obj,
         "search": search,
     }
-    
+
     return render(request, "artworks/exhibition_list.html", context)
+
+
+# DETAIL ================================
 
 
 @login_required
 def exhibition_detail(request, pk):
     exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
     artworks = exhibition.artwork_set.all()
-    
+
     context = {
         "exhibition": exhibition,
         "artworks": artworks,
     }
-    
+
     return render(request, "artworks/exhibition_detail.html", context)
+
+
+# CREATE ================================
 
 
 @login_required
@@ -776,20 +953,23 @@ def exhibition_create(request):
             # messages.error(request, form.errors.as_ul())
     else:
         form = ExhibitionForm()
-    
+
     context = {
         "form": form,
         "title": "Créer une exposition",
         "cancel_url": "artworks:exhibition_list",
     }
-    
+
     return render(request, "artworks/exhibition_form.html", context)
+
+
+# UPDATE ================================
 
 
 @login_required
 def exhibition_update(request, pk):
     exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
-    
+
     if request.method == "POST":
         form = ExhibitionForm(request.POST, instance=exhibition)
         if form.is_valid():
@@ -800,15 +980,18 @@ def exhibition_update(request, pk):
             messages.error(request, "Veuillez corriger les erreurs du formulaire.")
     else:
         form = ExhibitionForm(instance=exhibition)
-    
+
     context = {
         "form": form,
         "exhibition": exhibition,
         "title": "Modifier l'exposition",
         "cancel_url": "artworks:exhibition_detail",
     }
-    
+
     return render(request, "artworks/exhibition_form.html", context)
+
+
+# DELETE ================================
 
 
 @login_required
@@ -818,481 +1001,365 @@ def exhibition_delete(request, pk):
         exhibition.delete()
         messages.success(request, "Exposition supprimée avec succès.")
         return redirect("artworks:exhibition_list")
-    return render(request, "artworks/exhibition_confirm_delete.html", {"exhibition": exhibition})
+    return render(
+        request, "artworks/exhibition_confirm_delete.html", {"exhibition": exhibition}
+    )
+
+
+# EXPORT ================================
+
+
+@login_required
+def exhibition_export_html(request, pk):
+    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
+    artworks = exhibition.artwork_set.all()
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/exhibition_export.html",
+        context={"exhibition": exhibition, "artworks": artworks},
+        filename_base=f"exhibition_{exhibition.pk}",
+        as_pdf=False,
+    )
+
+
+@login_required
+def exhibition_export_pdf(request, pk):
+    exhibition = get_object_or_404(Exhibition, pk=pk, user=request.user)
+    artworks = exhibition.artwork_set.all()
+    return _export_response_from_template(
+        request=request,
+        template_name="artworks/exhibition_export.html",
+        context={"exhibition": exhibition, "artworks": artworks},
+        filename_base=f"exhibition_{exhibition.pk}",
+        as_pdf=True,
+        redirect_response=redirect("artworks:exhibition_detail", pk=pk),
+    )
+
+
+# ========================================
+# ART TYPE MANAGEMENT VIEWS
+# ========================================
+
+# LIST ================================
+
+
+@login_required
+def arttype_list(request):
+    return _reference_list(
+        request,
+        model=ArtType,
+        entity_name="Type d'art",
+        entity_name_plural="Types d'art",
+        create_url="artworks:arttype_create",
+    )
+
+
+# CREATE ================================
+
+
+@login_required
+def arttype_create(request):
+    return _reference_create(
+        request,
+        model=ArtType,
+        entity_label="type d'art",
+        back_url_name="artworks:arttype_list",
+        title="Ajouter un type d'art",
+    )
+
+
+# UPDATE ================================
+
+
+@login_required
+def arttype_update(request, pk):
+    return _reference_update(
+        request,
+        pk,
+        model=ArtType,
+        entity_label="type d'art",
+        back_url_name="artworks:arttype_list",
+        title="Modifier le type d'art",
+    )
+
+
+# DELETE ================================
+
+
+@login_required
+def arttype_delete(request, pk):
+    return _reference_delete(
+        request,
+        pk,
+        model=ArtType,
+        entity_label="type d'art",
+        back_url_name="artworks:arttype_list",
+    )
+
+
+# ========================================
+# SUPPORT MANAGEMENT VIEWS
+# ========================================
+
+# LIST ================================
+
+
+@login_required
+def support_list(request):
+    return _reference_list(
+        request,
+        model=Support,
+        entity_name="Support",
+        entity_name_plural="Supports",
+        create_url="artworks:support_create",
+    )
+
+
+# CREATE ================================
+
+
+@login_required
+def support_create(request):
+    return _reference_create(
+        request,
+        model=Support,
+        entity_label="support",
+        back_url_name="artworks:support_list",
+        title="Ajouter un support",
+    )
+
+
+# UPDATE ================================
+
+
+@login_required
+def support_update(request, pk):
+    return _reference_update(
+        request,
+        pk,
+        model=Support,
+        entity_label="support",
+        back_url_name="artworks:support_list",
+        title="Modifier le support",
+    )
+
+
+# DELETE ================================
+
+
+@login_required
+def support_delete(request, pk):
+    return _reference_delete(
+        request,
+        pk,
+        model=Support,
+        entity_label="support",
+        back_url_name="artworks:support_list",
+    )
+
+
+# ========================================
+# TECHNIQUE MANAGEMENT VIEWS
+# ========================================
+
+# LIST ================================
+
+
+@login_required
+def technique_list(request):
+    return _reference_list(
+        request,
+        model=Technique,
+        entity_name="Technique",
+        entity_name_plural="Techniques",
+        create_url="artworks:technique_create",
+    )
+
+
+# CREATE ================================
+
+
+@login_required
+def technique_create(request):
+    return _reference_create(
+        request,
+        model=Technique,
+        entity_label="technique",
+        back_url_name="artworks:technique_list",
+        title="Ajouter une technique",
+    )
+
+
+# UPDATE ================================
+
+
+@login_required
+def technique_update(request, pk):
+    return _reference_update(
+        request,
+        pk,
+        model=Technique,
+        entity_label="technique",
+        back_url_name="artworks:technique_list",
+        title="Modifier la technique",
+    )
+
+
+# DELETE ================================
+
+
+@login_required
+def technique_delete(request, pk):
+    return _reference_delete(
+        request,
+        pk,
+        model=Technique,
+        entity_label="technique",
+        back_url_name="artworks:technique_list",
+    )
+
+
+# ========================================
+# WISHLIST MANAGEMENT VIEWS
+# ========================================
+
+# LIST ================================
+
+
+@login_required
+def wishlist(request):
+    items = WishlistItem.objects.filter(user=request.user)
+
+    if request.method == "POST":
+        form = WishlistItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.user = request.user
+            item.save()
+            messages.success(request, "Œuvre ajoutée à la liste de souhaits.")
+            return redirect("artworks:wishlist")
+    else:
+        form = WishlistItemForm()
+
+    context = {
+        "items": items,
+        "form": form,
+    }
+
+    return render(request, "artworks/wishlist.html", context)
+
+
+# DELETE ================================
 
 
 @login_required
 def wishlist_delete(request, pk):
     item = get_object_or_404(WishlistItem, pk=pk, user=request.user)
-    
+
     if request.method == "POST":
         item.delete()
         messages.success(request, "Œuvre retirée de la liste de souhaits.")
         return redirect("artworks:wishlist")
-    
+
     return render(request, "artworks/wishlist_confirm_delete.html", {"item": item})
+
+
+# ========================================
+# AJAX ENDPOINTS FOR DYNAMIC FUNCTIONALITY
+# ========================================
+
+
+@require_POST
+@login_required
+def artist_create_ajax(request):
+    """
+    Create a new artist via AJAX for dynamic form functionality.
+
+    This endpoint is used by the SelectOrCreateWidget to allow users
+    to create new artists on-the-fly while filling out artwork forms.
+    Uses get_or_create to prevent duplicates.
+
+    Args:
+        request: The HTTP request object with JSON body containing artist name
+
+    Returns:
+        JsonResponse: Success response with artist data or error message
+
+    Expected JSON payload:
+        {"name": "Artist Name"}
+
+    Response format:
+        Success: {"success": True, "id": int, "name": str, "created": bool}
+        Error: {"error": str} with appropriate HTTP status code
+    """
+    # Créer un artiste associé à l'utilisateur courant
+    return _create_by_name_ajax_impl(request, model=Artist, with_user=True)
+
 
 @require_POST
 @login_required
 def collection_create_ajax(request):
     """Créer une nouvelle collection via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        collection, created = Collection.objects.get_or_create(
-            name=name,
-            user=request.user,
-            defaults={"description": ""}
-        )
-        
-        return JsonResponse({
-            "success": True,
-            "id": collection.pk,
-            "name": collection.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    return _create_by_name_ajax_impl(
+        request,
+        model=Collection,
+        with_user=True,
+        defaults={"description": ""},
+    )
 
 
 @require_POST
 @login_required
 def exhibition_create_ajax(request):
     """Créer une nouvelle exposition via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        exhibition, created = Exhibition.objects.get_or_create(
-            name=name,
-            user=request.user,
-            defaults={"description": "", "location": ""}
-        )
-        
-        return JsonResponse({
-            "success": True,
-            "id": exhibition.pk,
-            "name": exhibition.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    return _create_by_name_ajax_impl(
+        request,
+        model=Exhibition,
+        with_user=True,
+        defaults={"description": "", "location": ""},
+    )
 
 
 @require_POST
 @login_required
 def arttype_create_ajax(request):
     """Créer un nouveau type d"art via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        art_type, created = ArtType.objects.get_or_create(name=name)
-        
-        return JsonResponse({
-            "success": True,
-            "id": art_type.pk,
-            "name": art_type.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    return _create_by_name_ajax_impl(request, model=ArtType)
 
 
 @require_POST
 @login_required
 def support_create_ajax(request):
     """Créer un nouveau support via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        support, created = Support.objects.get_or_create(name=name)
-        
-        return JsonResponse({
-            "success": True,
-            "id": support.pk,
-            "name": support.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    return _create_by_name_ajax_impl(request, model=Support)
 
 
 @require_POST
 @login_required
 def technique_create_ajax(request):
     """Créer une nouvelle technique via AJAX"""
-    try:
-        data = json.loads(request.body)
-        name = data.get("name", "").strip()
-        
-        if not name:
-            return JsonResponse({"error": "Le nom est requis"}, status=400)
-        
-        technique, created = Technique.objects.get_or_create(name=name)
-        
-        return JsonResponse({
-            "success": True,
-            "id": technique.pk,
-            "name": technique.name,
-            "created": created
-        })
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-
-# ========================================
-# REFERENCE ENTITY MANAGEMENT VIEWS
-# ========================================
-# These views handle CRUD operations for reference entities like
-# ArtType, Support, and Technique that are shared across users
-
-@login_required
-def arttype_list(request):
-    """
-    Display a list of all art types with artwork count and search functionality.
-    
-    Art types are shared reference entities used to categorize artworks.
-    Shows count of artworks using each type across all users.
-    
-    Args:
-        request: The HTTP request object
-        
-    Returns:
-        HttpResponse: Rendered reference list page for art types
-    """
-    # Get all art types with count of associated artworks
-    art_types = ArtType.objects.all().annotate(
-        artwork_count=Count("artwork")
-    ).order_by("name")
-    
-    # Handle search functionality
-    search = request.GET.get("search", "")
-    if search:
-        art_types = art_types.filter(name__icontains=search)
-    
-    # Pagination for large lists
-    paginator = Paginator(art_types, 20)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    
-    # Context for generic reference template
-    context = {
-        "page_obj": page_obj,
-        "search": search,
-        "entity_name": "Type d'art",
-        "entity_name_plural": "Types d'art",
-        "create_url": "artworks:arttype_create",
-    }
-    
-    return render(request, "artworks/reference_list.html", context)
-
-
-@login_required
-def arttype_create(request):
-    """Créer un nouveau type d'art"""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            art_type, created = ArtType.objects.get_or_create(name=name)
-            if created:
-                messages.success(request, f"Type d'art '{name}' créé avec succès.")
-            else:
-                messages.info(request, f"Type d'art '{name}' existe déjà.")
-            return redirect("artworks:arttype_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Ajouter un type d'art",
-        "entity_name": "type d'art",
-        "back_url": "artworks:arttype_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def arttype_update(request, pk):
-    """Modifier un type d'art"""
-    art_type = get_object_or_404(ArtType, pk=pk)
-    
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            if name != art_type.name:
-                if ArtType.objects.filter(name=name).exists():
-                    messages.error(request, f"Un type d'art avec le nom '{name}' existe déjà.")
-                else:
-                    art_type.name = name
-                    art_type.save()
-                    messages.success(request, "Type d'art modifié avec succès.")
-                    return redirect("artworks:arttype_list")
-            else:
-                return redirect("artworks:arttype_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Modifier le type d'art",
-        "entity_name": "type d'art",
-        "current_name": art_type.name,
-        "back_url": "artworks:arttype_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def arttype_delete(request, pk):
-    """Supprimer un type d'art"""
-    art_type = get_object_or_404(ArtType, pk=pk)
-    
-    if request.method == "POST":
-        name = art_type.name
-        art_type.delete()
-        messages.success(request, f"Type d'art '{name}' supprimé avec succès.")
-        return redirect("artworks:arttype_list")
-    
-    context = {
-        "object": art_type,
-        "entity_name": "type d'art",
-        "back_url": "artworks:arttype_list",
-    }
-    
-    return render(request, "artworks/reference_confirm_delete.html", context)
-
-
-@login_required
-def support_list(request):
-    """Liste des supports"""
-    supports = Support.objects.all().annotate(
-        artwork_count=Count("artwork")
-    ).order_by("name")
-    
-    search = request.GET.get("search", "")
-    if search:
-        supports = supports.filter(name__icontains=search)
-    
-    paginator = Paginator(supports, 20)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        "page_obj": page_obj,
-        "search": search,
-        "entity_name": "Support",
-        "entity_name_plural": "Supports",
-        "create_url": "artworks:support_create",
-    }
-    
-    return render(request, "artworks/reference_list.html", context)
-
-
-@login_required
-def support_create(request):
-    """Créer un nouveau support"""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            support, created = Support.objects.get_or_create(name=name)
-            if created:
-                messages.success(request, f"Support '{name}' créé avec succès.")
-            else:
-                messages.info(request, f"Support '{name}' existe déjà.")
-            return redirect("artworks:support_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Ajouter un support",
-        "entity_name": "support",
-        "back_url": "artworks:support_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def support_update(request, pk):
-    """Modifier un support"""
-    support = get_object_or_404(Support, pk=pk)
-    
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            if name != support.name:
-                if Support.objects.filter(name=name).exists():
-                    messages.error(request, f"Un support avec le nom '{name}' existe déjà.")
-                else:
-                    support.name = name
-                    support.save()
-                    messages.success(request, "Support modifié avec succès.")
-                    return redirect("artworks:support_list")
-            else:
-                return redirect("artworks:support_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Modifier le support",
-        "entity_name": "support",
-        "current_name": support.name,
-        "back_url": "artworks:support_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def support_delete(request, pk):
-    """Supprimer un support"""
-    support = get_object_or_404(Support, pk=pk)
-    
-    if request.method == "POST":
-        name = support.name
-        support.delete()
-        messages.success(request, f"Support '{name}' supprimé avec succès.")
-        return redirect("artworks:support_list")
-    
-    context = {
-        "object": support,
-        "entity_name": "support",
-        "back_url": "artworks:support_list",
-    }
-    
-    return render(request, "artworks/reference_confirm_delete.html", context)
-
-
-@login_required
-def technique_list(request):
-    """Liste des techniques"""
-    techniques = Technique.objects.all().annotate(
-        artwork_count=Count("artwork")
-    ).order_by("name")
-    
-    search = request.GET.get("search", "")
-    if search:
-        techniques = techniques.filter(name__icontains=search)
-    
-    paginator = Paginator(techniques, 20)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    
-    context = {
-        "page_obj": page_obj,
-        "search": search,
-        "entity_name": "Technique",
-        "entity_name_plural": "Techniques",
-        "create_url": "artworks:technique_create",
-    }
-    
-    return render(request, "artworks/reference_list.html", context)
-
-
-@login_required
-def technique_create(request):
-    """Créer une nouvelle technique"""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            technique, created = Technique.objects.get_or_create(name=name)
-            if created:
-                messages.success(request, f"Technique '{name}' créée avec succès.")
-            else:
-                messages.info(request, f"Technique '{name}' existe déjà.")
-            return redirect("artworks:technique_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Ajouter une technique",
-        "entity_name": "technique",
-        "back_url": "artworks:technique_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def technique_update(request, pk):
-    """Modifier une technique"""
-    technique = get_object_or_404(Technique, pk=pk)
-    
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            if name != technique.name:
-                if Technique.objects.filter(name=name).exists():
-                    messages.error(request, f"Une technique avec le nom '{name}' existe déjà.")
-                else:
-                    technique.name = name
-                    technique.save()
-                    messages.success(request, "Technique modifiée avec succès.")
-                    return redirect("artworks:technique_list")
-            else:
-                return redirect("artworks:technique_list")
-        else:
-            messages.error(request, "Le nom est requis.")
-    
-    context = {
-        "title": "Modifier la technique",
-        "entity_name": "technique",
-        "current_name": technique.name,
-        "back_url": "artworks:technique_list",
-    }
-    
-    return render(request, "artworks/reference_form.html", context)
-
-
-@login_required
-def technique_delete(request, pk):
-    """Supprimer une technique"""
-    technique = get_object_or_404(Technique, pk=pk)
-    
-    if request.method == "POST":
-        name = technique.name
-        technique.delete()
-        messages.success(request, f"Technique '{name}' supprimée avec succès.")
-        return redirect("artworks:technique_list")
-    
-    context = {
-        "object": technique,
-        "entity_name": "technique",
-        "back_url": "artworks:technique_list",
-    }
-    
-    return render(request, "artworks/reference_confirm_delete.html", context)
+    return _create_by_name_ajax_impl(request, model=Technique)
 
 
 # ========================================
-# TAGS AUTOCOMPLETE (for a better tagging UX)
+# TAGS AUTOCOMPLETE
 # ========================================
 @login_required
 def tags_autocomplete(request):
     """
-    Autocomplétion de mots-clés limitée aux tags utilisés par l'utilisateur courant.
+    Autocompletion of keywords limited to tags used by the current user.
     Format: [{"value": name, "text": name}, ...]
     """
     q = request.GET.get("q", "").strip()
-    # Restreindre aux tags réellement utilisés sur les oeuvres de l'utilisateur
+    # Restrict to tags actually used on the user's artworks
+    artwork_ct = ContentType.objects.get_for_model(Artwork)
+    user_artwork_ids = Artwork.objects.filter(user=request.user).values_list(
+        "id", flat=True
+    )
+
     user_tags = Tag.objects.filter(
-        pk__in=UUIDTaggedItem.objects.filter(
-            content_object__user=request.user
-        ).values("tag_id")
+        artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
+        artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,  # noqa: E501
     ).distinct()
     if q:
         user_tags = user_tags.filter(name__icontains=q)

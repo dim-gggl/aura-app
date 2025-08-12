@@ -8,13 +8,27 @@ including artists, artworks, collections, exhibitions, and related entities.
 from django.db import models
 from django.urls import reverse
 import uuid
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+from imagekit.models import ProcessedImageField, ImageSpecField
+from imagekit.processors import Transpose, ResizeToFit
 from taggit.managers import TaggableManager
 from taggit.models import Tag, GenericUUIDTaggedItemBase
 
 from core.models import User
 
+LOCATIONS = [
+    ("domicile", "Domicile"),
+    ("stockage", "Stockage"),
+    ("pretee", "Prêtée"),
+    ("restauration", "En restauration"),
+    ("encadrement", "En encadrement"),
+    ("restitution", "En restitution"),
+    ("vente", "En vente"),
+    ("vendue", "Vendue"),
+    ("perdue", "Perdue"),
+    ("volée", "Volée"),
+    ("volée", "Volée"),
+    ("autre", "Autre"),
+]
 
 class Artist(models.Model):
     """
@@ -24,6 +38,14 @@ class Artist(models.Model):
     information such as birth/death years, nationality, and biography.
     """
     
+    # Propriétaire de l'artiste (optionnel pour compatibilité rétro)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="artists",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=200, verbose_name="Nom")
     birth_year = models.IntegerField(null=True, blank=True, verbose_name="Année de naissance")
     death_year = models.IntegerField(null=True, blank=True, verbose_name="Année de décès")
@@ -160,31 +182,7 @@ class Artwork(models.Model):
     This is the main model that stores comprehensive information about artworks
     including basic details, dimensions, acquisition info, status, and relationships
     with other entities like artists, collections, and exhibitions.
-    """
-    # Legacy art type choices - kept for backward compatibility
-    # TODO: Remove once all data is migrated to ArtType model
-    ART_TYPES = [
-        ("peinture", "Peinture"),
-        ("sculpture", "Sculpture"),
-        ("photographie", "Photographie"),
-        ("gravure", "Gravure"),
-        ("dessin", "Dessin"),
-        ("bd", "Bande dessinée"),
-        ("illustration", "Illustration"),
-        ("poésie", "Poésie"),
-        ("autre", "Autre"),
-    ]
-    
-    # Location choices for tracking where artworks are currently stored/displayed
-    LOCATIONS = [
-        ("domicile", "Domicile"),        # At home
-        ("stockage", "Stockage"),        # In storage
-        ("exposee", "Exposée"),          # On exhibition
-        ("pretee", "Prêtée"),            # On loan
-        ("restauration", "En restauration"),  # Being restored
-        ("autre", "Autre"),              # Other location
-    ]
-    
+    """   
     # === IDENTIFICATION FIELDS ===
     # Using UUID for better security and avoiding sequential IDs
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -260,10 +258,10 @@ class Artwork(models.Model):
         """
         if self.title:
             return self.title
-        elif self.artists.exists():
-            return f"Œuvre de {", ".join([artist.name for artist in self.artists.all()])}"
-        else:
-            return f"Œuvre #{str(self.id)[:8]}"
+        if self.artists.exists():
+            artist_names = ", ".join(artist.name for artist in self.artists.all())
+            return f"Œuvre de {artist_names}"
+        return f"Œuvre #{str(self.id)[:8]}"
     
     def get_absolute_url(self):
         """Return the canonical URL for this artwork's detail view."""
@@ -306,13 +304,20 @@ class ArtworkPhoto(models.Model):
     
     artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE, related_name="photos")
     # Images are organized by date in subdirectories for better file management
-    image = models.ImageField(upload_to="artworks/photos/%Y/%m/%d/", verbose_name="Photo")
+    # Image principale (redimensionnée au besoin lors de l'upload)
+    image = ProcessedImageField(
+        upload_to='artworks/',
+        processors=[Transpose(), ResizeToFit(2000, 2000, upscale=False)],
+        format='JPEG',  # garde le ratio ; change en fonction de ton besoin d'encodage
+        options={'quality': 80, 'optimize': True, 'progressive': True},
+        blank=True,
+        null=True,
+    )
 
-    # Automatically generated thumbnail using django-imagekit
-    # Resized to 400x300 with 80% JPEG quality for optimal web display
+    # Vignette générée à la volée pour les listes/cartes
     image_thumbnail = ImageSpecField(
         source='image',
-        processors=[ResizeToFill(400, 300)],  # Crop and resize to exact dimensions
+        processors=[ResizeToFit(600, 600, upscale=False)],
         format='JPEG',
         options={'quality': 80}
     )
@@ -363,7 +368,7 @@ class WishlistItem(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wishlist")
-    title = models.CharField(max_length=300, verbose_name="Titre")
+    title = models.CharField(max_length=300, verbose_name="Titre", default="Général")
     # Artist name as text field since the artist might not be in the database yet
     artist_name = models.CharField(max_length=200, blank=True, verbose_name="Artiste")
     estimated_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Prix estimé (€)")

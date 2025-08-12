@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load placeholder_extras %}
 
 {% block title %}{{ artwork.title|default:"Œuvre" }} - Catalogue{% endblock %}
 
@@ -7,21 +8,21 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div id="artwork-detail-header-container" class="justify-content-between align-items-center mb-4">
                 <h1 class="h2">
                     {{ artwork.title|default:"Sans titre" }}
                 </h1>
-                <div class="btn-group" role="group">
-                    <a href="{% url 'artworks:update' artwork.pk %}" class="btn btn-outline-primary">
+                <div class="btn-group artwork-detail-header-btn-group" role="group">
+                    <a href="{% url 'artworks:update' artwork.pk %}" class="artwork-detail-btn btn btn-outline-primary">
                         <i class="bi bi-pencil"></i> Modifier
                     </a>
-                    <a href="{% url 'artworks:export_html' artwork.pk %}" class="btn btn-outline-info">
+                    <a href="{% url 'artworks:export_html' artwork.pk %}" class="artwork-detail-btn btn btn-outline-info">
                         <i class="bi bi-file-code"></i> Export HTML
                     </a>
-                    <a href="{% url 'artworks:export_pdf' artwork.pk %}" class="btn btn-outline-info">
+                    <a href="{% url 'artworks:export_pdf' artwork.pk %}" class="artwork-detail-btn btn btn-outline-info">
                         <i class="bi bi-file-pdf"></i> Export PDF
                     </a>
-                    <a href="{% url 'artworks:delete' artwork.pk %}" class="btn btn-outline-danger">
+                    <a href="{% url 'artworks:delete' artwork.pk %}" class="artwork-detail-btn btn btn-outline-danger">
                         <i class="bi bi-trash"></i> Supprimer
                     </a>
                 </div>
@@ -58,13 +59,9 @@
                     {% endif %}
                 </div>
             {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center rounded" 
-                     style="height: 400px;">
-                    <div class="text-center text-muted">
-                        <i class="bi bi-image display-1 mb-3"></i>
-                        <p>Aucune photo disponible</p>
-                    </div>
-                </div>
+                <img src="{% random_placeholder_url 300 200 0 %}"
+                     class="d-block w-100 rounded" alt="Image de remplacement"
+                     style="height: 400px; object-fit: contain; background: #f8f9fa;">
             {% endif %}
         </div>
         
@@ -95,7 +92,7 @@
                         
                         {% if artwork.art_type %}
                             <dt class="col-sm-4">Type d'art:</dt>
-                            <dd class="col-sm-8">{{ artwork.get_art_type_display }}</dd>
+                            <dd class="col-sm-8">{{ artwork.art_type }}</dd>
                         {% endif %}
                         
                         {% if artwork.support %}
@@ -196,7 +193,7 @@
                             <h6>Collections:</h6>
                             <ul class="list-unstyled">
                                 {% for collection in artwork.collections.all %}
-                                    <li><span class="badge bg-primary">{{ collection.name }}</span></li>
+                                    <li><a href="../../artworks/collections/{{ collection.id }}/" class="badge bg-primary">{{ collection.name }}</a></li>
                                 {% endfor %}
                             </ul>
                         {% endif %}
@@ -231,7 +228,7 @@
                         
                         {% if artwork.tags.exists %}
                           <h6>Mots-clés:</h6>
-                          <p>
+                          <p class="tags-container">
                             {% for tag in artwork.tags.all %}
                               <a class="badge bg-light text-dark me-1"
                                  href="{% url 'artworks:list' %}?tags={{ tag.id }}">{{ tag.name }}</a>
@@ -257,8 +254,8 @@
     <!-- Navigation -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between">
-                <a href="{% url 'artworks:list' %}" class="btn btn-outline-secondary">
+            <div class="artwork-detail-footer-container justify-content-between">
+                <a href="{% url 'artworks:list' %}" class="artwork-detail-go-back-btn btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Retour à la liste
                 </a>
                 <small class="text-muted align-self-center">

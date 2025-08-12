@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load placeholder_extras %}
 
 {% block title %}Tableau de bord - Aura{% endblock %}
 
@@ -169,10 +170,9 @@
                                                  class="img-fluid rounded" alt="{{ artwork.title }}"
                                                  style="height: 60px; width: 100%; object-fit: cover;">
                                         {% else %}
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
-                                                 style="height: 60px;">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
+                                            <img src="{% random_placeholder_url 300 200 forloop.counter0 %}"
+                                                 class="img-fluid rounded" alt="Image de remplacement"
+                                                 style="height: 60px; width: 100%; object-fit: cover;">
                                         {% endif %}
                                     </div>
                                     <div class="col-8">
