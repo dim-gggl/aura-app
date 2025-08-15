@@ -3,10 +3,54 @@ from .base import *  # noqa
 DEBUG = True
 
 # Security
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.1.41"]
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "app.local",
+    "192.168.1.41",
+    "192.168.1.42",
+    "192.168.1.43",
+    "192.168.1.44",
+    "192.168.1.45",
+    "192.168.1.46",
+    "192.168.1.47",
+    "192.168.1.48",
+    "192.168.1.49",
+]
+
+# Liste des origines de confiance pour le mécanisme CSRF en environnement 
+# de développement. Cela permet à Django d'accepter les requêtes POST 
+# provenant de ces domaines sans déclencher d'alerte CSRF.
+# Attention : en production, cette liste doit être restreinte aux domaines 
+# réellement utilisés par l'application.
+CSRF_TRUSTED_ORIGINS = [
+    "http://app.local",           # Domaine personnalisé local (ex : via /etc/hosts)
+    "http://localhost:8000",      # Accès direct via localhost sur le port par défaut de Django
+    "http://127.0.0.1:8000",      # Accès direct via l'IP de loopback sur le port par défaut de Django
+    "http://192.168.1.41:8000",
+    "http://192.168.1.42:8000",
+    "http://192.168.1.43:8000",
+    "http://192.168.1.44:8000",
+    "http://192.168.1.45:8000",
+    "http://192.168.1.46:8000",
+    "http://192.168.1.47:8000",
+    "http://192.168.1.48:8000",
+    "http://192.168.1.49:8000",
+]
+
+# En environnement de développement, il est important de désactiver 
+# certaines sécurités liées au HTTPS pour faciliter les tests locaux, 
+# car le serveur de développement Django ne gère pas le SSL/TLS.
+SECURE_SSL_REDIRECT = False  # Ne pas forcer la redirection vers HTTPS en local
+
+# Les cookies de session et CSRF ne sont pas marqués comme "secure" pour permettre 
+# leur transmission en HTTP.
+SESSION_COOKIE_SECURE = False  # Le cookie de session peut être transmis en HTTP (non sécurisé)
+CSRF_COOKIE_SECURE = False     # Le cookie CSRF peut être transmis en HTTP (non sécurisé)
+
+# Pour le développement, les emails sont affichés dans la console au lieu 
+# d'être envoyés réellement.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Cache local (file-based par défaut); passez à Redis si dispo
@@ -27,3 +71,10 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
         "object-src": ("'none'",),
     }
 }
+
+# En dev, servir à la racine pour éviter les soucis de cookie CSRF lié au sous-chemin
+# (utilisez un proxy externe pour tester un sous-chemin si nécessaire)
+# FORCE_SCRIPT_NAME = "/aura"
+# USE_X_FORWARDED_HOST = True
+# STATIC_URL = "/aura/static/"
+# MEDIA_URL = "/aura/media/"
