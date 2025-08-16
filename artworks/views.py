@@ -250,7 +250,7 @@ def _create_by_name_ajax_impl(request, *, model, with_user: bool = False, defaul
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": "Les informations fournies correspondent à un objet existant."}, status=500)
 
 # ========================================
 # ARTWORK VIEWS

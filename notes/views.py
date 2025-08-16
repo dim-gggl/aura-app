@@ -22,6 +22,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
+import traceback
 
 from .models import Note
 from .forms import NoteForm
@@ -340,7 +341,10 @@ def note_toggle_favorite_ajax(request, pk):
         })
         
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
+        print(traceback.format_exc())
+        return JsonResponse(
+            {
+                "error": "Les informations fournies correspondent à un objet existant."
+            }, 
+            status=500
+        )
