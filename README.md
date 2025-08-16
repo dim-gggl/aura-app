@@ -6,7 +6,8 @@
 ![Static Badge](https://img.shields.io/badge/djangorestframework-3.16.1-%23FF474A?style=plastic&logo=django&logoColor=%23FF474A)
 ![Static Badge](https://img.shields.io/badge/drf--simplejwt-5.5.1-%237DD8FF?style=plastic&logo=django&logoColor=%237DD8FF)
 ![Static Badge](https://img.shields.io/badge/bootstrap-5.3.7-%23AAAAFE?style=plastic&logo=bootstrap&logoColor=%23AAAAFE&logoSize=auto)
-
+[![Coverage](coverage-badge)](coverage-link)
+[![MIT License](license-badge](LICENSE.md)
 
 
 ![aura-title](./aura-title.png)

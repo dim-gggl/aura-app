@@ -6,6 +6,7 @@ used for API endpoints and data serialization.
 """
 
 from rest_framework import serializers
+from django.db.models import Q
 from .models import Artwork, Artist
 
 
@@ -34,7 +35,10 @@ class ArtworkSerializer(serializers.ModelSerializer):
     
     artists = ArtistSerializer(many=True, read_only=True)
     artist_ids = serializers.PrimaryKeyRelatedField(
-        many=True, write_only=True, queryset=Artist.objects.all(), source="artists"
+        many=True,
+        write_only=True,
+        queryset=Artist.objects.none(),
+        source="artists",
     )
 
     class Meta:
@@ -43,6 +47,16 @@ class ArtworkSerializer(serializers.ModelSerializer):
             "id", "title", "year_created", "country", "status",
             "artists", "artist_ids",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request") if hasattr(self, "context") else None
+        if request and hasattr(request, "user") and request.user and request.user.is_authenticated:
+            # Limit selectable artists to the current user's artists or shared (user is null)
+            self.fields["artist_ids"].queryset = Artist.objects.filter(Q(user=request.user) | Q(user__isnull=True))
+        else:
+            # No request in context → disallow arbitrary cross-tenant linking
+            self.fields["artist_ids"].queryset = Artist.objects.none()
 
     def create(self, validated_data):
         """

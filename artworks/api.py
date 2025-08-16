@@ -47,17 +47,14 @@ class ArtworkViewSet(UserScopedMixin, viewsets.ModelViewSet):
     including listing, retrieving, creating, updating, and deleting
     artworks. It uses the ArtworkSerializer to serialize the data.
     """
+    queryset = Artwork.objects.all().prefetch_related(
+        "artists",
+        Prefetch("photos"),
+        "collections",
+    )
     serializer_class = ArtworkSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = DefaultPagination
-
-    def get_queryset(self):
-        qs = Artwork.objects.all().select_related("primary_artist").prefetch_related(
-            "artists",
-            Prefetch("photos"),
-            "collections",
-        )
-        return super().get_queryset().filter(pk__in=qs.values("pk"))
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -71,6 +68,7 @@ class ArtistViewSet(UserScopedMixin, viewsets.ModelViewSet):
     including listing, retrieving, creating, updating, and deleting
     artists. It uses the ArtistSerializer to serialize the data.
     """
+    queryset = Artist.objects.all()
     serializer_class = ArtistSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = DefaultPagination
