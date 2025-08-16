@@ -34,6 +34,10 @@ class ArtworkSerializer(serializers.ModelSerializer):
     """
     
     artists = ArtistSerializer(many=True, read_only=True)
+    # Champs exposés par l'API, mappés vers les champs du modèle
+    year_created = serializers.IntegerField(source="creation_year", required=False, allow_null=True)
+    country = serializers.CharField(source="origin_country", required=False, allow_blank=True)
+    status = serializers.CharField(source="current_location", required=False, allow_blank=True)
     artist_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         write_only=True,

@@ -10,6 +10,8 @@
 [![MIT License](license-badge](LICENSE.md)
 
 
-![aura-title](./aura-title.png)
+[![aura-title](./aura-title.png)](./EN.md)
 
 # <div align="center">[Français](./FR.md) | [English](./EN.md)</div>
+
+[![aura-api-title](./aura-api-title.png)](./API.md)

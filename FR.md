@@ -7,7 +7,9 @@
 ![Static Badge](https://img.shields.io/badge/drf--simplejwt-5.5.1-%237DD8FF?style=plastic&logo=django&logoColor=%237DD8FF)
 ![Static Badge](https://img.shields.io/badge/bootstrap-5.3.7-%23AAAAFE?style=plastic&logo=bootstrap&logoColor=%23AAAAFE&logoSize=auto)
 
-# <div align="center"> 🎨 Aura — *Vivre avec sa collection*</div>
+![](./aura-title.png)
+
+# <div align="center"> *Vivre avec sa collection*</div>
 
 On ne collectionne pas pour classer. On collectionne pour se souvenir, montrer, transmettre, rêver. Aura garde chaque œuvre vivante : son histoire, ses détails, ses images, ses voyages. Tout est clair, accessible, prêt quand vous en avez besoin.
 

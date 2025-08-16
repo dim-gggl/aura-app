@@ -7,7 +7,9 @@
 ![Static Badge](https://img.shields.io/badge/drf--simplejwt-5.5.1-%237DD8FF?style=plastic&logo=django&logoColor=%237DD8FF)
 ![Static Badge](https://img.shields.io/badge/bootstrap-5.3.7-%23AAAAFE?style=plastic&logo=bootstrap&logoColor=%23AAAAFE&logoSize=auto)
 
-# <div align="center"> 🎨 Aura - *Living with your collection*</div>
+![](./aura-title.png)
+
+# <div align="center"> *Living with your collection*</div>
 
 We don't collect to classify. We collect to remember, to show, to pass on, to dream. Aura keeps each work alive: its history, its details, its images, its journeys. Everything is clear, accessible and ready when you need it.
 

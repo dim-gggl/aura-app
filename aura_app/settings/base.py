@@ -131,18 +131,20 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = env("MEDIA_URL")
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Static files storage (hashed filenames + pre-compressed for optimal caching)
+# Static & media storages (Django 5 requires aliases under STORAGES)
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    }
+    },
 }
 WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year for hashed files
-
-
-DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 if env("USE_S3") and env("AWS_STORAGE_BUCKET_NAME"):
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    }
     AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
     AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
     AWS_QUERYSTRING_AUTH = True  # URLs signées
@@ -201,4 +203,4 @@ AUTH_USER_MODEL = "core.User"
 
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "core:dashboard"
-LOGOUT_REDIRECT_URL = "core:home"
+LOGOUT_REDIRECT_URL = LOGIN_URL
