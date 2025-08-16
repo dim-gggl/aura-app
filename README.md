@@ -1,110 +1,14 @@
-# <div align="center"> 🎨 Aura 🇬🇧 <br> *Live With Your Collection*
-
-Collecting isn’t about putting things in storage. It’s about remembering, sharing, passing things on, and dreaming.
-Aura keeps each piece alive: its story, its details, its images, its journeys.
-Everything stays clear, accessible, ready when you are.
-No instruction manuals, no hurdles — just open and find.
-Your collection becomes a place you live in, not a file you ignore.
-And it finally has the interface it deserves.
-
----
-
-## Quick Install
-
-```bash
-git clone https://github.com/dim-gggl/aura-app.git
-cd aura-app
-python -m venv .venv
-source .venv/bin/activate  # Windows: venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-* Generate a `SECRET_KEY` in `.env`.
-* Migrate and load base data:
-
-```bash
-python manage.py migrate
-python manage.py populate_art_data
-python manage.py createsuperuser
-```
-
-* Run:
-
-```bash
-python manage.py runserver
-```
-
-* Open: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-
----
-
-## Tech
-
-* **Backend**: Python + Django
-* **Frontend**: HTML, CSS, JS + Bootstrap 5
-* **Database**: PostgreSQL / SQLite
-* **Storage**: Amazon S3 / local
-* **Key Libs**: `django-crispy-forms`, `django-filter`, `django-imagekit`, `weasyprint`, `whitenoise`
-
----
-
-**Aura** — because your collection deserves more than a spreadsheet.
+![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)
+![Static Badge](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-%233775A9?style=plastic&logo=python&logoColor=%23FFE569)
+![Static Badge](https://img.shields.io/badge/django-5.2.5-%2344B78B?style=plastic&logo=django&logoColor=%2344B78B)
+![Static Badge](https://img.shields.io/badge/django--crispy--forms-2.4-%23E8D28B?style=plastic&logo=django&logoColor=%23E8D28B)
+![Static Badge](https://img.shields.io/badge/django--taggit-6.1.0-%239856D7?style=plastic&logo=django&logoColor=%239856D7)
+![Static Badge](https://img.shields.io/badge/djangorestframework-3.16.1-%23FF474A?style=plastic&logo=django&logoColor=%23FF474A)
+![Static Badge](https://img.shields.io/badge/drf--simplejwt-5.5.1-%237DD8FF?style=plastic&logo=django&logoColor=%237DD8FF)
+![Static Badge](https://img.shields.io/badge/bootstrap-5.3.7-%23AAAAFE?style=plastic&logo=bootstrap&logoColor=%23AAAAFE&logoSize=auto)
 
 
----
 
-# <div align="center"> 🎨 Aura 🇫🇷 <br> *Vivre avec sa collection*
+![aura-title](./aura-title.png)
 
-On ne collectionne pas pour classer. On collectionne pour se souvenir, montrer, transmettre, rêver.
-Aura garde chaque œuvre vivante : son histoire, ses détails, ses images, ses changements d’adresse.
-Tout est là, clair, accessible, prêt quand vous en avez besoin.
-Pas de mode d’emploi compliqué, pas de friction : vous ouvrez, vous retrouvez.
-Votre collection devient un espace où naviguer, pas un dossier à dépoussiérer.
-Et elle a enfin l’interface qu’elle mérite.
-
----
-
-## Installation rapide
-
-```bash
-git clone https://github.com/dim-gggl/aura-app.git
-cd aura-app
-python -m venv .venv
-source .venv/bin/activate  # Windows : venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-* Générez un `SECRET_KEY` dans `.env`.
-* Migrations + données de base :
-
-```bash
-python manage.py migrate
-python manage.py populate_art_data
-python manage.py createsuperuser
-```
-
-* Lancez :
-
-```bash
-python manage.py runserver
-```
-
-* Ouvrez : [http://127.0.0.1:8000](http://127.0.0.1:8000)
-
----
-
-## Tech
-
-* **Backend** : Python + Django
-* **Frontend** : HTML, CSS, JS + Bootstrap 5
-* **Base** : PostgreSQL / SQLite
-* **Stockage** : Amazon S3 / local
-* **Libs clés** : `django-crispy-forms`, `django-filter`, `django-imagekit`, `weasyprint`, `whitenoise`
-
----
-
-**Aura** — parce que votre collection mérite mieux qu’un tableur.
+# <div align="center">[Français](./FR.md) | [English](./EN.md)</div>
