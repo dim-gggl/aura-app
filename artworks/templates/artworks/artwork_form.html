@@ -130,7 +130,7 @@
 </div>
 
 {% block extra_js %}
-<script src="{% load static %}{% static 'js/select_or_create.js' %}"></script>
+<script src="{% load static %}{% static 'js/select_or_create.js' %}" defer></script>
 <script>
 // Gestion dynamique des formsets de photos
 document.addEventListener('DOMContentLoaded', function() {

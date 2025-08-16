@@ -15,10 +15,12 @@ Variables attendues :
         <img src="{{ artwork.photos.first.image_thumbnail.url }}" 
              class="card-img-top" 
              alt="{{ artwork.title|default:'Œuvre' }}"
+             loading="lazy" decoding="async" width="300" height="200"
              style="height: 200px; object-fit: cover;">
     {% else %}
         <img src="{% random_placeholder_url 300 200 forloop.counter0 %}"
              class="card-img-top" alt="Image de remplacement"
+             width="300" height="200" loading="lazy" decoding="async"
              style="height: 200px; object-fit: cover;">
     {% endif %}
     

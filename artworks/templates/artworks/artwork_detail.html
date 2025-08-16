@@ -38,8 +38,9 @@
                     <div class="carousel-inner">
                         {% for photo in photos %}
                             <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                <img src="{{ photo.image.url }}" class="d-block w-100" 
+                                <img src="{{ photo.image_display.url }}" class="d-block w-100" 
                                      alt="{{ photo.caption|default:artwork.title }}"
+                                     loading="lazy" decoding="async" width="800" height="400"
                                      style="height: 400px; object-fit: contain; background: #f8f9fa;">
                                 {% if photo.caption %}
                                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded">
@@ -61,6 +62,7 @@
             {% else %}
                 <img src="{% random_placeholder_url 300 200 0 %}"
                      class="d-block w-100 rounded" alt="Image de remplacement"
+                     width="300" height="200" loading="lazy" decoding="async"
                      style="height: 400px; object-fit: contain; background: #f8f9fa;">
             {% endif %}
         </div>

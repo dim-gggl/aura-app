@@ -322,6 +322,14 @@ class ArtworkPhoto(models.Model):
         options={'quality': 80}
     )
 
+    # Affichage grande taille (pour les pages de détail)
+    image_display = ImageSpecField(
+        source='image',
+        processors=[ResizeToFit(1200, 1200, upscale=False)],
+        format='JPEG',
+        options={'quality': 85}
+    )
+    
     caption = models.CharField(max_length=300, blank=True, verbose_name="Légende")
     is_primary = models.BooleanField(default=False, verbose_name="Photo principale")
     created_at = models.DateTimeField(auto_now_add=True)
