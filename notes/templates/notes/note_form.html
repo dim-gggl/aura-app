@@ -322,6 +322,10 @@ function insertFormatting(before, after) {
 }
 
 // Function to toggle the preview
+// Add marked and DOMPurify via CDN
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+
 function togglePreview() {
     // Get the preview section
     const previewSection = document.getElementById('previewSection');
@@ -336,26 +340,16 @@ function togglePreview() {
         // Display the preview
         let content = textarea.value;
         
-        // Basic markdown formatting
-        content = content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/~~(.*?)~~/g, '<del>$1</del>')
-            .replace(/^# (.*$)/gm, '<h1>$1</h1>')
-            .replace(/^## (.*$)/gm, '<h2>$1</h2>')
-            .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-            .replace(/^- (.*$)/gm, '<li>$1</li>')
-            .replace(/^> (.*$)/gm, '<blockquote class="border-start border-primary border-3 ps-3 text-muted">$1</blockquote>')
-            .replace(/\n/g, '<br>');
-        
-        // Wrap the lists
-        content = content.replace(/(<li>.*<\/li>)/g, '<ul class="list-unstyled">$1</ul>');
+        // Use marked to convert markdown to HTML
+        let html = marked.parse(content);
+        // Sanitize the HTML with DOMPurify
+        html = DOMPurify.sanitize(html);
         
         if (!content.trim()) {
-            content = '<em class="text-muted">Aucun contenu à prévisualiser...</em>';
+            html = '<em class="text-muted">Aucun contenu à prévisualiser...</em>';
         }
         
-        previewContent.innerHTML = content;
+        previewContent.innerHTML = html;
         previewSection.style.display = 'block';
         previewBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Masquer';
         previewBtn.classList.add('btn-warning');
