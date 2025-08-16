@@ -76,6 +76,7 @@
                                                 <img src="{{ photo.image_thumbnail.url }}" 
                                                      alt="Photo {{ forloop.counter }}" 
                                                      class="img-thumbnail" 
+                                                     width="80" height="80" loading="lazy" decoding="async"
                                                      style="max-width: 80px; max-height: 80px; object-fit: cover;">
                                             {% endfor %}
                                             {% if artwork.photos.count > 3 %}

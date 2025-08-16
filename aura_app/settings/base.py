@@ -131,6 +131,14 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = env("MEDIA_URL")
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Static files storage (hashed filenames + pre-compressed for optimal caching)
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year for hashed files
+
 
 DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 if env("USE_S3") and env("AWS_STORAGE_BUCKET_NAME"):
