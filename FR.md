@@ -29,7 +29,7 @@ cp env.example .env
 
 Éditez `.env` puis :
 
-- **SECRET_KEY**: générez une clé (ex. via [Djecrety](https://djecrety.ir/)).
+- **SECRET_KEY**: générez une clé (ex. via [ClinKey](https://dim-gggl.github.io/ClinKey/)).
 - **DEBUG**: laissez `True` en local.
 - **DATABASE_URL**: optionnel (par défaut SQLite). Exemples:
   - SQLite (défaut) : rien à faire
