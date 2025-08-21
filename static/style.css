@@ -21,7 +21,7 @@
     --theme-bg-color: #faf6f0;
     --theme-text-color: #0a0a0a;
     --theme-primary-color: #d4af37;
-    --theme-secondary-color: #004d40;
+    --theme-secondary-color: #6a1e0d;
     --theme-primary-text-color: #0a0a0a;
     --theme-link-color: var(--theme-primary-color);
     --theme-card-bg: #ffffff;
@@ -34,6 +34,8 @@
     --theme-alert-border-color: #d4af37;
     --theme-alert-text-color: #5c4d18;
     --bs-secondary-color: #7e8c8b;
+    --bs-warning-rgb: #ffc107;
+    --bs-btn-bg: var(--bs-warning-rgb);
 
     /* App specific */
     --artwork-card-image-height: 200px;
@@ -328,7 +330,7 @@
     --theme-bg-color: #faf6f0;
     --theme-text-color: #0a0a0a;
     --theme-primary-color: #d4af37;
-    --theme-secondary-color: #004d40;
+    --theme-secondary-color: #6a1e0d;
     --theme-primary-text-color: #0a0a0a;
     --theme-link-color: var(--theme-primary-color);
     --theme-card-bg: #ffffff;
