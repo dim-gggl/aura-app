@@ -139,6 +139,38 @@
                 </div>
             </div>
             
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="bi bi-paperclip"></i> Pièces jointes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% with attachments=artwork.attachments.all %}
+                        {% if attachments %}
+                            <ul class="list-unstyled">
+                                {% for att in attachments %}
+                                    <li class="mb-2">
+                                        <i class="bi bi-file-earmark"></i>
+                                        <a href="{{ att.file.url }}" target="_blank" rel="noopener">
+                                            {{ att.title|default:att.file.name|cut:"artwork_attachments/" }}
+                                        </a>
+                                        <small class="text-muted">— {{ att.uploaded_at|date:"d/m/Y H:i" }}</small>
+                                        {% if att.notes %}
+                                            <div><small class="text-muted">{{ att.notes }}</small></div>
+                                        {% endif %}
+                                    </li>
+                                {% empty %}
+                                    <li class="text-muted">Aucune pièce jointe</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted">Aucune pièce jointe</span>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
             <!-- Informations d'acquisition -->
             {% if artwork.acquisition_date or artwork.acquisition_place or artwork.price or artwork.provenance %}
                 <div class="card mt-3">

@@ -17,6 +17,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from datetime import datetime, timedelta
+from django.http import HttpResponse
 
 # Import models from related applications
 from artworks.models import Artwork, WishlistItem
@@ -225,3 +226,13 @@ def search(request):
     }
     
     return render(request, 'core/search.html', context)
+
+
+def site_manifest(request):
+    """
+    Serve the Web App Manifest with correct hashed static URLs.
+
+    Returns:
+        HttpResponse: JSON manifest with content type application/manifest+json
+    """
+    return render(request, 'site.webmanifest', content_type='application/manifest+json')

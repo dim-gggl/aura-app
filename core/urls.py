@@ -36,4 +36,6 @@ urlpatterns = [
     # Global search - comprehensive search across all user data
     # Searches artworks, contacts, and notes simultaneously
     path('search/', views.search, name='search'),
+    # Web App Manifest (served as template to inject hashed static URLs)
+    path('site.webmanifest', views.site_manifest, name='manifest'),
 ]

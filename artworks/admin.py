@@ -15,7 +15,7 @@ Key features:
 """
 
 from django.contrib import admin
-from .models import Artist, Artwork, ArtworkPhoto, Collection, Exhibition, WishlistItem
+from .models import Artist, Artwork, ArtworkPhoto, Collection, Exhibition, WishlistItem, ArtworkAttachment
 
 
 class ArtworkPhotoInline(admin.TabularInline):
@@ -30,6 +30,13 @@ class ArtworkPhotoInline(admin.TabularInline):
     fields = ['image', 'caption', 'is_primary']
     readonly_fields = ['created_at']
 
+
+class ArtworkAttachmentInline(admin.TabularInline):
+    """Inline admin for managing artwork attachments."""
+    model = ArtworkAttachment
+    extra = 1
+    fields = ['file', 'title', 'notes', 'uploaded_at']
+    readonly_fields = ['uploaded_at']
 
 @admin.register(Artist)
 class ArtistAdmin(admin.ModelAdmin):
@@ -88,7 +95,7 @@ class ArtworkAdmin(admin.ModelAdmin):
     ]
     # Horizontal filter widgets for better UX with many-to-many fields
     filter_horizontal = ['artists', 'collections', 'exhibitions']
-    inlines = [ArtworkPhotoInline]
+    inlines = [ArtworkPhotoInline, ArtworkAttachmentInline]
     readonly_fields = ['id', 'created_at', 'updated_at']
     
     # Organized fieldsets for better form organization

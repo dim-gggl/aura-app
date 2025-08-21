@@ -23,7 +23,7 @@ from crispy_forms.layout import Layout, Field, Fieldset, Row, Column, Submit, Di
 
 from .models import (
     Artwork, Artist, Collection, Exhibition, ArtworkPhoto, WishlistItem, 
-    ArtType, Support, Technique
+    ArtType, Support, Technique, ArtworkAttachment
 )
 from .widgets import SelectOrCreateWidget, SelectMultipleOrCreateWidget
 
@@ -329,7 +329,7 @@ class ArtworkPhotoForm(forms.ModelForm):
         model = ArtworkPhoto
         fields = ['image', 'caption', 'is_primary']
         widgets = {
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'caption': forms.TextInput(attrs={'class': 'form-control'}),
             'is_primary': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -367,3 +367,44 @@ ArtworkPhotoFormSet = inlineformset_factory(
     extra=3,
     can_delete=True,
 ) 
+
+
+class ArtworkAttachmentForm(forms.ModelForm):
+    """Formulaire pour une pièce jointe d'œuvre."""
+
+    class Meta:
+        model = ArtworkAttachment
+        fields = ["file", "title", "notes"]
+        widgets = {
+            "file": forms.FileInput(attrs={
+                "class": "form-control",
+                "accept": ".pdf,.odt,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png,.tif,.tiff,.zip",
+            }),
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "notes": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.render_hidden_fields = True
+        self.helper.layout = Layout(
+            Row(
+                Column("file", css_class="form-group col-md-6 mb-0"),
+                Column("title", css_class="form-group col-md-3 mb-0"),
+                Column("notes", css_class="form-group col-md-3 mb-0"),
+                css_class="form-row",
+            ),
+        )
+
+
+# Inline formset pour gérer plusieurs pièces jointes par œuvre
+ArtworkAttachmentFormSet = inlineformset_factory(
+    Artwork,
+    ArtworkAttachment,
+    form=ArtworkAttachmentForm,
+    fields=["file", "title", "notes"],
+    extra=2,
+    can_delete=True,
+)

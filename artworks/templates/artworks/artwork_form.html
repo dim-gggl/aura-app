@@ -109,12 +109,58 @@
                             {% endfor %}
                         </div>
                         
-                        <button type="button" class="btn btn-outline-primary" id="add-photo">
-                            <i class="bi bi-plus"></i> Ajouter une photo
-                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-plus"></i> Ajouter une photo
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><button type="button" class="dropdown-item photo-source" data-source="library"><i class="bi bi-image"></i> Bibliothèque / Photothèque</button></li>
+                                <li><button type="button" class="dropdown-item photo-source" data-source="camera"><i class="bi bi-camera"></i> Appareil photo</button></li>
+                                <li><button type="button" class="dropdown-item photo-source" data-source="file"><i class="bi bi-file-earmark"></i> Fichier</button></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Pièces jointes -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-paperclip"></i> Pièces jointes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {{ attachment_formset.management_form }}
+
+                        {% if attachment_formset.non_form_errors %}
+                            <div class="alert alert-danger">
+                                {{ attachment_formset.non_form_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div id="attachment-forms">
+                            {% for form in attachment_formset %}
+                                <div class="photo-form" data-attachment-form-index="{{ forloop.counter0 }}">
+                                    {{ form.id }}
+                                    {{ form.DELETE }}
+
+                                    {% if form.errors %}
+                                        <div class="alert alert-danger">
+                                            {{ form.errors }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% crispy form %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" class="btn btn-outline-secondary" id="add-attachment">
+                            <i class="bi bi-plus"></i> Ajouter une pièce jointe
+                        </button>
+                    </div>
+                </div>
+
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-check"></i> Enregistrer
@@ -135,7 +181,7 @@
 // Gestion dynamique des formsets de photos
 document.addEventListener('DOMContentLoaded', function() {
     const photoFormsContainer = document.getElementById('photo-forms');
-    const addPhotoBtn = document.getElementById('add-photo');
+    const photoSourceButtons = document.querySelectorAll('.photo-source');
     const managementForm = document.querySelector('[name="photos-TOTAL_FORMS"]');
     const maxFormsInput = document.querySelector('[name="photos-MAX_NUM_FORMS"]');
     const maxForms = maxFormsInput ? parseInt(maxFormsInput.value) : 1000;
@@ -186,70 +232,140 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialiser les formulaires existants
     document.querySelectorAll('.photo-form').forEach(setupImagePreview);
     
-    // Ajouter un nouveau formulaire
-    if (addPhotoBtn) {
-        addPhotoBtn.addEventListener('click', function() {
-            const currentTotal = parseInt(managementForm.value || '0');
+    function addNewPhotoFormAndPickFile(source) {
+        const currentTotal = parseInt(managementForm.value || '0');
+        if (currentTotal >= maxForms) {
+            alert('Nombre maximum de photos atteint');
+            return;
+        }
 
-            if (currentTotal >= maxForms) {
-                alert('Nombre maximum de photos atteint');
-                return;
+        const firstForm = document.querySelector('.photo-form');
+        if (!firstForm) return;
+
+        const newForm = firstForm.cloneNode(true);
+        const newIndex = currentTotal;
+
+        newForm.querySelectorAll('input, select, textarea').forEach(function(input) {
+            if (input.name) {
+                input.name = input.name.replace(/photos-\d+/, 'photos-' + newIndex);
+                input.id = input.id.replace(/photos-\d+/, 'photos-' + newIndex);
             }
-            
-            // Cloner le premier formulaire
-            const firstForm = document.querySelector('.photo-form');
-            if (firstForm) {
-                const newForm = firstForm.cloneNode(true);
-                const newIndex = currentTotal;
-                
-                // Mettre à jour les noms des champs
-                newForm.querySelectorAll('input, select, textarea').forEach(function(input) {
-                    if (input.name) {
-                        input.name = input.name.replace(/photos-\d+/, 'photos-' + newIndex);
-                        input.id = input.id.replace(/photos-\d+/, 'photos-' + newIndex);
-                    }
-                    if (input.name && input.name.includes('DELETE')) {
-                        input.checked = false;
-                    }
-                    if (input.type === 'file') {
-                        input.value = '';
-                    } else if (input.type === 'hidden' || /-id$/.test(input.name || '')) {
-                        // Important: l'ID du nouveau formulaire doit être vide
-                        input.value = '';
-                    } else if (input.type !== 'checkbox') {
-                        input.value = '';
-                    }
-                });
-                
-                // Mettre à jour les labels
-                newForm.querySelectorAll('label').forEach(function(label) {
-                    if (label.getAttribute('for')) {
-                        label.setAttribute('for', label.getAttribute('for').replace(/photos-\d+/, 'photos-' + newIndex));
-                    }
-                });
-                
-                // Supprimer la prévisualisation existante
-                const existingPreview = newForm.querySelector('.photo-preview');
-                if (existingPreview) {
-                    existingPreview.remove();
-                }
-                // Supprimer les éventuels messages d'erreur copiés
-                const existingAlerts = newForm.querySelectorAll('.alert');
-                existingAlerts.forEach(a => a.remove());
-                
-                newForm.classList.remove('deleted');
-                newForm.setAttribute('data-form-index', newIndex);
-                
-                photoFormsContainer.appendChild(newForm);
-                setupImagePreview(newForm);
-                // Incrémenter TOTAL_FORMS seulement à l'ajout
-                managementForm.value = currentTotal + 1;
+            if (input.name && input.name.includes('DELETE')) {
+                input.checked = false;
+            }
+            if (input.type === 'file') {
+                input.value = '';
+            } else if (input.type === 'hidden' || /-id$/.test(input.name || '')) {
+                input.value = '';
+            } else if (input.type !== 'checkbox') {
+                input.value = '';
             }
         });
+
+        newForm.querySelectorAll('label').forEach(function(label) {
+            if (label.getAttribute('for')) {
+                label.setAttribute('for', label.getAttribute('for').replace(/photos-\d+/, 'photos-' + newIndex));
+            }
+        });
+
+        const existingPreview = newForm.querySelector('.photo-preview');
+        if (existingPreview) existingPreview.remove();
+        newForm.classList.remove('deleted');
+        newForm.setAttribute('data-form-index', newIndex);
+
+        photoFormsContainer.appendChild(newForm);
+        setupImagePreview(newForm);
+        managementForm.value = currentTotal + 1;
+
+        // Définir les attributs d'entrée fichier selon la source choisie et ouvrir le sélecteur
+        const fileInput = newForm.querySelector('input[type="file"]');
+        if (fileInput) {
+            if (source === 'camera') {
+                fileInput.setAttribute('accept', 'image/*');
+                fileInput.setAttribute('capture', 'environment');
+            } else if (source === 'library') {
+                fileInput.setAttribute('accept', 'image/*');
+                fileInput.removeAttribute('capture');
+            } else {
+                fileInput.removeAttribute('accept');
+                fileInput.removeAttribute('capture');
+            }
+            // Ouvrir le picker tout de suite
+            setTimeout(() => fileInput.click(), 0);
+        }
     }
+
+    photoSourceButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const source = btn.getAttribute('data-source');
+            addNewPhotoFormAndPickFile(source);
+        });
+    });
     
     // Initialiser le compteur au nombre réel de formulaires rendus
     updateTotalForms();
+});
+</script>
+<script>
+// Gestion dynamique des formsets de pièces jointes
+document.addEventListener('DOMContentLoaded', function() {
+    const attContainer = document.getElementById('attachment-forms');
+    const addAttachmentBtn = document.getElementById('add-attachment');
+    const attTotalForms = document.querySelector('[name="attachments-TOTAL_FORMS"]');
+    const attMaxFormsInput = document.querySelector('[name="attachments-MAX_NUM_FORMS"]');
+    const attMax = attMaxFormsInput ? parseInt(attMaxFormsInput.value) : 1000;
+
+    function attUpdateTotal() {
+        const total = document.querySelectorAll('#attachment-forms .photo-form').length;
+        if (attTotalForms) attTotalForms.value = total;
+    }
+
+    function cloneAttachmentForm() {
+        const currentTotal = parseInt(attTotalForms.value || '0');
+        if (currentTotal >= attMax) {
+            alert('Nombre maximum de pièces jointes atteint');
+            return null;
+        }
+        const first = attContainer.querySelector('.photo-form');
+        if (!first) return null;
+        const newForm = first.cloneNode(true);
+        const newIndex = currentTotal;
+        newForm.querySelectorAll('input, select, textarea').forEach(function(input) {
+            if (input.name) {
+                input.name = input.name.replace(/attachments-\d+/, 'attachments-' + newIndex);
+                input.id = input.id.replace(/attachments-\d+/, 'attachments-' + newIndex);
+            }
+            if (input.name && input.name.includes('DELETE')) {
+                input.checked = false;
+            }
+            if (input.type === 'file') {
+                input.value = '';
+            } else if (input.type === 'hidden' || /-id$/.test(input.name || '')) {
+                input.value = '';
+            } else if (input.type !== 'checkbox') {
+                input.value = '';
+            }
+        });
+        newForm.querySelectorAll('label').forEach(function(label) {
+            if (label.getAttribute('for')) {
+                label.setAttribute('for', label.getAttribute('for').replace(/attachments-\d+/, 'attachments-' + newIndex));
+            }
+        });
+        return newForm;
+    }
+
+    if (addAttachmentBtn && attContainer && attTotalForms) {
+        addAttachmentBtn.addEventListener('click', function() {
+            const newForm = cloneAttachmentForm();
+            if (!newForm) return;
+            attContainer.appendChild(newForm);
+            attTotalForms.value = parseInt(attTotalForms.value || '0') + 1;
+            const fileInput = newForm.querySelector('input[type="file"]');
+            if (fileInput) setTimeout(() => fileInput.click(), 0);
+        });
+    }
+
+    attUpdateTotal();
 });
 </script>
 <script>

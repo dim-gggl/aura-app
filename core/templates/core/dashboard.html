@@ -18,59 +18,67 @@
     <!-- Statistiques -->
     <div class="row mb-4">
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title">Œuvres</h5>
-                            <h2 class="mb-0">{{ total_artworks }}</h2>
+            <a href="{% url 'artworks:list' %}" class="text-decoration-none d-block" aria-label="Voir la liste des œuvres">
+                <div class="card stats-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Œuvres</h5>
+                                <h2 class="mb-0">{{ total_artworks }}</h2>
+                            </div>
+                            <i class="bi bi-palette2 display-4"></i>
                         </div>
-                        <i class="bi bi-palette2 display-4"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title">Contacts</h5>
-                            <h2 class="mb-0">{{ total_contacts }}</h2>
+            <a href="{% url 'contacts:list' %}" class="text-decoration-none d-block" aria-label="Voir la liste des contacts">
+                <div class="card stats-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Contacts</h5>
+                                <h2 class="mb-0">{{ total_contacts }}</h2>
+                            </div>
+                            <i class="bi bi-person-lines-fill display-4"></i>
                         </div>
-                        <i class="bi bi-person-lines-fill display-4"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title">Notes</h5>
-                            <h2 class="mb-0">{{ total_notes }}</h2>
+            <a href="{% url 'notes:list' %}" class="text-decoration-none d-block" aria-label="Voir la liste des notes">
+                <div class="card stats-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Notes</h5>
+                                <h2 class="mb-0">{{ total_notes }}</h2>
+                            </div>
+                            <i class="bi bi-journal-text display-4"></i>
                         </div>
-                        <i class="bi bi-journal-text display-4"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
         
         <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card stats-card text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h5 class="card-title">Souhaits</h5>
-                            <h2 class="mb-0">{{ total_wishlist }}</h2>
+            <a href="{% url 'artworks:wishlist' %}" class="text-decoration-none d-block" aria-label="Voir la liste des souhaits">
+                <div class="card stats-card text-white">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h5 class="card-title">Souhaits</h5>
+                                <h2 class="mb-0">{{ total_wishlist }}</h2>
+                            </div>
+                            <i class="bi bi-heart display-4"></i>
                         </div>
-                        <i class="bi bi-heart display-4"></i>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
     
@@ -162,7 +170,7 @@
                 <div class="card-body">
                     {% if recent_artworks %}
                         {% for artwork in recent_artworks %}
-                            <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="mb-3 pb-3 position-relative {% if not forloop.last %}border-bottom{% endif %}">
                                 <div class="row g-2 align-items-center">
                                     <div class="col-4">
                                                                                     {% if artwork.photos.first %}
@@ -179,7 +187,7 @@
 </div>
                                     <div class="col-8">
                                         <h6 class="mb-1">
-                                            <a href="{{ artwork.get_absolute_url }}" class="text-decoration-none">
+                                            <a href="{{ artwork.get_absolute_url }}" class="text-decoration-none stretched-link">
                                                 {{ artwork.title|default:"Sans titre" }}
                                             </a>
                                         </h6>

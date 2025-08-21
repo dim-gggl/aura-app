@@ -49,6 +49,7 @@ from .forms import (
     CollectionForm,
     ExhibitionForm,
     ArtworkPhotoFormSet,
+    ArtworkAttachmentFormSet,
     WishlistItemForm,
 )
 from .widgets import SelectOrCreateWidget
@@ -403,8 +404,11 @@ def artwork_create(request):
         photo_formset = ArtworkPhotoFormSet(
             request.POST, request.FILES, prefix="photos"
         )
+        attachment_formset = ArtworkAttachmentFormSet(
+            request.POST, request.FILES, prefix="attachments"
+        )
 
-        if form.is_valid() and photo_formset.is_valid():
+        if form.is_valid() and photo_formset.is_valid() and attachment_formset.is_valid():
             # Save artwork but don't commit to DB yet (need to set user)
             artwork = form.save(commit=False)
             artwork.user = request.user
@@ -416,16 +420,22 @@ def artwork_create(request):
             photo_formset.instance = artwork
             photo_formset.save()
 
+            # Associate attachment formset and save attachments
+            attachment_formset.instance = artwork
+            attachment_formset.save()
+
             messages.success(request, "Oeuvre ajoutée avec succès.")
             return redirect("artworks:detail", pk=artwork.pk)
     else:
         # GET request: initialize empty forms
         form = ArtworkForm(user=request.user)
         photo_formset = ArtworkPhotoFormSet(prefix="photos")
+        attachment_formset = ArtworkAttachmentFormSet(prefix="attachments")
 
     context = {
         "form": form,
         "photo_formset": photo_formset,
+        "attachment_formset": attachment_formset,
         "title": "Ajouter une œuvre",
     }
 
@@ -440,24 +450,30 @@ def artwork_update(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
 
     if request.method == "POST":
-        form = ArtworkForm(request.POST, instance=artwork, user=request.user)
+        form = ArtworkForm(request.POST, request.FILES, instance=artwork, user=request.user)
         photo_formset = ArtworkPhotoFormSet(
             request.POST, request.FILES, instance=artwork, prefix="photos"
         )
+        attachment_formset = ArtworkAttachmentFormSet(
+            request.POST, request.FILES, instance=artwork, prefix="attachments"
+        )
 
-        if form.is_valid() and photo_formset.is_valid():
+        if form.is_valid() and photo_formset.is_valid() and attachment_formset.is_valid():
             form.save()
             photo_formset.save()
+            attachment_formset.save()
 
             messages.success(request, "Œuvre modifiée avec succès.")
             return redirect("artworks:detail", pk=artwork.pk)
     else:
         form = ArtworkForm(instance=artwork, user=request.user)
         photo_formset = ArtworkPhotoFormSet(instance=artwork, prefix="photos")
+        attachment_formset = ArtworkAttachmentFormSet(instance=artwork, prefix="attachments")
 
     context = {
         "form": form,
         "photo_formset": photo_formset,
+        "attachment_formset": attachment_formset,
         "artwork": artwork,
         "title": 'Modifier l"œuvre',
     }

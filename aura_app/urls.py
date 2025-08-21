@@ -4,6 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.views.generic import RedirectView
+from django.templatetags.static import static as static_url
 
 
 # ========================================
@@ -52,6 +54,13 @@ urlpatterns = [
     # JWT authentication
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
+
+# Root-level redirects for common icon endpoints
+urlpatterns += [
+    path("favicon.ico", RedirectView.as_view(url=static_url("flavicon/favicon.ico"), permanent=True)),
+    path("favicon.svg", RedirectView.as_view(url=static_url("flavicon/favicon.svg"), permanent=True)),
+    path("apple-touch-icon.png", RedirectView.as_view(url=static_url("flavicon/apple-touch-icon.png"), permanent=True)),
 ]
 
 # ========================================

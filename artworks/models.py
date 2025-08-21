@@ -7,6 +7,7 @@ including artists, artworks, collections, exhibitions, and related entities.
 
 from django.db import models
 from django.urls import reverse
+from django.core.validators import FileExtensionValidator
 import uuid
 from imagekit.models import ProcessedImageField, ImageSpecField
 from imagekit.processors import Transpose, ResizeToFit
@@ -358,6 +359,52 @@ class ArtworkPhoto(models.Model):
             ArtworkPhoto.objects.filter(artwork=self.artwork).exclude(pk=self.pk).update(is_primary=False)
         else:
             super().save(*args, **kwargs)
+
+
+class ArtworkAttachment(models.Model):
+    """
+    Generic file attachment linked to an artwork.
+    
+    Supports common document formats (PDF, ODT, Office) and images. Used to
+    store invoices, certificates, condition reports, etc.
+    """
+
+    artwork = models.ForeignKey(Artwork, on_delete=models.CASCADE, related_name="attachments")
+    title = models.CharField(max_length=255, blank=True, verbose_name="Titre")
+    file = models.FileField(
+        upload_to="artwork_attachments/",
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[
+                    "pdf",
+                    "odt",
+                    "doc",
+                    "docx",
+                    "xls",
+                    "xlsx",
+                    "csv",
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "tif",
+                    "tiff",
+                    "zip",
+                ]
+            )
+        ],
+        verbose_name="Fichier",
+    )
+    notes = models.CharField(max_length=500, blank=True, verbose_name="Notes")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-uploaded_at"]
+        verbose_name = "Pièce jointe"
+        verbose_name_plural = "Pièces jointes"
+
+    def __str__(self) -> str:
+        label = self.title or (self.file.name.split("/")[-1] if self.file else "")
+        return f"Pièce jointe de {self.artwork}: {label}".strip()
 
 
 class WishlistItem(models.Model):
