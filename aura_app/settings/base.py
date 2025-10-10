@@ -1,17 +1,20 @@
 from pathlib import Path
+from dotenv import load_dotenv
 import environ
+
 import os
 from django.core.exceptions import ImproperlyConfigured
 from datetime import timedelta
 
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False),
-    SECRET_KEY=(str, ""),
-    ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
-    DATABASE_URL=(str, f"sqlite:///{(BASE_DIR / 'db.sqlite3').as_posix()}"),
+    DEBUG=(os.environ.get("DJANGO_DEBUG"), False),
+    SECRET_KEY=os.environ.get("DJANGO_SECRET_KEY"),
+    ALLOWED_HOSTS=os.environ.get("DJANGO_ALLOWED_HOSTS",["127.0.0.1", "localhost"]),
+    DATABASE_URL=(str, f"postgresql://{os.environ.get('POSTGRES_USER')}:{os.environ.get('POSTGRES_PASSWORD')}@{os.environ.get('POSTGRES_HOST')}:{os.environ.get('POSTGRES_PORT')}/{os.environ.get('POSTGRES_DB')}"),
     CSRF_TRUSTED_ORIGINS=(list, []),
     SECURE_SSL_REDIRECT=(bool, False),
     SESSION_COOKIE_SECURE=(bool, False),
@@ -35,7 +38,7 @@ SECRET_KEY = env("SECRET_KEY") or "change-me-now"
 if not DEBUG and (not SECRET_KEY or SECRET_KEY == "change-me-now"):
     raise ImproperlyConfigured("SECRET_KEY must be set in production")
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production")
 
@@ -110,6 +113,12 @@ ASGI_APPLICATION = "aura_app.asgi.application"
 DATABASES = {
     "default": env.db(),  # DATABASE_URL
 }
+
+# PostgreSQL schema configuration
+if 'postgres' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['OPTIONS'] = {
+        'options': '-c search_path=aura,public'
+    }
 
 # Auth
 AUTH_PASSWORD_VALIDATORS = [
@@ -200,7 +209,3 @@ CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "core.User"
-
-LOGIN_URL = "accounts:login"
-LOGIN_REDIRECT_URL = "core:dashboard"
-LOGOUT_REDIRECT_URL = LOGIN_URL

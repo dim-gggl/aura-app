@@ -1,0 +1,191 @@
+Configuration Guide
+====================
+
+This guide covers the configuration options available in Aura Art.
+
+Settings Structure
+------------------
+
+Aura Art uses Django's settings system with environment-specific configurations:
+
+* ``base.py``: Base settings shared across all environments
+* ``dev.py``: Development-specific settings
+* ``production.py``: Production-specific settings
+* ``tests.py``: Test-specific settings
+
+Environment Configuration
+-------------------------
+
+Development Environment
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The development environment (``dev.py``) includes:
+
+* Debug mode enabled
+* SQLite database by default
+* Detailed error pages
+* Automatic reloading
+* Development-specific middleware
+
+Production Environment
+~~~~~~~~~~~~~~~~~~~~~~
+
+The production environment (``production.py``) includes:
+
+* Debug mode disabled
+* Security middleware enabled
+* Static file serving configuration
+* Database connection pooling
+* Logging configuration
+
+Database Settings
+-----------------
+
+Database Configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Configure your database in the environment-specific settings file:
+
+.. code-block:: python
+
+   DATABASES = {
+       'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'aura_art',
+           'USER': 'your_username',
+           'PASSWORD': 'your_password',
+           'HOST': 'localhost',
+           'PORT': '5432',
+       }
+   }
+
+Media and Static Files
+----------------------
+
+Static Files
+~~~~~~~~~~~~
+
+Static files are served from the ``static/`` directory and include:
+
+* CSS stylesheets
+* JavaScript files
+* Images and icons
+* Font files
+
+Media Files
+~~~~~~~~~~~
+
+Media files (user uploads) are stored in the ``media/`` directory and include:
+
+* Artwork images
+* Artist photos
+* Document uploads
+
+Security Settings
+-----------------
+
+Security Configuration
+~~~~~~~~~~~~~~~~~~~~~~
+
+Important security settings for production:
+
+* ``SECRET_KEY``: Must be unique and kept secret
+SECRET_KEY can be generated using Clinkey-Cli:
+
+.. code-block:: bash
+
+   uv pip install clinkey-cli   
+   # or pip install clinkey-cli
+   export DJANGO_SECRET_KEY=$(clinkey -l 64 -s - -t super_strong --lower)
+
+* ``DEBUG``: Must be False in production
+* ``ALLOWED_HOSTS``: Must include your domain
+* ``SECURE_SSL_REDIRECT``: Enable HTTPS redirects
+* ``SESSION_COOKIE_SECURE``: Secure session cookies
+* ``CSRF_COOKIE_SECURE``: Secure CSRF cookies
+
+Email Configuration
+-------------------
+
+SMTP Settings
+~~~~~~~~~~~~~~
+
+Configure email settings for notifications and password resets:
+
+.. code-block:: python
+
+   EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+   EMAIL_HOST = 'smtp.gmail.com'
+   EMAIL_PORT = 587
+   EMAIL_USE_TLS = True
+   EMAIL_HOST_USER = 'your_email@gmail.com'
+   EMAIL_HOST_PASSWORD = 'your_app_password'
+
+Logging Configuration
+---------------------
+
+Logging Setup
+~~~~~~~~~~~~~
+
+Configure logging for different environments:
+
+.. code-block:: python
+
+   LOGGING = {
+       'version': 1,
+       'disable_existing_loggers': False,
+       'handlers': {
+           'file': {
+               'level': 'INFO',
+               'class': 'logging.FileHandler',
+               'filename': 'aura_art.log',
+           },
+       },
+       'loggers': {
+           'django': {
+               'handlers': ['file'],
+               'level': 'INFO',
+               'propagate': True,
+           },
+       },
+   }
+
+Custom Settings
+----------------
+
+Application-Specific Settings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Aura Art includes several custom settings:
+
+* ``ARTWORK_IMAGE_MAX_SIZE``: Maximum size for artwork images
+* ``ARTWORK_IMAGE_FORMATS``: Allowed image formats
+* ``EXPORT_FORMATS``: Available export formats
+* ``PAGINATION_SIZE``: Number of items per page
+
+Performance Optimization
+------------------------
+
+Caching Configuration
+~~~~~~~~~~~~~~~~~~~~~
+
+Configure caching for better performance:
+
+.. code-block:: python
+
+   CACHES = {
+       'default': {
+           'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+           'LOCATION': 'redis://127.0.0.1:6379/1',
+       }
+   }
+
+Database Optimization
+~~~~~~~~~~~~~~~~~~~~~
+
+For production deployments:
+
+* Use connection pooling
+* Configure database indexes
+* Enable query optimization
+* Use read replicas for heavy read operations

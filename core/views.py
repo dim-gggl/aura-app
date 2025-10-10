@@ -17,7 +17,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from datetime import datetime, timedelta
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.db import connection
 
 # Import models from related applications
 from artworks.models import Artwork, WishlistItem
@@ -226,6 +227,43 @@ def search(request):
     }
     
     return render(request, 'core/search.html', context)
+
+
+def health_check(request):
+    """
+    Health check endpoint for monitoring and load balancers.
+    
+    This endpoint provides a simple way to check if the application is running
+    and can connect to its database. It's used by Docker health checks,
+    load balancers, and monitoring systems.
+    
+    Returns:
+        JsonResponse: Status information with HTTP 200 for healthy, 500 for unhealthy
+    """
+    try:
+        # Test database connection
+        connection.ensure_connection()
+        
+        # Basic application health check
+        health_status = {
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'version': '1.0',
+            'database': 'connected'
+        }
+        
+        return JsonResponse(health_status, status=200)
+        
+    except Exception as e:
+        # Return unhealthy status if any error occurs
+        health_status = {
+            'status': 'unhealthy',
+            'timestamp': datetime.now().isoformat(),
+            'version': '1.0',
+            'error': str(e)
+        }
+        
+        return JsonResponse(health_status, status=500)
 
 
 def site_manifest(request):
