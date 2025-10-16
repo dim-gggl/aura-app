@@ -11,10 +11,10 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env(
-    DEBUG=(os.environ.get("DJANGO_DEBUG"), False),
-    SECRET_KEY=os.environ.get("DJANGO_SECRET_KEY"),
-    ALLOWED_HOSTS=os.environ.get("DJANGO_ALLOWED_HOSTS",["127.0.0.1", "localhost"]),
-    DATABASE_URL=(str, f"postgresql://{os.environ.get('POSTGRES_USER')}:{os.environ.get('POSTGRES_PASSWORD')}@{os.environ.get('POSTGRES_HOST')}:{os.environ.get('POSTGRES_PORT')}/{os.environ.get('POSTGRES_DB')}"),
+    DEBUG=(bool, False),
+    SECRET_KEY=(str, ""),
+    ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
+    DATABASE_URL=(str, None),
     CSRF_TRUSTED_ORIGINS=(list, []),
     SECURE_SSL_REDIRECT=(bool, False),
     SESSION_COOKIE_SECURE=(bool, False),
@@ -38,7 +38,8 @@ SECRET_KEY = env("SECRET_KEY") or "change-me-now"
 if not DEBUG and (not SECRET_KEY or SECRET_KEY == "change-me-now"):
     raise ImproperlyConfigured("SECRET_KEY must be set in production")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS")
+# Hosts autorisés (liste)
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production")
 
@@ -110,8 +111,22 @@ WSGI_APPLICATION = "aura_app.wsgi.application"
 ASGI_APPLICATION = "aura_app.asgi.application"
 
 # DB
+# Construire un fallback pour DATABASE_URL à partir des variables POSTGRES_*
+_database_url = env("DATABASE_URL", default=None)
+if not _database_url:
+    pg_user = os.environ.get("POSTGRES_USER")
+    pg_password = os.environ.get("POSTGRES_PASSWORD")
+    pg_host = os.environ.get("POSTGRES_HOST", "localhost")
+    pg_port = os.environ.get("POSTGRES_PORT", "5432")
+    pg_db = os.environ.get("POSTGRES_DB")
+    if pg_user and pg_password and pg_db:
+        _database_url = f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}"
+    else:
+        # Fallback raisonnable pour le dev local
+        _database_url = "sqlite:///db.sqlite3"
+
 DATABASES = {
-    "default": env.db(),  # DATABASE_URL
+    "default": env.db_url("DATABASE_URL", default=_database_url),
 }
 
 # PostgreSQL schema configuration
@@ -179,7 +194,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.UserRateThrottle",
     ),
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "50/min",
+        "anon": "5/min",
         "user": "200/min",
     },
 }

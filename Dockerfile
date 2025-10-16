@@ -20,14 +20,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY pyproject.toml uv.lock ./
-RUN pip install uv && uv sync --frozen
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 
 # Copy project
 COPY . .
-
-# Collect static files
-RUN python manage.py collectstatic --noinput --settings=aura_app.settings.production
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser \

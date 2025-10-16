@@ -159,59 +159,6 @@ def profile(request):
     return render(request, 'accounts/profile.html', context)
 
 
-@login_required
-def profile_test(request):
-    """
-    Test/debug version of the profile view with enhanced debugging.
-    
-    This view is identical to the main profile view but includes additional
-    debugging output for development and troubleshooting purposes. It uses
-    a simplified template and provides console output for form validation.
-    
-    Debug features:
-    - Prints POST and FILES data to console
-    - Shows form validation status and errors
-    - Uses simplified template for testing
-    
-    Args:
-        request: HTTP request object (from authenticated user)
-        
-    Returns:
-        HttpResponse: Simple profile form or redirect after update
-        
-    Note:
-        This view should be removed or disabled in production environments
-        as it exposes potentially sensitive debugging information.
-    """
-    # Ensure the user has a profile, create one if not
-    profile, created = UserProfile.objects.get_or_create(user=request.user)
-
-    if request.method == 'POST':
-        form = UserProfileForm(
-            request.POST, 
-            request.FILES, 
-            instance=profile, 
-            user=request.user
-        )
-        
-        # Debug output for development
-        print(f"POST data: {request.POST}")
-        print(f"FILES data: {request.FILES}")
-        print(f"Form is valid: {form.is_valid()}")
-        if not form.is_valid():
-            print(f"Form errors: {form.errors}")
-        
-        if form.is_valid():
-            # Handle profile picture removal
-            if request.POST.get('remove_picture'):
-                if profile.profile_picture:
-                    profile.profile_picture.delete(save=False)
-                profile.profile_picture = None
-            
-            form.save()
-            messages.success(request, _('Profil mis à jour avec succès.'))
-            return redirect('accounts:profile_test')
-    else:
-        form = UserProfileForm(instance=profile, user=request.user)
-    
-    return render(request, 'accounts/profile_simple.html', {'form': form})
+# REMOVED: profile_test view was a security risk as it exposed sensitive data
+# in debug output including POST data, files, and form errors.
+# This view has been removed to prevent information disclosure.

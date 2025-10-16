@@ -22,7 +22,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.template.loader import render_to_string
-import traceback
+import logging
 
 from .models import Note
 from .forms import NoteForm
@@ -341,10 +341,12 @@ def note_toggle_favorite_ajax(request, pk):
         })
         
     except Exception as e:
-        print(traceback.format_exc())
+        # Log the full error for debugging (server-side only)
+        logging.error(f"Error toggling note favorite status: {str(e)}", exc_info=True)
+        
         return JsonResponse(
             {
-                "error": "Les informations fournies correspondent à un objet existant."
+                "error": "Une erreur est survenue lors de la mise à jour."
             }, 
             status=500
         )
