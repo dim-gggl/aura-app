@@ -1,0 +1,178 @@
+Models Documentation
+=====================
+
+This section documents the data models used in Aura Art.
+
+Core Models
+-----------
+
+Artwork Model
+~~~~~~~~~~~~~
+
+The ``Artwork`` model represents individual pieces of art in the collection.
+It is thought to be as flexible as possible, so most of the fields are optional.
+
+.. autoclass:: artworks.models.Artwork
+   :members:
+   :undoc-members:
+
+Artist Model
+~~~~~~~~~~~~
+
+The ``Artist`` model stores information about artists.
+
+.. autoclass:: artworks.models.Artist
+   :members:
+   :undoc-members:
+
+Collection Model
+~~~~~~~~~~~~~~~~
+
+The ``Collection`` model groups related artworks together.
+
+.. autoclass:: artworks.models.Collection
+   :members:
+   :undoc-members:
+
+Exhibition Model
+~~~~~~~~~~~~~~~~
+
+The ``Exhibition`` model tracks art exhibitions and shows.
+
+.. autoclass:: artworks.models.Exhibition
+   :members:
+   :undoc-members:
+
+Contact Models
+--------------
+
+Contact Model
+~~~~~~~~~~~~~
+
+The ``Contact`` model stores information about galleries, collectors, and other art professionals.
+
+.. autoclass:: contacts.models.Contact
+   :members:
+   :undoc-members:
+
+User Models
+-----------
+
+User Profile
+~~~~~~~~~~~~
+
+The ``Profile`` model extends Django's User model with additional fields.
+
+.. autoclass:: accounts.models.Profile
+   :members:
+   :undoc-members:
+
+Notes Models
+------------
+
+Note Model
+~~~~~~~~~~
+
+The ``Note`` model allows users to add personal notes to artworks and artists.
+
+.. autoclass:: notes.models.Note
+   :members:
+   :undoc-members:
+
+Model Relationships
+-------------------
+
+The following diagram shows the relationships between the main models:
+
+.. mermaid::
+
+   erDiagram
+       User ||--o{ Profile : has
+       User ||--o{ Note : creates
+       Artist ||--o{ Artwork : creates
+       Artist ||--o{ Note : has
+       Artwork ||--o{ Note : has
+       Collection ||--o{ Artwork : contains
+       Exhibition ||--o{ Artwork : displays
+       Contact ||--o{ Exhibition : organizes
+
+Model Methods
+-------------
+
+Common Methods
+~~~~~~~~~~~~~~
+
+All models include common methods for:
+
+* String representation (``__str__``)
+* Absolute URL generation (``get_absolute_url``)
+* Metadata access (``_meta``)
+
+Custom Methods
+~~~~~~~~~~~~~~
+
+Each model includes custom methods specific to its functionality:
+
+* **Artwork**: ``get_image_url()``, ``get_dimensions_display()``
+* **Artist**: ``get_full_name()``, ``get_artwork_count()``
+* **Collection**: ``get_total_value()``, ``get_artwork_count()``
+* **Exhibition**: ``is_current()``, ``get_duration()``
+
+Model Validation
+----------------
+
+Field Validation
+~~~~~~~~~~~~~~~
+
+Models include field-level validation for:
+
+* Required fields
+* Field length limits
+* Format validation (email, URL, etc.)
+* Value constraints
+
+Model Validation
+~~~~~~~~~~~~~~~~
+
+Custom model validation includes:
+
+* Business logic validation
+* Cross-field validation
+* Unique constraint validation
+* Related object validation
+
+Database Indexes
+----------------
+
+Performance Optimization
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Models include database indexes for:
+
+* Frequently queried fields
+* Foreign key relationships
+* Search fields
+* Date/time fields
+
+Migration Strategy
+------------------
+
+Model Changes
+~~~~~~~~~~~~~
+
+When modifying models:
+
+1. Create a new migration file
+2. Test the migration on a copy of production data
+3. Apply the migration during maintenance windows
+4. Update related code and tests
+
+Data Integrity
+~~~~~~~~~~~~~~
+
+Models maintain data integrity through:
+
+* Foreign key constraints
+* Unique constraints
+* Check constraints
+* Cascade delete rules

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Models Documentation - Aura Art 1.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Documentation" href="api.html" /><link rel="prev" title="Configuration Guide" href="configuration.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b1a1f93b" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=bb284d7b" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Models Documentation"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Aura Art</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Models Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#core-models">Core Models</a><ul>
+<li><a class="reference internal" href="#artwork-model">Artwork Model</a></li>
+<li><a class="reference internal" href="#artist-model">Artist Model</a></li>
+<li><a class="reference internal" href="#collection-model">Collection Model</a></li>
+<li><a class="reference internal" href="#exhibition-model">Exhibition Model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contact-models">Contact Models</a><ul>
+<li><a class="reference internal" href="#contact-model">Contact Model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-models">User Models</a><ul>
+<li><a class="reference internal" href="#user-profile">User Profile</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notes-models">Notes Models</a><ul>
+<li><a class="reference internal" href="#note-model">Note Model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-relationships">Model Relationships</a></li>
+<li><a class="reference internal" href="#model-methods">Model Methods</a><ul>
+<li><a class="reference internal" href="#common-methods">Common Methods</a></li>
+<li><a class="reference internal" href="#custom-methods">Custom Methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#model-validation">Model Validation</a><ul>
+<li><a class="reference internal" href="#field-validation">Field Validation</a></li>
+<li><a class="reference internal" href="#id1">Model Validation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#database-indexes">Database Indexes</a><ul>
+<li><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migration-strategy">Migration Strategy</a><ul>
+<li><a class="reference internal" href="#model-changes">Model Changes</a></li>
+<li><a class="reference internal" href="#data-integrity">Data Integrity</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Aura Art</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Models Documentation</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="models-documentation">
+<h1>Models Documentation<a class="headerlink" href="#models-documentation" title="Link to this heading">¶</a></h1>
+<p>This section documents the data models used in Aura Art.</p>
+<section id="core-models">
+<h2>Core Models<a class="headerlink" href="#core-models" title="Link to this heading">¶</a></h2>
+<section id="artwork-model">
+<h3>Artwork Model<a class="headerlink" href="#artwork-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Artwork</span></code> model represents individual pieces of art in the collection.
+It is thought to be as flexible as possible, so most of the fields are optional.</p>
+</section>
+<section id="artist-model">
+<h3>Artist Model<a class="headerlink" href="#artist-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Artist</span></code> model stores information about artists.</p>
+</section>
+<section id="collection-model">
+<h3>Collection Model<a class="headerlink" href="#collection-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Collection</span></code> model groups related artworks together.</p>
+</section>
+<section id="exhibition-model">
+<h3>Exhibition Model<a class="headerlink" href="#exhibition-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Exhibition</span></code> model tracks art exhibitions and shows.</p>
+</section>
+</section>
+<section id="contact-models">
+<h2>Contact Models<a class="headerlink" href="#contact-models" title="Link to this heading">¶</a></h2>
+<section id="contact-model">
+<h3>Contact Model<a class="headerlink" href="#contact-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Contact</span></code> model stores information about galleries, collectors, and other art professionals.</p>
+</section>
+</section>
+<section id="user-models">
+<h2>User Models<a class="headerlink" href="#user-models" title="Link to this heading">¶</a></h2>
+<section id="user-profile">
+<h3>User Profile<a class="headerlink" href="#user-profile" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Profile</span></code> model extends Django’s User model with additional fields.</p>
+</section>
+</section>
+<section id="notes-models">
+<h2>Notes Models<a class="headerlink" href="#notes-models" title="Link to this heading">¶</a></h2>
+<section id="note-model">
+<h3>Note Model<a class="headerlink" href="#note-model" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Note</span></code> model allows users to add personal notes to artworks and artists.</p>
+</section>
+</section>
+<section id="model-relationships">
+<h2>Model Relationships<a class="headerlink" href="#model-relationships" title="Link to this heading">¶</a></h2>
+<p>The following diagram shows the relationships between the main models:</p>
+</section>
+<section id="model-methods">
+<h2>Model Methods<a class="headerlink" href="#model-methods" title="Link to this heading">¶</a></h2>
+<section id="common-methods">
+<h3>Common Methods<a class="headerlink" href="#common-methods" title="Link to this heading">¶</a></h3>
+<p>All models include common methods for:</p>
+<ul class="simple">
+<li><p>String representation (<code class="docutils literal notranslate"><span class="pre">__str__</span></code>)</p></li>
+<li><p>Absolute URL generation (<code class="docutils literal notranslate"><span class="pre">get_absolute_url</span></code>)</p></li>
+<li><p>Metadata access (<code class="docutils literal notranslate"><span class="pre">_meta</span></code>)</p></li>
+</ul>
+</section>
+<section id="custom-methods">
+<h3>Custom Methods<a class="headerlink" href="#custom-methods" title="Link to this heading">¶</a></h3>
+<p>Each model includes custom methods specific to its functionality:</p>
+<ul class="simple">
+<li><p><strong>Artwork</strong>: <code class="docutils literal notranslate"><span class="pre">get_image_url()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_dimensions_display()</span></code></p></li>
+<li><p><strong>Artist</strong>: <code class="docutils literal notranslate"><span class="pre">get_full_name()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_artwork_count()</span></code></p></li>
+<li><p><strong>Collection</strong>: <code class="docutils literal notranslate"><span class="pre">get_total_value()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_artwork_count()</span></code></p></li>
+<li><p><strong>Exhibition</strong>: <code class="docutils literal notranslate"><span class="pre">is_current()</span></code>, <code class="docutils literal notranslate"><span class="pre">get_duration()</span></code></p></li>
+</ul>
+</section>
+</section>
+<section id="model-validation">
+<h2>Model Validation<a class="headerlink" href="#model-validation" title="Link to this heading">¶</a></h2>
+<section id="field-validation">
+<h3>Field Validation<a class="headerlink" href="#field-validation" title="Link to this heading">¶</a></h3>
+<p>Models include field-level validation for:</p>
+<ul class="simple">
+<li><p>Required fields</p></li>
+<li><p>Field length limits</p></li>
+<li><p>Format validation (email, URL, etc.)</p></li>
+<li><p>Value constraints</p></li>
+</ul>
+</section>
+<section id="id1">
+<h3>Model Validation<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>Custom model validation includes:</p>
+<ul class="simple">
+<li><p>Business logic validation</p></li>
+<li><p>Cross-field validation</p></li>
+<li><p>Unique constraint validation</p></li>
+<li><p>Related object validation</p></li>
+</ul>
+</section>
+</section>
+<section id="database-indexes">
+<h2>Database Indexes<a class="headerlink" href="#database-indexes" title="Link to this heading">¶</a></h2>
+<section id="performance-optimization">
+<h3>Performance Optimization<a class="headerlink" href="#performance-optimization" title="Link to this heading">¶</a></h3>
+<p>Models include database indexes for:</p>
+<ul class="simple">
+<li><p>Frequently queried fields</p></li>
+<li><p>Foreign key relationships</p></li>
+<li><p>Search fields</p></li>
+<li><p>Date/time fields</p></li>
+</ul>
+</section>
+</section>
+<section id="migration-strategy">
+<h2>Migration Strategy<a class="headerlink" href="#migration-strategy" title="Link to this heading">¶</a></h2>
+<section id="model-changes">
+<h3>Model Changes<a class="headerlink" href="#model-changes" title="Link to this heading">¶</a></h3>
+<p>When modifying models:</p>
+<ol class="arabic simple">
+<li><p>Create a new migration file</p></li>
+<li><p>Test the migration on a copy of production data</p></li>
+<li><p>Apply the migration during maintenance windows</p></li>
+<li><p>Update related code and tests</p></li>
+</ol>
+</section>
+<section id="data-integrity">
+<h3>Data Integrity<a class="headerlink" href="#data-integrity" title="Link to this heading">¶</a></h3>
+<p>Models maintain data integrity through:</p>
+<ul class="simple">
+<li><p>Foreign key constraints</p></li>
+<li><p>Unique constraints</p></li>
+<li><p>Check constraints</p></li>
+<li><p>Cascade delete rules</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="configuration.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Configuration Guide</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="api.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">API Documentation</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2025, Dimitri Gaggioli</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/shibuya.js?v=e730760c"></script></body>
+</html>
