@@ -1,5 +1,5 @@
 # Dockerfile for Aura Art Django Application
-FROM python:3.11-slim
+FROM python:alpine
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
