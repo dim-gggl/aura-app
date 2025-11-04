@@ -72,3 +72,7 @@ lint: ## Run linting
 
 type-check: ## Run type checking
 	mypy .
+
+secret-key: ## Generate secret key
+	@key=$$(clinkey -l 64 -s - -t super_strong --lower); \
+	echo "DJANGO_SECRET_KEY='$$key'" >> .env

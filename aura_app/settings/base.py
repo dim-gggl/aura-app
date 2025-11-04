@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env(
     DEBUG=(bool, False),
-    SECRET_KEY=(str, ""),
+    SECRET_KEY=os.environ.get("DJANGO_SECRET_KEY", "change-me-now"),
     ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
     DATABASE_URL=(str, None),
     CSRF_TRUSTED_ORIGINS=(list, []),
