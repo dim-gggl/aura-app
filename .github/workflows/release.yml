@@ -1,0 +1,323 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: read
+
+jobs:
+  # ============================================================================
+  # Create GitHub Release
+  # ============================================================================
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREV_TAG" ]; then
+            # First release - get all commits
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits since previous tag
+            CHANGELOG=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # Save to file
+          echo "$CHANGELOG" > changelog.txt
+
+          # Count commits
+          COMMIT_COUNT=$(echo "$CHANGELOG" | wc -l)
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create release notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          ## 🚀 What's New in ${{ steps.version.outputs.version }}
+
+          ### 📝 Changes
+
+          $(cat changelog.txt)
+
+          ### 📊 Statistics
+
+          - **Commits since last release:** ${{ steps.changelog.outputs.commit_count }}
+          - **Previous version:** ${{ steps.changelog.outputs.prev_tag }}
+
+          ### 🐳 Docker Images
+
+          Images are available on GitHub Container Registry:
+
+          ```bash
+          docker pull ghcr.io/${{ github.repository }}/web:${{ steps.version.outputs.version }}
+          docker pull ghcr.io/${{ github.repository }}/nginx:${{ steps.version.outputs.version }}
+          ```
+
+          ### 📦 Installation
+
+          #### Using Docker Compose
+
+          ```bash
+          # Clone repository
+          git clone https://github.com/${{ github.repository }}.git
+          cd aura-app
+
+          # Checkout this version
+          git checkout ${{ steps.version.outputs.version }}
+
+          # Configure environment
+          cp .env.production.example .env
+          # Edit .env with your settings
+
+          # Deploy
+          ./deploy.sh production
+          ```
+
+          #### Manual Installation
+
+          See [DOCKER_DEPLOYMENT.md](https://github.com/${{ github.repository }}/blob/main/DOCKER_DEPLOYMENT.md) for detailed instructions.
+
+          ### 🔧 Configuration Changes
+
+          Check the [Migration Guide](https://github.com/${{ github.repository }}/blob/main/MIGRATION_GUIDE.md) if upgrading from a previous version.
+
+          ### 🐛 Bug Fixes & Known Issues
+
+          See the [Issues](https://github.com/${{ github.repository }}/issues) page for known issues.
+
+          ---
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.changelog.outputs.prev_tag }}...${{ steps.version.outputs.version }}
+          EOF
+
+          # Expand variables
+          envsubst < release_notes.md > release_notes_final.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body_path: release_notes_final.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-rc') || contains(steps.version.outputs.version, '-beta') || contains(steps.version.outputs.version, '-alpha') }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # Build Release Docker Images
+  # ============================================================================
+  build-release-images:
+    name: Build Release Docker Images
+    runs-on: ubuntu-latest
+    needs: create-release
+
+    strategy:
+      matrix:
+        image: [web, nginx]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/${{ matrix.image }}
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.version.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and push web image
+        if: matrix.image == 'web'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            VERSION=${{ steps.version.outputs.version }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push nginx image
+        if: matrix.image == 'nginx'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.nginx
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ============================================================================
+  # Create Release Assets
+  # ============================================================================
+  create-assets:
+    name: Create Release Assets
+    runs-on: ubuntu-latest
+    needs: create-release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create source archive
+        run: |
+          tar -czf aura-app-${{ steps.version.outputs.version }}-source.tar.gz \
+            --exclude='.git' \
+            --exclude='media' \
+            --exclude='staticfiles' \
+            --exclude='__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.env' \
+            .
+
+      - name: Create deployment bundle
+        run: |
+          mkdir -p deployment-bundle
+
+          # Copy essential files for deployment
+          cp docker-compose.yml deployment-bundle/
+          cp docker-compose.prod.yml deployment-bundle/
+          cp .env.production.example deployment-bundle/.env.example
+          cp deploy.sh deployment-bundle/
+          cp backup.sh deployment-bundle/
+          cp nginx.conf deployment-bundle/
+          cp DOCKER_DEPLOYMENT.md deployment-bundle/README.md
+
+          # Make scripts executable
+          chmod +x deployment-bundle/*.sh
+
+          # Create archive
+          tar -czf aura-app-${{ steps.version.outputs.version }}-deployment.tar.gz deployment-bundle/
+
+      - name: Generate checksums
+        run: |
+          sha256sum aura-app-${{ steps.version.outputs.version }}-*.tar.gz > checksums.txt
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          files: |
+            aura-app-${{ steps.version.outputs.version }}-source.tar.gz
+            aura-app-${{ steps.version.outputs.version }}-deployment.tar.gz
+            checksums.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # Notify Release
+  # ============================================================================
+  notify-release:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [create-release, build-release-images, create-assets]
+    if: always()
+
+    steps:
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Summary
+        run: |
+          echo "### 🎉 Release ${{ steps.version.outputs.version }} Created!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release URL:** https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Docker Images:**" >> $GITHUB_STEP_SUMMARY
+          echo "- \`ghcr.io/${{ github.repository }}/web:${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`ghcr.io/${{ github.repository }}/nginx:${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Release: ${{ needs.create-release.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker Build: ${{ needs.build-release-images.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Assets: ${{ needs.create-assets.result }}" >> $GITHUB_STEP_SUMMARY
+
+      # Optional: Notify Slack, Discord, etc.
+      # - name: Notify Slack
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+      #     payload: |
+      #       {
+      #         "text": "🎉 New release ${{ steps.version.outputs.version }} is available!"
+      #       }

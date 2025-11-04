@@ -30,7 +30,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 
 # PostgreSQL Database Configuration
 POSTGRES_DB=aura_db
-POSTGRES_USER=aura_user
+POSTGRES_USER=aura_app
 POSTGRES_PASSWORD=your-secure-password-here
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
@@ -50,7 +50,7 @@ chmod +x setup_postgresql.sh
 Ce script va :
 - Vérifier que PostgreSQL est installé et démarré
 - Créer la base de données `aura_db`
-- Créer l'utilisateur `aura_user`
+- Créer l'utilisateur `aura_app`
 - Créer le schéma `aura`
 - Configurer les permissions
 - Définir le `search_path`
@@ -58,7 +58,7 @@ Ce script va :
 #### 2.2 Vérification manuelle (optionnel)
 ```bash
 # Se connecter à PostgreSQL
-psql -h localhost -p 5432 -U aura_user -d aura_db
+psql -h localhost -p 5432 -U aura_app -d aura_db
 
 # Vérifier le schéma
 \dn
@@ -141,7 +141,7 @@ Visitez `http://localhost:8000` pour vérifier que tout fonctionne.
 #### 5.3 Vérifier les données dans PostgreSQL
 ```bash
 # Se connecter à la base de données
-psql -h localhost -p 5432 -U aura_user -d aura_db
+psql -h localhost -p 5432 -U aura_app -d aura_db
 
 # Lister les tables dans le schéma aura
 \dt aura.*
@@ -176,14 +176,14 @@ sudo systemctl start postgresql
 sudo -u postgres psql
 
 -- Accorder les permissions
-GRANT ALL PRIVILEGES ON DATABASE aura_db TO aura_user;
-GRANT ALL PRIVILEGES ON SCHEMA aura TO aura_user;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_user;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_user;
+GRANT ALL PRIVILEGES ON DATABASE aura_db TO aura_app;
+GRANT ALL PRIVILEGES ON SCHEMA aura TO aura_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_app;
 
 -- Définir les permissions par défaut
-ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON TABLES TO aura_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON SEQUENCES TO aura_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON TABLES TO aura_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON SEQUENCES TO aura_app;
 ```
 
 #### 3. Tables créées dans le mauvais schéma
@@ -254,7 +254,7 @@ python manage.py migrate
 
 ### Bonnes Pratiques
 1. **Mots de passe forts** : Utilisez des mots de passe complexes pour la base de données
-2. **Permissions minimales** : L'utilisateur `aura_user` n'a que les permissions nécessaires
+2. **Permissions minimales** : L'utilisateur `aura_app` n'a que les permissions nécessaires
 3. **Schéma isolé** : Les données sont dans le schéma `aura`, séparées du schéma `public`
 4. **Variables d'environnement** : Les informations sensibles sont dans `.env`
 

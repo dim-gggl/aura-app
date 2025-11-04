@@ -1,0 +1,36 @@
+# Nginx Dockerfile for Aura Art
+FROM nginx:1.25-alpine
+
+# Labels
+LABEL maintainer="dim-gggl" \
+      org.opencontainers.image.title="Aura Art Nginx" \
+      org.opencontainers.image.description="Nginx reverse proxy for Aura Art Django application"
+
+# Install curl for healthchecks
+RUN apk add --no-cache curl
+
+# Remove default nginx configuration
+RUN rm /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy custom nginx configuration
+# Note: This is overridden by volume mount in docker-compose.yml
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Create directories for static and media files
+RUN mkdir -p /var/www/static /var/www/media
+
+# Create directory for SSL certificates
+RUN mkdir -p /etc/nginx/ssl
+
+# Set proper permissions
+RUN chown -R nginx:nginx /var/www /etc/nginx/ssl
+
+# Expose HTTP and HTTPS ports
+EXPOSE 80 443
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/health/ || exit 1
+
+# Start nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]

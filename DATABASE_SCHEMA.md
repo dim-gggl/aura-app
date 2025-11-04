@@ -18,11 +18,11 @@ DEBUG=True
 SECRET_KEY=your-secret-key-here
 
 # PostgreSQL Database with aura schema
-DATABASE_URL=postgres://aura_user:your-password@localhost:5432/aura_db?options=-csearch_path=aura
+DATABASE_URL=postgres://aura_app:your-password@localhost:5432/aura_db?options=-csearch_path=aura
 
 # Ou utilisez les variables séparées :
 DB_NAME=aura_db
-DB_USER=aura_user
+DB_USER=aura_app
 DB_PASSWORD=your-password
 DB_HOST=localhost
 DB_PORT=5432
@@ -67,10 +67,10 @@ Connectez-vous à PostgreSQL et exécutez :
 CREATE SCHEMA IF NOT EXISTS aura;
 
 -- Accorder les permissions
-GRANT USAGE ON SCHEMA aura TO aura_user;
-GRANT CREATE ON SCHEMA aura TO aura_user;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_user;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_user;
+GRANT USAGE ON SCHEMA aura TO aura_app;
+GRANT CREATE ON SCHEMA aura TO aura_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_app;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_app;
 
 -- Définir le search_path
 ALTER DATABASE aura_db SET search_path TO aura, public;
@@ -104,11 +104,11 @@ Si vous rencontrez des erreurs de permissions :
 
 ```sql
 -- Accorder tous les privilèges sur le schéma
-GRANT ALL PRIVILEGES ON SCHEMA aura TO aura_user;
+GRANT ALL PRIVILEGES ON SCHEMA aura TO aura_app;
 
 -- Accorder les privilèges sur les futures tables
-ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON TABLES TO aura_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON SEQUENCES TO aura_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON TABLES TO aura_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA aura GRANT ALL ON SEQUENCES TO aura_app;
 ```
 
 ### Tables dans le mauvais schéma

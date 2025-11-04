@@ -44,12 +44,12 @@ def create_aura_schema():
             
             # Grant permissions to the database user
             cursor.execute("""
-                GRANT USAGE ON SCHEMA aura TO aura_user;
-                GRANT CREATE ON SCHEMA aura TO aura_user;
-                GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_user;
-                GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_user;
+                GRANT USAGE ON SCHEMA aura TO aura_app;
+                GRANT CREATE ON SCHEMA aura TO aura_app;
+                GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_app;
+                GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_app;
             """)
-            print("✅ Permissions granted to 'aura_user' for schema 'aura'.")
+            print("✅ Permissions granted to 'aura_app' for schema 'aura'.")
             
         except Exception as e:
             print(f"❌ Error creating schema: {e}")

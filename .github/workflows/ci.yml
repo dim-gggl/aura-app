@@ -1,0 +1,269 @@
+name: CI - Tests & Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: '3.11'
+  POSTGRES_VERSION: '16'
+
+jobs:
+  # ============================================================================
+  # Linting and Code Quality
+  # ============================================================================
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort pylint bandit safety
+
+      - name: Run Black (code formatting check)
+        run: |
+          black --check --diff .
+        continue-on-error: true
+
+      - name: Run isort (import sorting check)
+        run: |
+          isort --check-only --diff .
+        continue-on-error: true
+
+      - name: Run Flake8 (linting)
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=110 --statistics
+        continue-on-error: true
+
+      - name: Run Bandit (security linting)
+        run: |
+          bandit -r . -f json -o bandit-report.json || true
+          bandit -r . -ll || true
+        continue-on-error: true
+
+      - name: Check dependency vulnerabilities
+        run: |
+          safety check --json || true
+        continue-on-error: true
+
+  # ============================================================================
+  # Django Tests with PostgreSQL
+  # ============================================================================
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aura_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: aura_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client libpq-dev gettext
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv pip install -r requirements.txt --system
+          pip install pytest pytest-django pytest-cov
+
+      - name: Create test database schema
+        env:
+          DATABASE_URL: postgresql://aura_user:test_password@localhost:5432/aura_test_db
+        run: |
+          PGPASSWORD=test_password psql -h localhost -U aura_user -d aura_test_db -c "CREATE SCHEMA IF NOT EXISTS aura;"
+
+      - name: Run Django system checks
+        env:
+          SECRET_KEY: test-secret-key-for-ci
+          DATABASE_URL: postgresql://aura_user:test_password@localhost:5432/aura_test_db
+          DJANGO_SETTINGS_MODULE: aura_app.settings.tests
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          python manage.py check
+
+      - name: Run migrations
+        env:
+          SECRET_KEY: test-secret-key-for-ci
+          DATABASE_URL: postgresql://aura_user:test_password@localhost:5432/aura_test_db
+          DJANGO_SETTINGS_MODULE: aura_app.settings.tests
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          python manage.py migrate --noinput
+
+      - name: Run tests with coverage
+        env:
+          SECRET_KEY: test-secret-key-for-ci
+          DATABASE_URL: postgresql://aura_user:test_password@localhost:5432/aura_test_db
+          DJANGO_SETTINGS_MODULE: aura_app.settings.tests
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest --cov=. --cov-report=xml --cov-report=term --verbose
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  # ============================================================================
+  # Django Configuration Check
+  # ============================================================================
+  django-check:
+    name: Django Deployment Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv pip install -r requirements.txt --system
+
+      - name: Run Django deployment checks
+        env:
+          SECRET_KEY: test-secret-key-for-ci-deployment-check
+          DATABASE_URL: sqlite:///db.sqlite3
+          DJANGO_SETTINGS_MODULE: aura_app.settings.production
+          ALLOWED_HOSTS: example.com
+          CSRF_TRUSTED_ORIGINS: https://example.com
+          DEBUG: False
+        run: |
+          python manage.py check --deploy --fail-level WARNING
+
+  # ============================================================================
+  # Security Checks
+  # ============================================================================
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety bandit
+
+      - name: Check for security vulnerabilities in dependencies
+        run: |
+          safety check --json || true
+
+      - name: Run Bandit security scanner
+        run: |
+          bandit -r . -f json -o bandit-report.json || true
+          cat bandit-report.json
+
+      - name: Upload Bandit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-security-report
+          path: bandit-report.json
+
+  # ============================================================================
+  # Collect Static Files Check
+  # ============================================================================
+  static-check:
+    name: Static Files Collection
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv pip install -r requirements.txt --system
+
+      - name: Collect static files
+        env:
+          SECRET_KEY: test-secret-key-for-static
+          DATABASE_URL: sqlite:///db.sqlite3
+          DJANGO_SETTINGS_MODULE: aura_app.settings.production
+          ALLOWED_HOSTS: example.com
+          CSRF_TRUSTED_ORIGINS: https://example.com
+        run: |
+          python manage.py collectstatic --noinput --clear
+
+      - name: Check static files were created
+        run: |
+          if [ ! -d "staticfiles" ]; then
+            echo "Static files directory not created!"
+            exit 1
+          fi
+          echo "Static files collected successfully"
+          ls -lah staticfiles/

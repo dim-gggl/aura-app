@@ -1,0 +1,141 @@
+# Production overrides for docker-compose.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  # PostgreSQL Database - Production Configuration
+  db:
+    restart: always
+    environment:
+      # Enforce md5 authentication in production
+      POSTGRES_HOST_AUTH_METHOD: md5
+    # Remove port exposure in production (only internal access)
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # Redis Cache - Production Configuration
+  redis:
+    restart: always
+    # Remove port exposure in production
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Django Web Application - Production Configuration
+  web:
+    restart: always
+    # Override build to ensure production settings
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-}
+        VERSION: ${VERSION:-latest}
+        VCS_REF: ${VCS_REF:-}
+    # Remove source code volume mount (no hot reload in production)
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    environment:
+      # Production Django settings
+      DJANGO_SETTINGS_MODULE: aura_app.settings.production
+      DEBUG: "False"
+
+      # Force static collection
+      FORCE_COLLECT_STATIC: "true"
+
+      # Security - require all variables from .env
+      # (SECRET_KEY, ALLOWED_HOSTS, CSRF_TRUSTED_ORIGINS must be set in .env)
+    # Remove direct port exposure (nginx handles this)
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+  # Nginx - Production Configuration
+  nginx:
+    restart: always
+    # In production, you might want to use a pre-built image
+    # or build with production-specific configuration
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_volume:/var/www/static:ro
+      - media_volume:/var/www/media:ro
+      # Production SSL certificates
+      # Mount from Let's Encrypt or your certificate provider
+      - /etc/letsencrypt/live/aura-art.org:/etc/nginx/ssl:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
+# Volumes - Production configuration
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/aura/postgres}
+
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${REDIS_DATA_PATH:-/var/lib/aura/redis}
+
+  static_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${STATIC_PATH:-/var/www/aura/static}
+
+  media_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MEDIA_PATH:-/var/www/aura/media}
