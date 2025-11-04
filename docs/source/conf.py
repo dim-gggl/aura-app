@@ -73,7 +73,8 @@ napoleon_attr_annotations = True
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'shibuya'
-html_static_path = ['_static']
+html_theme_path = '.'
+html_static_path = ['docs/html/_static']
 html_logo = None
 html_favicon = None
 
