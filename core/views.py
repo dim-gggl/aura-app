@@ -12,6 +12,7 @@ Key features:
 - Global search across all user data (artworks, contacts, notes)
 - Performance-optimized queries with proper filtering and limiting
 """
+import logging
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -81,7 +82,9 @@ def dashboard(request):
     # Get the 5 most recently added artworks for quick access
     recent_artworks = Artwork.objects.filter(
         user=request.user
-    ).select_related('art_type').prefetch_related('artists', 'photos').order_by('-created_at')[:5]
+    ).select_related('art_type').prefetch_related(
+        'artists', 'photos'
+    ).order_by('-created_at')[:5]
     
     # === ANALYTICS DATA ===
     # Artwork distribution by current location
@@ -262,8 +265,9 @@ def health_check(request):
             'version': '1.0',
             'error': str(e)
         }
+        logging.error(f"Health check failed: {e}")
         
-        return JsonResponse(health_status, status=500)
+        return "An internal error occurred"
 
 
 def site_manifest(request):
