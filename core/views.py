@@ -240,6 +240,11 @@ def health_check(request):
     and can connect to its database. It's used by Docker health checks,
     load balancers, and monitoring systems.
     
+    Security considerations:
+    - Never exposes detailed error information to clients
+    - Logs full error details server-side only for debugging
+    - Returns generic error messages to prevent information disclosure
+    
     Returns:
         JsonResponse: Status information with HTTP 200 for healthy, 500 for unhealthy
     """
@@ -258,12 +263,15 @@ def health_check(request):
         return JsonResponse(health_status, status=200)
         
     except Exception as e:
-        # Return unhealthy status if any error occurs
+        # Log the full error for debugging (server-side only)
+        logging.error(f"Health check failed: {str(e)}", exc_info=True)
+        
+        # Return generic error without exposing details
         health_status = {
             'status': 'unhealthy',
             'timestamp': datetime.now().isoformat(),
             'version': '1.0',
-            'error': str(e)
+            'error': 'Service temporarily unavailable'
         }
         logging.error(f"Health check failed: {e}")
         
@@ -278,3 +286,42 @@ def site_manifest(request):
         HttpResponse: JSON manifest with content type application/manifest+json
     """
     return render(request, 'site.webmanifest', content_type='application/manifest+json')
+
+
+def custom_404(request, exception):
+    """
+    Custom 404 error handler that doesn't expose sensitive information.
+    
+    This handler provides a user-friendly 404 page without revealing
+    any internal application structure or sensitive data.
+    
+    Args:
+        request: HTTP request object
+        exception: The exception that triggered the 404
+        
+    Returns:
+        HttpResponse: Rendered 404 template with HTTP 404 status
+    """
+    # Log the 404 for monitoring purposes (without sensitive data)
+    logging.warning(f"404 error for path: {request.path} from IP: {request.META.get('REMOTE_ADDR', 'unknown')}")
+    
+    return render(request, 'core/404.html', status=404)
+
+
+def custom_500(request):
+    """
+    Custom 500 error handler that doesn't expose sensitive information.
+    
+    This handler provides a user-friendly 500 page while logging the
+    full error details server-side for debugging purposes.
+    
+    Args:
+        request: HTTP request object
+        
+    Returns:
+        HttpResponse: Rendered 500 template with HTTP 500 status
+    """
+    # Log the full error for debugging (server-side only)
+    logging.error("Internal server error", exc_info=True)
+    
+    return render(request, 'core/500.html', status=500)

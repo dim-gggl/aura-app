@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Documentation - Aura Art 1.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Deployment Guide" href="deployment.html" /><link rel="prev" title="Models Documentation" href="models.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b1a1f93b" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=bb284d7b" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="API Documentation"/>
+<meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Aura Art</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials"></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing Guide</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#api-overview">API Overview</a></li>
+<li><a class="reference internal" href="#base-url">Base URL</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a><ul>
+<li><a class="reference internal" href="#api-key-authentication">API Key Authentication</a></li>
+<li><a class="reference internal" href="#session-authentication">Session Authentication</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#endpoints">Endpoints</a><ul>
+<li><a class="reference internal" href="#artworks-api">Artworks API</a><ul>
+<li><a class="reference internal" href="#list-artworks">List Artworks</a></li>
+<li><a class="reference internal" href="#get-artwork">Get Artwork</a></li>
+<li><a class="reference internal" href="#create-artwork">Create Artwork</a></li>
+<li><a class="reference internal" href="#update-artwork">Update Artwork</a></li>
+<li><a class="reference internal" href="#delete-artwork">Delete Artwork</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#artists-api">Artists API</a><ul>
+<li><a class="reference internal" href="#list-artists">List Artists</a></li>
+<li><a class="reference internal" href="#get-artist">Get Artist</a></li>
+<li><a class="reference internal" href="#create-artist">Create Artist</a></li>
+<li><a class="reference internal" href="#update-artist">Update Artist</a></li>
+<li><a class="reference internal" href="#delete-artist">Delete Artist</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#collections-api">Collections API</a><ul>
+<li><a class="reference internal" href="#list-collections">List Collections</a></li>
+<li><a class="reference internal" href="#get-collection">Get Collection</a></li>
+<li><a class="reference internal" href="#create-collection">Create Collection</a></li>
+<li><a class="reference internal" href="#update-collection">Update Collection</a></li>
+<li><a class="reference internal" href="#delete-collection">Delete Collection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exhibitions-api">Exhibitions API</a><ul>
+<li><a class="reference internal" href="#list-exhibitions">List Exhibitions</a></li>
+<li><a class="reference internal" href="#get-exhibition">Get Exhibition</a></li>
+<li><a class="reference internal" href="#create-exhibition">Create Exhibition</a></li>
+<li><a class="reference internal" href="#update-exhibition">Update Exhibition</a></li>
+<li><a class="reference internal" href="#delete-exhibition">Delete Exhibition</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contacts-api">Contacts API</a><ul>
+<li><a class="reference internal" href="#list-contacts">List Contacts</a></li>
+<li><a class="reference internal" href="#get-contact">Get Contact</a></li>
+<li><a class="reference internal" href="#create-contact">Create Contact</a></li>
+<li><a class="reference internal" href="#update-contact">Update Contact</a></li>
+<li><a class="reference internal" href="#delete-contact">Delete Contact</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#notes-api">Notes API</a><ul>
+<li><a class="reference internal" href="#list-notes">List Notes</a></li>
+<li><a class="reference internal" href="#get-note">Get Note</a></li>
+<li><a class="reference internal" href="#create-note">Create Note</a></li>
+<li><a class="reference internal" href="#update-note">Update Note</a></li>
+<li><a class="reference internal" href="#delete-note">Delete Note</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#filtering-and-search">Filtering and Search</a><ul>
+<li><a class="reference internal" href="#query-parameters">Query Parameters</a></li>
+<li><a class="reference internal" href="#field-specific-filters">Field-Specific Filters</a></li>
+<li><a class="reference internal" href="#example-filtering">Example Filtering</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-handling">Error Handling</a><ul>
+<li><a class="reference internal" href="#error-responses">Error Responses</a></li>
+<li><a class="reference internal" href="#error-format">Error Format</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rate-limiting">Rate Limiting</a><ul>
+<li><a class="reference internal" href="#api-limits">API Limits</a></li>
+<li><a class="reference internal" href="#rate-limit-headers">Rate Limit Headers</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Aura Art</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">API Documentation</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading">¶</a></h1>
+<p>Aura Art provides a REST API for programmatic access to your data.</p>
+<section id="api-overview">
+<h2>API Overview<a class="headerlink" href="#api-overview" title="Link to this heading">¶</a></h2>
+<p>The API is built using Django REST Framework and provides:</p>
+<ul class="simple">
+<li><p>Full CRUD operations for all models</p></li>
+<li><p>Filtering and searching capabilities</p></li>
+<li><p>Pagination support</p></li>
+<li><p>Authentication and permissions</p></li>
+<li><p>Serialized data in JSON format</p></li>
+</ul>
+</section>
+<section id="base-url">
+<h2>Base URL<a class="headerlink" href="#base-url" title="Link to this heading">¶</a></h2>
+<p>All API endpoints are prefixed with <code class="docutils literal notranslate"><span class="pre">/api/</span></code>:</p>
+<p><strong>Production</strong>: <a class="reference external" href="https://aura-art.org/api/">https://aura-art.org/api/</a></p>
+<p><strong>Development</strong>: <a class="reference external" href="http://localhost:8000/api/">http://localhost:8000/api/</a></p>
+</section>
+<section id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Link to this heading">¶</a></h2>
+<section id="api-key-authentication">
+<h3>API Key Authentication<a class="headerlink" href="#api-key-authentication" title="Link to this heading">¶</a></h3>
+<p>The API supports API key authentication:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Api-Key your-api-key&quot;</span><span class="w"> </span>https://aura-art.org/api/artworks/
+</span></pre></div>
+</div>
+</section>
+<section id="session-authentication">
+<h3>Session Authentication<a class="headerlink" href="#session-authentication" title="Link to this heading">¶</a></h3>
+<p>For web applications, session authentication is supported:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Cookie: sessionid=your-session-id&quot;</span><span class="w"> </span>https://aura-art.org/api/artworks/
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="endpoints">
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Link to this heading">¶</a></h2>
+<section id="artworks-api">
+<h3>Artworks API<a class="headerlink" href="#artworks-api" title="Link to this heading">¶</a></h3>
+<section id="list-artworks">
+<h4>List Artworks<a class="headerlink" href="#list-artworks" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/artworks/</span>
+</span></pre></div>
+</div>
+<p>Response:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span>
+</span><span data-line="2"><span class="w">    </span><span class="nt">&quot;count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">    </span><span class="nt">&quot;next&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://your-domain.com/api/artworks/?page=2&quot;</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">    </span><span class="nt">&quot;previous&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">    </span><span class="nt">&quot;results&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span data-line="6"><span class="w">        </span><span class="p">{</span>
+</span><span data-line="7"><span class="w">            </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span data-line="8"><span class="w">            </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Mona Lisa&quot;</span><span class="p">,</span>
+</span><span data-line="9"><span class="w">            </span><span class="nt">&quot;artist&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="10"><span class="w">                </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span data-line="11"><span class="w">                </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Leonardo da Vinci&quot;</span>
+</span><span data-line="12"><span class="w">            </span><span class="p">},</span>
+</span><span data-line="13"><span class="w">            </span><span class="nt">&quot;year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1503</span><span class="p">,</span>
+</span><span data-line="14"><span class="w">            </span><span class="nt">&quot;medium&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Oil on canvas&quot;</span><span class="p">,</span>
+</span><span data-line="15"><span class="w">            </span><span class="nt">&quot;dimensions&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;77 x 53 cm&quot;</span><span class="p">,</span>
+</span><span data-line="16"><span class="w">            </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span><span class="p">,</span>
+</span><span data-line="17"><span class="w">            </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-01T00:00:00Z&quot;</span>
+</span><span data-line="18"><span class="w">        </span><span class="p">}</span>
+</span><span data-line="19"><span class="w">    </span><span class="p">]</span>
+</span><span data-line="20"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-artwork">
+<h4>Get Artwork<a class="headerlink" href="#get-artwork" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/artworks/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-artwork">
+<h4>Create Artwork<a class="headerlink" href="#create-artwork" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/artworks/</span>
+</span></pre></div>
+</div>
+<p>Request body:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span>
+</span><span data-line="2"><span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;New Artwork&quot;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">    </span><span class="nt">&quot;artist&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span data-line="4"><span class="w">    </span><span class="nt">&quot;year&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2025</span><span class="p">,</span>
+</span><span data-line="5"><span class="w">    </span><span class="nt">&quot;medium&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Oil on canvas&quot;</span><span class="p">,</span>
+</span><span data-line="6"><span class="w">    </span><span class="nt">&quot;dimensions&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;50 x 40 cm&quot;</span>
+</span><span data-line="7"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-artwork">
+<h4>Update Artwork<a class="headerlink" href="#update-artwork" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/artworks/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-artwork">
+<h4>Delete Artwork<a class="headerlink" href="#delete-artwork" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/artworks/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="artists-api">
+<h3>Artists API<a class="headerlink" href="#artists-api" title="Link to this heading">¶</a></h3>
+<section id="list-artists">
+<h4>List Artists<a class="headerlink" href="#list-artists" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/artists/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-artist">
+<h4>Get Artist<a class="headerlink" href="#get-artist" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/artists/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-artist">
+<h4>Create Artist<a class="headerlink" href="#create-artist" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/artists/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-artist">
+<h4>Update Artist<a class="headerlink" href="#update-artist" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/artists/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-artist">
+<h4>Delete Artist<a class="headerlink" href="#delete-artist" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/artists/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="collections-api">
+<h3>Collections API<a class="headerlink" href="#collections-api" title="Link to this heading">¶</a></h3>
+<section id="list-collections">
+<h4>List Collections<a class="headerlink" href="#list-collections" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/collections/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-collection">
+<h4>Get Collection<a class="headerlink" href="#get-collection" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/collections/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-collection">
+<h4>Create Collection<a class="headerlink" href="#create-collection" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/collections/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-collection">
+<h4>Update Collection<a class="headerlink" href="#update-collection" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/collections/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-collection">
+<h4>Delete Collection<a class="headerlink" href="#delete-collection" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/collections/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="exhibitions-api">
+<h3>Exhibitions API<a class="headerlink" href="#exhibitions-api" title="Link to this heading">¶</a></h3>
+<section id="list-exhibitions">
+<h4>List Exhibitions<a class="headerlink" href="#list-exhibitions" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/exhibitions/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-exhibition">
+<h4>Get Exhibition<a class="headerlink" href="#get-exhibition" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/exhibitions/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-exhibition">
+<h4>Create Exhibition<a class="headerlink" href="#create-exhibition" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/exhibitions/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-exhibition">
+<h4>Update Exhibition<a class="headerlink" href="#update-exhibition" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/exhibitions/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-exhibition">
+<h4>Delete Exhibition<a class="headerlink" href="#delete-exhibition" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/exhibitions/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="contacts-api">
+<h3>Contacts API<a class="headerlink" href="#contacts-api" title="Link to this heading">¶</a></h3>
+<section id="list-contacts">
+<h4>List Contacts<a class="headerlink" href="#list-contacts" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/contacts/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-contact">
+<h4>Get Contact<a class="headerlink" href="#get-contact" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/contacts/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-contact">
+<h4>Create Contact<a class="headerlink" href="#create-contact" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/contacts/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-contact">
+<h4>Update Contact<a class="headerlink" href="#update-contact" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/contacts/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-contact">
+<h4>Delete Contact<a class="headerlink" href="#delete-contact" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/contacts/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="notes-api">
+<h3>Notes API<a class="headerlink" href="#notes-api" title="Link to this heading">¶</a></h3>
+<section id="list-notes">
+<h4>List Notes<a class="headerlink" href="#list-notes" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/notes/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="get-note">
+<h4>Get Note<a class="headerlink" href="#get-note" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">GET /api/notes/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="create-note">
+<h4>Create Note<a class="headerlink" href="#create-note" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">POST /api/notes/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="update-note">
+<h4>Update Note<a class="headerlink" href="#update-note" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">PUT /api/notes/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+<section id="delete-note">
+<h4>Delete Note<a class="headerlink" href="#delete-note" title="Link to this heading">¶</a></h4>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">DELETE /api/notes/{id}/</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="filtering-and-search">
+<h2>Filtering and Search<a class="headerlink" href="#filtering-and-search" title="Link to this heading">¶</a></h2>
+<section id="query-parameters">
+<h3>Query Parameters<a class="headerlink" href="#query-parameters" title="Link to this heading">¶</a></h3>
+<p>All list endpoints support the following query parameters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">search</span></code>: Search across relevant fields</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ordering</span></code>: Sort results by field name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">page</span></code>: Page number for pagination</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">page_size</span></code>: Number of items per page</p></li>
+</ul>
+</section>
+<section id="field-specific-filters">
+<h3>Field-Specific Filters<a class="headerlink" href="#field-specific-filters" title="Link to this heading">¶</a></h3>
+<p>Each endpoint supports field-specific filters:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">artist__name</span></code>: Filter by artist name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">year__gte</span></code>: Filter by year greater than or equal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">year__lte</span></code>: Filter by year less than or equal</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">medium</span></code>: Filter by medium</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">created_at__date</span></code>: Filter by creation date</p></li>
+</ul>
+</section>
+<section id="example-filtering">
+<h3>Example Filtering<a class="headerlink" href="#example-filtering" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Search for artworks by Leonardo da Vinci</span>
+</span><span data-line="2">curl<span class="w"> </span><span class="s2">&quot;https://your-domain.com/api/artworks/?artist__name=Leonardo&quot;</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># Get artworks from 2020 onwards</span>
+</span><span data-line="5">curl<span class="w"> </span><span class="s2">&quot;https://your-domain.com/api/artworks/?year__gte=2020&quot;</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># Search for oil paintings</span>
+</span><span data-line="8">curl<span class="w"> </span><span class="s2">&quot;https://your-domain.com/api/artworks/?search=oil&quot;</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="error-handling">
+<h2>Error Handling<a class="headerlink" href="#error-handling" title="Link to this heading">¶</a></h2>
+<section id="error-responses">
+<h3>Error Responses<a class="headerlink" href="#error-responses" title="Link to this heading">¶</a></h3>
+<p>The API returns appropriate HTTP status codes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: Successful request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">201</span> <span class="pre">Created</span></code>: Resource created successfully</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">Bad</span> <span class="pre">Request</span></code>: Invalid request data</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">401</span> <span class="pre">Unauthorized</span></code>: Authentication required</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">403</span> <span class="pre">Forbidden</span></code>: Permission denied</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code>: Resource not found</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code>: Server error</p></li>
+</ul>
+</section>
+<section id="error-format">
+<h3>Error Format<a class="headerlink" href="#error-format" title="Link to this heading">¶</a></h3>
+<p>Error responses include detailed information:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="p">{</span>
+</span><span data-line="2"><span class="w">    </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Validation failed&quot;</span><span class="p">,</span>
+</span><span data-line="3"><span class="w">    </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span data-line="4"><span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;This field is required.&quot;</span><span class="p">],</span>
+</span><span data-line="5"><span class="w">        </span><span class="nt">&quot;year&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Enter a valid year.&quot;</span><span class="p">]</span>
+</span><span data-line="6"><span class="w">    </span><span class="p">}</span>
+</span><span data-line="7"><span class="p">}</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="rate-limiting">
+<h2>Rate Limiting<a class="headerlink" href="#rate-limiting" title="Link to this heading">¶</a></h2>
+<section id="api-limits">
+<h3>API Limits<a class="headerlink" href="#api-limits" title="Link to this heading">¶</a></h3>
+<p>The API implements rate limiting to ensure fair usage:</p>
+<ul class="simple">
+<li><p><strong>Authenticated users</strong>: 1000 requests per hour</p></li>
+<li><p><strong>Anonymous users</strong>: 100 requests per hour</p></li>
+</ul>
+</section>
+<section id="rate-limit-headers">
+<h3>Rate Limit Headers<a class="headerlink" href="#rate-limit-headers" title="Link to this heading">¶</a></h3>
+<p>Rate limit information is included in response headers:</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="err">X-RateLimit-Limit: 1000</span>
+</span><span data-line="2"><span class="err">X-RateLimit-Remaining: 999</span>
+</span><span data-line="3"><span class="err">X-RateLimit-Reset: 1640995200</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="models.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Models Documentation</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="deployment.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Deployment Guide</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2025, Dimitri Gaggioli</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials"></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/shibuya.js?v=e730760c"></script></body>
+</html>

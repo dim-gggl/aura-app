@@ -167,7 +167,8 @@ def contact_export_html(request, pk):
     contact = get_object_or_404(Contact, pk=pk, user=request.user)
     html_content = render_to_string('contacts/contact_export.html', {
         'contact': contact,
-    })
+        }
+    )
     response = HttpResponse(html_content, content_type='text/html')
     response['Content-Disposition'] = f"attachment; filename='contact_{contact.pk}.html'"
     return response
@@ -184,7 +185,8 @@ def contact_export_pdf(request, pk):
     html_content = render_to_string('contacts/contact_export.html', {
         'contact': contact,
         'is_pdf': True,
-    })
+        }
+    )
     pdf = HTML(string=html_content).write_pdf()
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f"attachment; filename='contact_{contact.pk}.pdf'"

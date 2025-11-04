@@ -26,6 +26,7 @@ from django.template.loader import render_to_string
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 import json
+import logging
 import random  # Used for random artwork suggestions
 from datetime import datetime, timedelta
 from taggit.models import Tag
@@ -251,7 +252,10 @@ def _create_by_name_ajax_impl(request, *, model, with_user: bool = False, defaul
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON data"}, status=400)
     except Exception as e:
-        return JsonResponse({"error": "Les informations fournies correspondent à un objet existant."}, status=500)
+        # Log the full error for debugging (server-side only)
+        logging.error(f"Error in AJAX entity creation: {str(e)}", exc_info=True)
+        
+        return JsonResponse({"error": "Une erreur est survenue lors de la création."}, status=500)
 
 # ========================================
 # ARTWORK VIEWS
@@ -582,6 +586,9 @@ def random_suggestion(request):
                 request, "artworks/random_suggestion.html", {"no_suggestion": True}
             )
     except Exception as e:
+        # Log the full error for debugging (server-side only)
+        logging.error(f"Error generating random artwork suggestion: {str(e)}", exc_info=True)
+        
         # Graceful error handling - redirect with user-friendly message
         messages.error(
             request, "Une erreur est survenue lors de la génération de la suggestion."

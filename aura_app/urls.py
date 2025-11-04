@@ -58,10 +58,17 @@ urlpatterns = [
 
 # Root-level redirects for common icon endpoints
 urlpatterns += [
-    path("favicon.ico", RedirectView.as_view(url=static_url("flavicon/favicon.ico"), permanent=True)),
-    path("favicon.svg", RedirectView.as_view(url=static_url("flavicon/favicon.svg"), permanent=True)),
-    path("apple-touch-icon.png", RedirectView.as_view(url=static_url("flavicon/apple-touch-icon.png"), permanent=True)),
+    path("favicon.ico", RedirectView.as_view(url="/static/flavicon/favicon.ico", permanent=True)),
+    path("favicon.svg", RedirectView.as_view(url="/static/flavicon/favicon.svg", permanent=True)),
+    path("apple-touch-icon.png", RedirectView.as_view(url="/static/flavicon/apple-touch-icon.png", permanent=True)),
 ]
+
+# ========================================
+# CUSTOM ERROR HANDLERS
+# ========================================
+# Custom error handlers that don't expose sensitive information
+handler404 = 'core.views.custom_404'
+handler500 = 'core.views.custom_500'
 
 # ========================================
 # DEVELOPMENT MEDIA FILE SERVING

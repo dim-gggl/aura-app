@@ -11,4 +11,28 @@
 
 # <div align="center">*Lisez-moi -->>*&nbsp;&nbsp;&nbsp;&nbsp; [🇫🇷](./FR.md) &nbsp;&nbsp;&nbsp;   [🇬🇧](./EN.md) &nbsp;&nbsp;&nbsp;&nbsp;*<<-- Read me*</div>
 
+## 🚀 Live Application
+
+**Aura Art is deployed and accessible at: [https://aura-art.org](https://aura-art.org)**
+
 [![aura-api-title](./aura-api-title.png)](./API.md)
+
+## 🐳 Quick Start with Docker
+
+The easiest way to run Aura Art locally:
+
+```bash
+git clone https://github.com/dim-gggl/aura-app.git
+cd aura-app
+cp env.example .env
+docker-compose up -d
+```
+
+Then visit http://localhost:8000
+
+## 📚 Documentation
+
+- [Installation Guide](docs/source/installation.rst)
+- [API Documentation](docs/source/api.rst)
+- [Deployment Guide](docs/source/deployment.rst)
+- [Contributing Guide](docs/source/contributing.rst)

@@ -35,8 +35,7 @@ urlpatterns = [
     # User profile management (viewing and editing)
     path('profile/', views.profile, name='profile'),
     
-    # Test/debug version of profile view (should be removed in production)
-    path('profile/test/', views.profile_test, name='profile_test'),
+    # (removed) Test/debug version of profile view
     
     # ========================================
     # DJANGO BUILT-IN AUTHENTICATION URLS
