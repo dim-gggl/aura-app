@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/github/last-commit/dim-gggl/aura-app?display_timestamp=author&style=plastic">
 </div>
 
-
+# Full documentation ---> [📖](https://aura-app.readthedocs.io/en/latest/)
 
 
 [![aura-title](./aura-title.png)](./EN.md)
@@ -27,23 +27,3 @@
 
 
 [![aura-api-title](./aura-api-title.png)](./API.md)
-
-## 🐳 Quick Start with Docker
-
-The easiest way to run Aura Art locally:
-
-```bash
-git clone https://github.com/dim-gggl/aura-app.git
-cd aura-app
-cp env.example .env
-docker-compose up -d
-```
-
-Then visit http://localhost:8000
-
-## 📚 Documentation
-
-- [Installation Guide](docs/source/installation.rst)
-- [API Documentation](docs/source/api.rst)
-- [Deployment Guide](docs/source/deployment.rst)
-- [Contributing Guide](docs/source/contributing.rst)
