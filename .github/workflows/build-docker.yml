@@ -120,6 +120,9 @@ jobs:
   security-scan:
     name: Security Scan Docker Images
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
     needs: build-and-push
     if: github.event_name != 'pull_request'
 
