@@ -161,6 +161,8 @@ jobs:
   test-docker-compose:
     name: Test Docker Compose
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: build-and-push
 
     steps:
