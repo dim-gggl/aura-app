@@ -1,45 +1,37 @@
-from pathlib import Path
-from dotenv import load_dotenv
-import environ
-
 import os
-from django.core.exceptions import ImproperlyConfigured
 from datetime import timedelta
+from pathlib import Path
+
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
 
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, False),
-    SECRET_KEY=os.environ.get("DJANGO_SECRET_KEY", "change-me-now"),
-    ALLOWED_HOSTS=(list, ["127.0.0.1", "localhost"]),
-    DATABASE_URL=(str, None),
-    CSRF_TRUSTED_ORIGINS=(list, []),
-    SECURE_SSL_REDIRECT=(bool, False),
-    SESSION_COOKIE_SECURE=(bool, False),
-    CSRF_COOKIE_SECURE=(bool, False),
-    USE_S3=(bool, False),
-    AWS_STORAGE_BUCKET_NAME=(str, ""),
-    AWS_S3_REGION_NAME=(str, "eu-west-3"),
-    AWS_ACCESS_KEY_ID=(str, ""),
-    AWS_SECRET_ACCESS_KEY=(str, ""),
-    MEDIA_URL=(str, "/media/"),
-    STATIC_URL=(str, "/static/"),
-)
+
+def get_bool_env(name: str, default: bool = False) -> bool:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() in {"1", "true", "yes", "on"}
 
 
-ENV_FILE = BASE_DIR / ".env"
-if ENV_FILE.exists():
-    environ.Env.read_env(ENV_FILE)
+def get_list_env(name: str, default: list[str] | None = None) -> list[str]:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default or []
+    return [item.strip() for item in raw_value.split(",") if item.strip()]
 
-DEBUG = env("DEBUG")
-SECRET_KEY = env("SECRET_KEY") or "change-me-now"
-if not DEBUG and (not SECRET_KEY or SECRET_KEY == "change-me-now"):
+
+DEBUG = get_bool_env("DEBUG", False)
+SECRET_KEY = os.getenv("SECRET_KEY") or "change-me-now"
+if not DEBUG and SECRET_KEY == "change-me-now":
     raise ImproperlyConfigured("SECRET_KEY must be set in production")
 
-# Hosts autorisés (liste)
-ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+ALLOWED_HOSTS = get_list_env("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production")
 
@@ -52,7 +44,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
-
     # 3rd-party
     "crispy_forms",
     "crispy_bootstrap5",
@@ -63,7 +54,6 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "taggit",
     "csp",
-
     # local apps
     "core",
     "accounts",
@@ -74,7 +64,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "csp.middleware.CSPMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -82,6 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "csp.middleware.CSPMiddleware",
 ]
 
 ROOT_URLCONF = "aura_app.urls"
@@ -112,32 +102,33 @@ ASGI_APPLICATION = "aura_app.asgi.application"
 
 # DB
 # Construire un fallback pour DATABASE_URL à partir des variables POSTGRES_*
-_database_url = env("DATABASE_URL", default=None)
-if not _database_url:
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
     pg_user = os.environ.get("POSTGRES_USER")
     pg_password = os.environ.get("POSTGRES_PASSWORD")
     pg_host = os.environ.get("POSTGRES_HOST", "localhost")
     pg_port = os.environ.get("POSTGRES_PORT", "5432")
     pg_db = os.environ.get("POSTGRES_DB")
     if pg_user and pg_password and pg_db:
-        _database_url = f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}"
+        DATABASE_URL = (
+            f"postgresql://{pg_user}:{pg_password}@{pg_host}:{pg_port}/{pg_db}"
+        )
     else:
         # Fallback raisonnable pour le dev local
-        _database_url = "sqlite:///db.sqlite3"
+        DATABASE_URL = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
 
 DATABASES = {
-    "default": env.db_url("DATABASE_URL", default=_database_url),
+    "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600),
 }
-
-# PostgreSQL schema configuration
-if 'postgres' in DATABASES['default']['ENGINE']:
-    DATABASES['default']['OPTIONS'] = {
-        'options': '-c search_path=aura,public'
-    }
 
 # Auth
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        )
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -148,11 +139,11 @@ TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = env("STATIC_URL")
+STATIC_URL = os.getenv("STATIC_URL", "/static/")
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = env("MEDIA_URL")
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Static & media storages (Django 5 requires aliases under STORAGES)
@@ -165,12 +156,13 @@ STORAGES = {
     },
 }
 WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year for hashed files
-if env("USE_S3") and env("AWS_STORAGE_BUCKET_NAME"):
+USE_S3 = get_bool_env("USE_S3", False)
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "").strip()
+if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     }
-    AWS_STORAGE_BUCKET_NAME = env("AWS_STORAGE_BUCKET_NAME")
-    AWS_S3_REGION_NAME = env("AWS_S3_REGION_NAME")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
     AWS_QUERYSTRING_AUTH = True  # URLs signées
     AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = None
@@ -181,9 +173,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
@@ -216,9 +206,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 
 
-SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
-SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
-CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+SECURE_SSL_REDIRECT = get_bool_env("SECURE_SSL_REDIRECT", False)
+SESSION_COOKIE_SECURE = get_bool_env("SESSION_COOKIE_SECURE", False)
+CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", False)
 # HSTS configured in production settings
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

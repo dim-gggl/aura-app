@@ -19,15 +19,13 @@ ALLOWED_HOSTS = [
     "192.168.1.49",
 ]
 
-# Liste des origines de confiance pour le mécanisme CSRF en environnement 
-# de développement. Cela permet à Django d'accepter les requêtes POST 
-# provenant de ces domaines sans déclencher d'alerte CSRF.
-# Attention : en production, cette liste doit être restreinte aux domaines 
-# réellement utilisés par l'application.
+# Trusted origins for CSRF while developing locally. Django accepts POST
+# requests originating from these domains without raising CSRF errors. Make
+# sure to restrict the list to production domains before deploying.
 CSRF_TRUSTED_ORIGINS = [
-    "http://app.local",           # Domaine personnalisé local (ex : via /etc/hosts)
-    "http://localhost:8000",      # Accès direct via localhost sur le port par défaut de Django
-    "http://127.0.0.1:8000",      # Accès direct via l'IP de loopback sur le port par défaut de Django
+    "http://app.local",  # Custom local domain (for example via /etc/hosts)
+    "http://localhost:8000",  # Localhost on Django's default port
+    "http://127.0.0.1:8000",  # Loopback IP on the default Django port
     "http://192.168.1.41:8000",
     "http://192.168.1.42:8000",
     "http://192.168.1.43:8000",
@@ -39,17 +37,19 @@ CSRF_TRUSTED_ORIGINS = [
     "http://192.168.1.49:8000",
 ]
 
-# En environnement de développement, il est important de désactiver 
-# certaines sécurités liées au HTTPS pour faciliter les tests locaux, 
+# En environnement de développement, il est important de désactiver
+# certaines sécurités liées au HTTPS pour faciliter les tests locaux,
 # car le serveur de développement Django ne gère pas le SSL/TLS.
 SECURE_SSL_REDIRECT = False  # Ne pas forcer la redirection vers HTTPS en local
 
-# Les cookies de session et CSRF ne sont pas marqués comme "secure" pour permettre 
+# Les cookies de session et CSRF ne sont pas marqués comme "secure" pour permettre
 # leur transmission en HTTP.
-SESSION_COOKIE_SECURE = False  # Le cookie de session peut être transmis en HTTP (non sécurisé)
-CSRF_COOKIE_SECURE = False     # Le cookie CSRF peut être transmis en HTTP (non sécurisé)
+SESSION_COOKIE_SECURE = (
+    False  # Le cookie de session peut être transmis en HTTP (non sécurisé)
+)
+CSRF_COOKIE_SECURE = False  # Le cookie CSRF peut être transmis en HTTP (non sécurisé)
 
-# Pour le développement, les emails sont affichés dans la console au lieu 
+# Pour le développement, les emails sont affichés dans la console au lieu
 # d'être envoyés réellement.
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

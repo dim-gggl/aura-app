@@ -92,7 +92,7 @@ COPY --chown=appuser:appuser . .
 COPY --chown=appuser:appuser entrypoint.sh /app/entrypoint.sh
 
 # Collect static files (can be overridden in entrypoint)
-RUN python manage.py collectstatic --noinput --settings=aura_app.settings.production || true
+RUN python manage.py collectstatic --noinput --clear
 
 # Expose port
 EXPOSE 8000

@@ -1,17 +1,17 @@
 [project]
 name = "aura-app"
 version = "0.1.0"
-description = "Add your description here"
+author = {name = "Dimitri Gaggioli", email = "dimitri.gaggioli@gmail.com"}
+description = "A Django app to manage your art collection"
 readme = "README.md"
-requires-python = ">=3.13.7"
+requires-python = ">=3.9"
 dependencies = [
-    "django>=5.2.7",
+    "django>=5.2.8",
     "djangorestframework>=3.16.1",
-    "django-crispy-form">=2.4",
     "django-environ>=0.12.0",
     "psycopg-binary>=3.2.10",
     "python-dotenv[cli]>=1.1.1",
     "sphinx>=8.2.3",
     "sphinx-rtd-theme>=3.0.2",
-    "shibuya>=2025.11.4"
+    "shibuya>=2025.11.4",
 ]

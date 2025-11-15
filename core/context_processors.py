@@ -13,42 +13,43 @@ Key functionality:
 
 from django.core.exceptions import ObjectDoesNotExist
 
+
 def theme_context(request):
     """
     Add the current user's theme to the template context.
-    
+
     This context processor makes the user's selected theme available in all
     templates as 'current_theme'. This enables dynamic theming throughout
     the application without requiring each view to explicitly pass theme data.
-    
+
     Behavior:
     - For authenticated users: Returns their selected theme from UserProfile
     - For anonymous users: Returns the default theme ('artdeco')
     - Auto-creates UserProfile if it doesn't exist for authenticated users
     - Handles errors gracefully with fallback to default theme
-    
+
     The theme value is used in templates to:
     - Set CSS classes for dynamic styling
     - Control color schemes and visual elements
     - Provide personalized user experiences
-    
+
     Args:
         request: HTTP request object containing user information
-        
+
     Returns:
         dict: Context dictionary with 'current_theme' key
-        
+
     Example:
         In templates: <html data-theme="{{ current_theme }}">
         In CSS: [data-theme="artdeco"] { ... }
     """
     # Default theme for fallback situations
-    default_theme = 'artdeco'
+    default_theme = "artdeco"
 
     # If a theme is stored in session (set after profile update), use it directly
-    session_theme = request.session.get('current_theme')
+    session_theme = request.session.get("current_theme")
     if session_theme:
-        return {'current_theme': session_theme}
+        return {"current_theme": session_theme}
 
     # Check if user is authenticated
     if request.user.is_authenticated:
@@ -67,8 +68,7 @@ def theme_context(request):
 
                 # Create profile if it doesn't exist, or update existing one
                 profile, created = UserProfile.objects.get_or_create(
-                    user=request.user,
-                    defaults={'theme': default_theme}
+                    user=request.user, defaults={"theme": default_theme}
                 )
                 theme = profile.theme if profile.theme else default_theme
 
@@ -80,4 +80,4 @@ def theme_context(request):
         # Anonymous user - use default theme
         theme = default_theme
 
-    return {'current_theme': theme}
+    return {"current_theme": theme}

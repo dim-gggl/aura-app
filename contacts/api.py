@@ -1,6 +1,8 @@
-from rest_framework import viewsets, permissions
+from rest_framework import permissions, viewsets
+
 from .models import Contact
 from .serializers import ContactSerializer
+
 
 class ContactViewSet(viewsets.ModelViewSet):
     serializer_class = ContactSerializer
