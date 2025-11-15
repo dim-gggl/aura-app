@@ -37,9 +37,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY pyproject.toml uv.lock* ./
-RUN pip install --no-cache-dir uv && \
-    uv sync --frozen || uv sync
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Runtime stage
 FROM python:3.11-slim
@@ -80,7 +80,8 @@ RUN adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app
 
 # Copy Python dependencies from builder
-COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Switch to non-root user
 USER appuser
