@@ -1,6 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from artworks.api import ArtworkViewSet, ArtistViewSet
+
+from artworks.api import ArtistViewSet, ArtworkViewSet
 from contacts.api import ContactViewSet
 from notes.api import NoteViewSet
 

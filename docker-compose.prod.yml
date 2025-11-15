@@ -95,7 +95,8 @@ services:
       - media_volume:/var/www/media:ro
       # Production SSL certificates
       # Mount from Let's Encrypt or your certificate provider
-      - /etc/letsencrypt/live/aura-art.org:/etc/nginx/ssl:ro
+      # Replace with your actual domain or use Cloudflare Origin certificates
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
     deploy:
       resources:
         limits:

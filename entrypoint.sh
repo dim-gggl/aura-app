@@ -47,17 +47,17 @@ wait_for_postgres() {
     echo -e "${GREEN}PostgreSQL is ready!${NC}"
 }
 
-# Function to setup PostgreSQL schema
-setup_schema() {
-    echo -e "${YELLOW}[2/6] Setting up PostgreSQL schema...${NC}"
+# # Function to setup PostgreSQL schema
+# setup_schema() {
+#     echo -e "${YELLOW}[2/6] Setting up PostgreSQL schema...${NC}"
 
-    # Try to create the aura schema if it doesn't exist
-    python manage.py setup_aura_schema || {
-        echo -e "${YELLOW}Warning: Could not setup schema (may already exist)${NC}"
-    }
+#     # Try to create the aura schema if it doesn't exist
+#     python manage.py setup_aura_schema || {
+#         echo -e "${YELLOW}Warning: Could not setup schema (may already exist)${NC}"
+#     }
 
-    echo -e "${GREEN}Schema setup complete!${NC}"
-}
+#     echo -e "${GREEN}Schema setup complete!${NC}"
+# }
 
 # Function to run migrations
 run_migrations() {
@@ -68,18 +68,18 @@ run_migrations() {
     echo -e "${GREEN}Migrations complete!${NC}"
 }
 
-# Function to collect static files
-collect_static() {
-    echo -e "${YELLOW}[4/6] Collecting static files...${NC}"
+# # Function to collect static files
+# collect_static() {
+#     echo -e "${YELLOW}[4/6] Collecting static files...${NC}"
 
-    # Only collect static if not already collected (check if staticfiles dir has content)
-    if [ "$DJANGO_SETTINGS_MODULE" = "aura_app.settings.production" ] || [ "$FORCE_COLLECT_STATIC" = "true" ]; then
-        python manage.py collectstatic --noinput --clear
-        echo -e "${GREEN}Static files collected!${NC}"
-    else
-        echo -e "${YELLOW}Skipping static collection (not in production mode)${NC}"
-    fi
-}
+#     # Only collect static if not already collected (check if staticfiles dir has content)
+#     if [ "$DJANGO_SETTINGS_MODULE" = "aura_app.settings.production" ] || [ "$FORCE_COLLECT_STATIC" = "true" ]; then
+#         python manage.py collectstatic --noinput --clear
+#         echo -e "${GREEN}Static files collected!${NC}"
+#     else
+#         echo -e "${YELLOW}Skipping static collection (not in production mode)${NC}"
+#     fi
+# }
 
 # Function to create superuser (optional, for first deployment)
 create_superuser() {
@@ -111,9 +111,9 @@ health_check() {
 # Main execution
 main() {
     wait_for_postgres
-    setup_schema
+    # setup_schema
     run_migrations
-    collect_static
+    # collect_static
     create_superuser
     health_check
 

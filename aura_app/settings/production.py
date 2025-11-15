@@ -2,10 +2,11 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 
-from django.core.exceptions import ImproperlyConfigured
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 from .base import *
+
 
 ############################################
 #                HELPERS
@@ -16,6 +17,7 @@ def get_env(name: str, default=None, required: bool = False):
         raise ImproperlyConfigured(f"Missing required environment variable: {name}")
     return val
 
+
 ############################################
 #                 CORE
 ############################################
@@ -24,7 +26,9 @@ DEBUG = False
 SECRET_KEY = get_env("SECRET_KEY", required=True)
 
 ALLOWED_HOSTS = [h.strip() for h in get_env("ALLOWED_HOSTS", required=True).split(",")]
-CSRF_TRUSTED_ORIGINS = [o.strip() for o in get_env("CSRF_TRUSTED_ORIGINS", required=True).split(",")]
+CSRF_TRUSTED_ORIGINS = [
+    o.strip() for o in get_env("CSRF_TRUSTED_ORIGINS", required=True).split(",")
+]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
@@ -68,10 +72,13 @@ if "whitenoise.runserver_nostatic" not in INSTALLED_APPS:
     INSTALLED_APPS += ["whitenoise.runserver_nostatic"]
 
 STORAGES = {
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    },
     "default": (
         {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}
-        if get_env("AWS_STORAGE_BUCKET_NAME") and (get_env("AWS_ACCESS_KEY_ID") and get_env("AWS_SECRET_ACCESS_KEY"))
+        if get_env("AWS_STORAGE_BUCKET_NAME")
+        and (get_env("AWS_ACCESS_KEY_ID") and get_env("AWS_SECRET_ACCESS_KEY"))
         else {"BACKEND": "django.core.files.storage.FileSystemStorage"}
     ),
 }
@@ -111,7 +118,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # HSTS (1 mois, étends à 6-12 mois quand tout est stable)
-SECURE_HSTS_SECONDS = 3600 * 24 * 30
+SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -124,6 +131,12 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 ############################################
 #    CONTENT SECURITY POLICY (django-csp)
 ############################################
+INSTALLED_APPS += ["corsheaders"]
+MIDDLEWARE += ["corsheaders.middleware.CorsMiddleware"]
+CORS_ALLOW_CREDENTIALS = (
+    True  # Permet aux cookies d'être envoyés avec les requêtes CORS
+)
+
 if "csp" not in INSTALLED_APPS:
     INSTALLED_APPS += ["csp"]
 if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
@@ -134,12 +147,12 @@ if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
         MIDDLEWARE.insert(0, "csp.middleware.CSPMiddleware")
 
 CONTENT_SECURITY_POLICY = {
-    'DIRECTIVES': {
-        'default-src': ("'self'",),
-        'style-src': ("'self'", "'unsafe-inline'"),
-        'script-src': ("'self'",),
-        'img-src': ("'self'", "data:"),
-        'object-src': ("'none'",),
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "style-src": ("'self'",),
+        "script-src": ("'self'",),
+        "img-src": ("'self'", "data:"),
+        "object-src": ("'none'",),
     }
 }
 
@@ -179,14 +192,14 @@ LOGGING = {
     },
     "loggers": {
         "django.security": {
-            "handlers": ["console"], 
-            "level": "WARNING", 
-            "propagate": False
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
         },
         "django.request": {
-            "handlers": ["console"], 
-            "level": "WARNING", 
-            "propagate": False
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
         },
         "aura_app": {
             "handlers": ["console"],

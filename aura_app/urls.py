@@ -1,12 +1,10 @@
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib import admin
+from django.urls import include, path
 from django.views.generic import RedirectView
-from django.templatetags.static import static as static_url
-
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
 # ========================================
 # MAIN URL PATTERNS
@@ -19,38 +17,29 @@ urlpatterns = [
     # Django admin interface for site administration
     # Accessible only to staff/superuser accounts
     path(getattr(settings, "ADMIN_URL", "admin/"), admin.site.urls),
-    
     # ========================================
     # APPLICATION URL INCLUDES
     # ========================================
-    
     # Core application URLs (homepage, dashboard, search)
     # Mounted at root level for primary navigation
     path("", include("core.urls")),
-    
     # Artwork collection management
     # Includes CRUD operations, filtering, export, and AJAX endpoints
     path("artworks/", include("artworks.urls")),
-    
     # Professional contact management
     # Includes contact CRUD operations with search and filtering
     path("contacts/", include("contacts.urls")),
-    
     # Personal note-taking system
     # Includes note CRUD operations with favorites and search
     path("notes/", include("notes.urls")),
-    
     # User authentication and account management
     # Includes registration, login, logout, profile, and password management
     path("accounts/", include("accounts.urls")),
-
     # =========================================
     # API URLS
     # =========================================
-
     # API Endpoints
     path("api/", include("aura_app.api_urls")),
-
     # JWT authentication
     path("api/auth/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
@@ -58,17 +47,28 @@ urlpatterns = [
 
 # Root-level redirects for common icon endpoints
 urlpatterns += [
-    path("favicon.ico", RedirectView.as_view(url="/static/flavicon/favicon.ico", permanent=True)),
-    path("favicon.svg", RedirectView.as_view(url="/static/flavicon/favicon.svg", permanent=True)),
-    path("apple-touch-icon.png", RedirectView.as_view(url="/static/flavicon/apple-touch-icon.png", permanent=True)),
+    path(
+        "favicon.ico",
+        RedirectView.as_view(url="/static/flavicon/favicon.ico", permanent=True),
+    ),
+    path(
+        "favicon.svg",
+        RedirectView.as_view(url="/static/flavicon/favicon.svg", permanent=True),
+    ),
+    path(
+        "apple-touch-icon.png",
+        RedirectView.as_view(
+            url="/static/flavicon/apple-touch-icon.png", permanent=True
+        ),
+    ),
 ]
 
 # ========================================
 # CUSTOM ERROR HANDLERS
 # ========================================
 # Custom error handlers that don't expose sensitive information
-handler404 = 'core.views.custom_404'
-handler500 = 'core.views.custom_500'
+handler404 = "core.views.custom_404"
+handler500 = "core.views.custom_500"
 
 # ========================================
 # DEVELOPMENT MEDIA FILE SERVING
@@ -78,8 +78,8 @@ handler500 = 'core.views.custom_500'
 # In production, media files are served by the web server or cloud storage (AWS S3)
 if settings.DEBUG:
     urlpatterns += static(
-        settings.MEDIA_URL,           # URL prefix for media files
-        document_root=settings.MEDIA_ROOT  # Local directory containing media files
+        settings.MEDIA_URL,  # URL prefix for media files
+        document_root=settings.MEDIA_ROOT,  # Local directory containing media files
     )
 
 # ========================================

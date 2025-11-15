@@ -8,13 +8,16 @@ with a few visual variations (plain, blur, blur with intensity, greyscale).
 from __future__ import annotations
 
 import random
+
 from django import template
 
 register = template.Library()
 
 
 @register.simple_tag
-def random_placeholder_url(width: int = 300, height: int = 200, seed: int | str | None = None) -> str:
+def random_placeholder_url(
+    width: int = 300, height: int = 200, seed: int | str | None = None
+) -> str:
     """Return a random picsum placeholder URL.
 
     The function randomly picks one of these variants:
@@ -47,5 +50,3 @@ def random_placeholder_url(width: int = 300, height: int = 200, seed: int | str 
         separator = "&" if "?" in url else "?"
         url = f"{url}{separator}random={seed}"
     return url
-
-

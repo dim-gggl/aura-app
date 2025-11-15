@@ -8,7 +8,7 @@ views for the web interface and AJAX endpoints for dynamic functionality.
 The views are organized into the following sections:
 - Artwork CRUD operations
 - Artist management
-- Collection management  
+- Collection management
 - Exhibition management
 - Wishlist functionality
 - Reference entity management (ArtType, Support, Technique, Keyword)
@@ -16,49 +16,35 @@ The views are organized into the following sections:
 - Export functionality
 """
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models import Q, Count
-from django.http import HttpResponse, JsonResponse
-from django.contrib.contenttypes.models import ContentType
-from django.template.loader import render_to_string
-from django.core.paginator import Paginator
-from django.views.decorators.http import require_POST
 import json
 import logging
 import random  # Used for random artwork suggestions
 from datetime import datetime, timedelta
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 from taggit.models import Tag
 
-# Import all models used in the views
-from .models import (
-    Artwork,
-    Artist,
-    Collection,
-    Exhibition,
-    WishlistItem,
-    ArtType,
-    Support,
-    Technique,
-)
-
-# Import forms for handling user input
-from .forms import (
-    ArtworkForm,
-    ArtistForm,
-    CollectionForm,
-    ExhibitionForm,
-    ArtworkPhotoFormSet,
-    ArtworkAttachmentFormSet,
-    WishlistItemForm,
-)
-from .widgets import SelectOrCreateWidget
 from .filters import ArtworkFilter
+# Import forms for handling user input
+from .forms import (ArtistForm, ArtworkAttachmentFormSet, ArtworkForm,
+                    ArtworkPhotoFormSet, CollectionForm, ExhibitionForm,
+                    WishlistItemForm)
+# Import all models used in the views
+from .models import (Artist, ArtType, Artwork, Collection, Exhibition, Support,
+                     Technique, WishlistItem)
 
 # ========================================
 # UTILITAIRES COMMUNS
 # ========================================
+
 
 def _export_response_from_template(
     *,
@@ -112,8 +98,10 @@ def _reference_list(
     entity_name_plural: str,
     create_url: str,
 ):
-    """Vue générique de liste pour les entités de référence (nom + compteur d'œuvres)."""
-    items = model.objects.all().annotate(artwork_count=Count("artwork")).order_by("name")
+    """Generic list view for reference entities with artwork counters."""
+    items = (
+        model.objects.all().annotate(artwork_count=Count("artwork")).order_by("name")
+    )
 
     search = request.GET.get("search", "")
     if search:
@@ -148,9 +136,13 @@ def _reference_create(
         if name:
             obj, created = model.objects.get_or_create(name=name)
             if created:
-                messages.success(request, f"{entity_label.capitalize()} '{name}' créé avec succès.")
+                messages.success(
+                    request, f"{entity_label.capitalize()} '{name}' créé avec succès."
+                )
             else:
-                messages.info(request, f"{entity_label.capitalize()} '{name}' existe déjà.")
+                messages.info(
+                    request, f"{entity_label.capitalize()} '{name}' existe déjà."
+                )
             return redirect(back_url_name)
         else:
             messages.error(request, "Le nom est requis.")
@@ -187,7 +179,9 @@ def _reference_update(
                 else:
                     obj.name = name
                     obj.save()
-                    messages.success(request, f"{entity_label.capitalize()} modifié avec succès.")
+                    messages.success(
+                        request, f"{entity_label.capitalize()} modifié avec succès."
+                    )
                     return redirect(back_url_name)
             else:
                 return redirect(back_url_name)
@@ -217,7 +211,9 @@ def _reference_delete(
     if request.method == "POST":
         name = obj.name
         obj.delete()
-        messages.success(request, f"{entity_label.capitalize()} '{name}' supprimé avec succès.")
+        messages.success(
+            request, f"{entity_label.capitalize()} '{name}' supprimé avec succès."
+        )
         return redirect(back_url_name)
 
     context = {
@@ -228,7 +224,9 @@ def _reference_delete(
     return render(request, "artworks/reference_confirm_delete.html", context)
 
 
-def _create_by_name_ajax_impl(request, *, model, with_user: bool = False, defaults: dict | None = None):
+def _create_by_name_ajax_impl(
+    request, *, model, with_user: bool = False, defaults: dict | None = None
+):
     """Logique générique de création via AJAX d'une entité identifiée par son nom."""
     try:
         data = json.loads(request.body)
@@ -254,8 +252,11 @@ def _create_by_name_ajax_impl(request, *, model, with_user: bool = False, defaul
     except Exception as e:
         # Log the full error for debugging (server-side only)
         logging.error(f"Error in AJAX entity creation: {str(e)}", exc_info=True)
-        
-        return JsonResponse({"error": "Une erreur est survenue lors de la création."}, status=500)
+
+        return JsonResponse(
+            {"error": "Une erreur est survenue lors de la création."}, status=500
+        )
+
 
 # ========================================
 # ARTWORK VIEWS
@@ -412,7 +413,11 @@ def artwork_create(request):
             request.POST, request.FILES, prefix="attachments"
         )
 
-        if form.is_valid() and photo_formset.is_valid() and attachment_formset.is_valid():
+        if (
+            form.is_valid()
+            and photo_formset.is_valid()
+            and attachment_formset.is_valid()
+        ):
             # Save artwork but don't commit to DB yet (need to set user)
             artwork = form.save(commit=False)
             artwork.user = request.user
@@ -454,7 +459,9 @@ def artwork_update(request, pk):
     artwork = get_object_or_404(Artwork, pk=pk, user=request.user)
 
     if request.method == "POST":
-        form = ArtworkForm(request.POST, request.FILES, instance=artwork, user=request.user)
+        form = ArtworkForm(
+            request.POST, request.FILES, instance=artwork, user=request.user
+        )
         photo_formset = ArtworkPhotoFormSet(
             request.POST, request.FILES, instance=artwork, prefix="photos"
         )
@@ -462,7 +469,11 @@ def artwork_update(request, pk):
             request.POST, request.FILES, instance=artwork, prefix="attachments"
         )
 
-        if form.is_valid() and photo_formset.is_valid() and attachment_formset.is_valid():
+        if (
+            form.is_valid()
+            and photo_formset.is_valid()
+            and attachment_formset.is_valid()
+        ):
             form.save()
             photo_formset.save()
             attachment_formset.save()
@@ -472,7 +483,9 @@ def artwork_update(request, pk):
     else:
         form = ArtworkForm(instance=artwork, user=request.user)
         photo_formset = ArtworkPhotoFormSet(instance=artwork, prefix="photos")
-        attachment_formset = ArtworkAttachmentFormSet(instance=artwork, prefix="attachments")
+        attachment_formset = ArtworkAttachmentFormSet(
+            instance=artwork, prefix="attachments"
+        )
 
     context = {
         "form": form,
@@ -587,8 +600,10 @@ def random_suggestion(request):
             )
     except Exception as e:
         # Log the full error for debugging (server-side only)
-        logging.error(f"Error generating random artwork suggestion: {str(e)}", exc_info=True)
-        
+        logging.error(
+            f"Error generating random artwork suggestion: {str(e)}", exc_info=True
+        )
+
         # Graceful error handling - redirect with user-friendly message
         messages.error(
             request, "Une erreur est survenue lors de la génération de la suggestion."
@@ -606,11 +621,11 @@ def random_suggestion(request):
 @login_required
 def artist_list(request):
     """
-    Affiche la liste de tous les artistes, avec un compteur d'œuvres pour l'utilisateur.
+    Display every artist with a per-user artwork counter.
 
-    - Montre tous les artistes (même sans œuvre)
-    - Ajoute `artwork_count` = nombre d'œuvres de l'utilisateur courant liées à l'artiste
-    - Permet une recherche par nom
+    - Lists all artists even when they have zero artworks
+    - Annotates `artwork_count` with the number of artworks owned by the user
+    - Allows searching by name
     """
     # Afficher uniquement les artistes de l'utilisateur et annoter le nombre d'œuvres
     artists = (

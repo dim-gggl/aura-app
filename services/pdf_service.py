@@ -1,9 +1,9 @@
 from django.core.cache import cache
-from weasyprint import HTML
-from pathlib import Path
 from django.template.loader import render_to_string
+from weasyprint import HTML
 
 CACHE_TTL = 60 * 60  # 1h
+
 
 class PDFService:
     @staticmethod

@@ -3,22 +3,20 @@
 Script to create the 'aura' schema in PostgreSQL database.
 This script should be run before running Django migrations.
 """
-
 import os
 import sys
-import django
 from pathlib import Path
+import django
+
+from django.db import connection
 
 # Add the project root to Python path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR))
 
 # Set up Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aura_app.settings.dev')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.dev")
 django.setup()
-
-from django.db import connection
-from django.core.management import execute_from_command_line
 
 
 def create_aura_schema():
@@ -28,33 +26,37 @@ def create_aura_schema():
     with connection.cursor() as cursor:
         try:
             # Check if schema already exists
-            cursor.execute("""
-                SELECT schema_name 
-                FROM information_schema.schemata 
+            cursor.execute(
+                """
+                SELECT schema_name
+                FROM information_schema.schemata
                 WHERE schema_name = 'aura'
-            """)
-            
+            """
+            )
+
             if cursor.fetchone():
                 print("✅ Schema 'aura' already exists.")
                 return
-            
+
             # Create the schema
-            cursor.execute('CREATE SCHEMA IF NOT EXISTS aura;')
+            cursor.execute("CREATE SCHEMA IF NOT EXISTS aura;")
             print("✅ Schema 'aura' created successfully.")
-            
+
             # Grant permissions to the database user
-            cursor.execute("""
+            cursor.execute(
+                """
                 GRANT USAGE ON SCHEMA aura TO aura_app;
                 GRANT CREATE ON SCHEMA aura TO aura_app;
                 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA aura TO aura_app;
                 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA aura TO aura_app;
-            """)
+            """
+            )
             print("✅ Permissions granted to 'aura_app' for schema 'aura'.")
-            
+
         except Exception as e:
             print(f"❌ Error creating schema: {e}")
             return False
-    
+
     return True
 
 
@@ -72,7 +74,7 @@ def set_search_path():
 
 if __name__ == "__main__":
     print("🚀 Creating 'aura' schema in PostgreSQL...")
-    
+
     if create_aura_schema():
         set_search_path()
         print("\n✅ Schema setup completed successfully!")
