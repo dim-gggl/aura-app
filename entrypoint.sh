@@ -63,6 +63,16 @@ wait_for_postgres() {
 run_migrations() {
     echo -e "${YELLOW}[3/6] Running database migrations...${NC}"
 
+    # Debug: Check if core migrations exist
+    echo -e "${YELLOW}Checking for core migrations...${NC}"
+    if [ -d "/app/core/migrations" ]; then
+        echo -e "${GREEN}Core migrations directory exists${NC}"
+        ls -la /app/core/migrations/
+    else
+        echo -e "${RED}ERROR: Core migrations directory does not exist!${NC}"
+        exit 1
+    fi
+
     # CRITICAL: Always migrate core app first to create custom User model
     # This must happen before admin, auth, or any other app that references User
     echo -e "${YELLOW}Migrating core app first (custom User model)...${NC}"

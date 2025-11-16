@@ -3,7 +3,7 @@
 aura-app-1-txt.txt
 cahier-des-charges.md
 db.sqlite3
-migrations
+# migrations  # COMMENTED OUT - Django migrations MUST be in version control!
 .cursor
 .vscode
 .DS_Store
