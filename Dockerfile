@@ -1,4 +1,5 @@
-FROM python:3.11-slim AS builder
+# Use Python 3.12 for latest security patches
+FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
@@ -13,7 +14,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Runtime
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -35,7 +36,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && mkdir -p /app/staticfiles /app/media \
     && chown -R appuser:appuser /app
 
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 COPY --chown=appuser:appuser . .
