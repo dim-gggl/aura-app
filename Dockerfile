@@ -1,32 +1,35 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    postgresql-dev \
-    gcc \
-    musl-dev \
-    linux-headers
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Runtime
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN apk add --no-cache \
-    postgresql-libs \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    libpq5 \
     gettext \
-    curl && \
-    adduser -D -u 1000 appuser && \
-    mkdir -p /app/staticfiles /app/media && \
-    chown -R appuser:appuser /app
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && adduser --disabled-password --gecos '' appuser \
+    && mkdir -p /app/staticfiles /app/media \
+    && chown -R appuser:appuser /app
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
