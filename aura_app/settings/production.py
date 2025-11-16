@@ -170,7 +170,7 @@ if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ("'self'",),
-        "style-src": ("'self'",),
+        "style-src": ("'self'", "'unsafe-inline'"),
         "script-src": ("'self'",),
         "img-src": ("'self'", "data:"),
         "object-src": ("'none'",),
