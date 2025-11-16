@@ -158,8 +158,8 @@ CORS_ALLOW_CREDENTIALS = (
     True  # Permet aux cookies d'être envoyés avec les requêtes CORS
 )
 
-if "csp" not in INSTALLED_APPS:
-    INSTALLED_APPS += ["csp"]
+if not "csp" in INSTALLED_APPS:
+    INSTALLED_APPS.append("csp")
 if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
     try:
         sec_idx = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
@@ -169,7 +169,7 @@ if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": ("'self'",),
+        "default-src": ("'self'", "'unsafe-inline'"),
         "style-src": ("'self'", "'unsafe-inline'"),
         "script-src": ("'self'", "'unsafe-inline'"),
         "img-src": ("'self'", "data:"),
