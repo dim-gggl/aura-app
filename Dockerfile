@@ -5,6 +5,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -25,6 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext \
     curl \
     ca-certificates \
+    libexpat1 \
+    libxml2 \
+    && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
     && adduser --disabled-password --gecos '' appuser \
