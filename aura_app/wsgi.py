@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.dev")
+# Use production settings by default, can be overridden by environment variable
+# This ensures Railway and other deployment platforms use the correct settings
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.production")
 
 application = get_wsgi_application()
