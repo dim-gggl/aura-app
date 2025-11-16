@@ -1,11 +1,32 @@
 import os
 from pathlib import Path
-from urllib.parse import urlparse
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
-from .base import *
+from . import base
+
+
+def _clone_setting(value):
+    if isinstance(value, dict):
+        return value.copy()
+    if isinstance(value, list):
+        return list(value)
+    if isinstance(value, set):
+        return set(value)
+    return value
+
+
+# Bring uppercase settings from base into this module without star imports
+for _name in dir(base):
+    if _name.isupper():
+        globals()[_name] = _clone_setting(getattr(base, _name))
+
+# Explicit aliases for static analysis
+BASE_DIR = base.BASE_DIR
+INSTALLED_APPS = list(base.INSTALLED_APPS)
+MIDDLEWARE = list(base.MIDDLEWARE)
+STORAGES = base.STORAGES.copy()
 
 
 ############################################

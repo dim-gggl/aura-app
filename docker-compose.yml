@@ -21,23 +21,6 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
-  # Redis Cache (optional but recommended)
-  redis:
-    image: redis:7-alpine
-    container_name: aura_redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
-    volumes:
-      - redis_data:/data
-    networks:
-      - aura_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
 
   # Django Web Application
   web:
@@ -67,9 +50,6 @@ services:
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER:-aura_user}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-aura_db}
 
-      # Redis
-      REDIS_URL: redis://:${REDIS_PASSWORD:-}@redis:6379/0
-      CACHE_KEY_PREFIX: ${CACHE_KEY_PREFIX:-aura_dev}
 
       # Static/Media
       STATIC_URL: /static/
@@ -92,8 +72,6 @@ services:
       AWS_S3_ENDPOINT_URL: ${AWS_S3_ENDPOINT_URL:-}
     depends_on:
       db:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     networks:
       - aura_network
@@ -135,8 +113,6 @@ services:
 # Named volumes for data persistence
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
   static_volume:
     driver: local

@@ -24,25 +24,6 @@ services:
         max-size: "50m"
         max-file: "5"
 
-  # Redis Cache - Production Configuration
-  redis:
-    restart: always
-    # Remove port exposure in production
-    ports: []
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   # Django Web Application - Production Configuration
   web:
     restart: always
@@ -119,13 +100,6 @@ volumes:
       type: none
       o: bind
       device: ${POSTGRES_DATA_PATH:-/var/lib/aura/postgres}
-
-  redis_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${REDIS_DATA_PATH:-/var/lib/aura/redis}
 
   static_volume:
     driver: local
