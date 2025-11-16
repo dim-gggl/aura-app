@@ -182,20 +182,18 @@ CONTENT_SECURITY_POLICY = {
             "unsafe-inline",
         ),
         "object-src": ("none",),
+        "img-src": (
+            "'self'",
+            "data:",
+            "blob:",
+        ),
+        "font-src": (
+            "'self'",
+            "https://fonts.gstatic.com",
+            "data:",
+        ),
     }
 }
-
-CSP_FONT_SRC = (
-    "'self'",
-    "https://fonts.gstatic.com",     # Google Fonts fichiers woff2
-    "data:",                         # utile pour certains frameworks
-)
-
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "blob:",
-)
 
 ############################################
 #           ADMIN HARDENING
