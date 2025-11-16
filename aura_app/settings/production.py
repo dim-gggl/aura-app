@@ -171,7 +171,7 @@ CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ("'self'",),
         "style-src": ("'self'", "'unsafe-inline'"),
-        "script-src": ("'self'",),
+        "script-src": ("'self'", "'unsafe-inline'"),
         "img-src": ("'self'", "data:"),
         "object-src": ("'none'",),
     }
