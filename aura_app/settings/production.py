@@ -190,6 +190,7 @@ CONTENT_SECURITY_POLICY = {
         "font-src": (
             "'self'",
             "https://fonts.gstatic.com",
+            "https://cdn.jsdelivr.net",
             "data:",
         ),
     }
