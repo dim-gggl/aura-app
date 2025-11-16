@@ -63,20 +63,20 @@ wait_for_postgres() {
 run_migrations() {
     echo -e "${YELLOW}[3/6] Running database migrations...${NC}"
 
-    # Check if this is a fresh database (no django_migrations table)
-    if ! python manage.py showmigrations > /dev/null 2>&1; then
-        echo -e "${YELLOW}Fresh database detected - running migrations in correct order${NC}"
-        # Ensure core migrations run first (creates custom User model)
-        python manage.py migrate core --noinput || {
-            echo -e "${RED}ERROR: Core migrations failed${NC}"
-            exit 1
-        }
-        # Then run all other migrations
-        python manage.py migrate --noinput
-    else
-        # Normal migration run for existing database
-        python manage.py migrate --noinput
-    fi
+    # CRITICAL: Always migrate core app first to create custom User model
+    # This must happen before admin, auth, or any other app that references User
+    echo -e "${YELLOW}Migrating core app first (custom User model)...${NC}"
+    python manage.py migrate core --noinput || {
+        echo -e "${RED}ERROR: Core migrations failed${NC}"
+        exit 1
+    }
+
+    # Then run all other migrations
+    echo -e "${YELLOW}Migrating remaining apps...${NC}"
+    python manage.py migrate --noinput || {
+        echo -e "${RED}ERROR: Migrations failed${NC}"
+        exit 1
+    }
 
     echo -e "${GREEN}Migrations complete!${NC}"
 }
