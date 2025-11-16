@@ -169,13 +169,33 @@ if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": ("'self'", "'unsafe-inline'"),
-        "style-src": ("'self'", "'unsafe-inline'"),
-        "script-src": ("'self'", "'unsafe-inline'"),
-        "img-src": ("'self'", "data:"),
-        "object-src": ("'none'",),
+        "default-src": ("'self'", "unsafe-inline"),
+        "style-src": (
+            "'self'",
+            "unsafe-inline",
+            "https://cdn.jsdelivr.net",
+            "https://fonts.googleapis.com",
+        ),
+        "script-src": (
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "unsafe-inline",
+        ),
+        "object-src": ("none",),
     }
 }
+
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",     # Google Fonts fichiers woff2
+    "data:",                         # utile pour certains frameworks
+)
+
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "blob:",
+)
 
 ############################################
 #           ADMIN HARDENING
