@@ -37,6 +37,10 @@ if not DEBUG and not ALLOWED_HOSTS:
 
 # Applications
 INSTALLED_APPS = [
+    # Custom user model MUST be defined before django.contrib.admin
+    # to ensure migrations run in the correct order
+    "core",
+    # Django built-in apps
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -55,7 +59,6 @@ INSTALLED_APPS = [
     "taggit",
     "csp",
     # local apps
-    "core",
     "accounts",
     "artworks",
     "contacts",
