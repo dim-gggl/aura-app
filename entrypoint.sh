@@ -68,18 +68,14 @@ run_migrations() {
     echo -e "${GREEN}Migrations complete!${NC}"
 }
 
-# # Function to collect static files
-# collect_static() {
-#     echo -e "${YELLOW}[4/6] Collecting static files...${NC}"
+# Function to collect static files
+collect_static() {
+    echo -e "${YELLOW}[4/6] Collecting static files...${NC}"
 
-#     # Only collect static if not already collected (check if staticfiles dir has content)
-#     if [ "$DJANGO_SETTINGS_MODULE" = "aura_app.settings.production" ] || [ "$FORCE_COLLECT_STATIC" = "true" ]; then
-#         python manage.py collectstatic --noinput --clear
-#         echo -e "${GREEN}Static files collected!${NC}"
-#     else
-#         echo -e "${YELLOW}Skipping static collection (not in production mode)${NC}"
-#     fi
-# }
+    # Always collect static files in production
+    python manage.py collectstatic --noinput --clear
+    echo -e "${GREEN}Static files collected!${NC}"
+}
 
 # Function to create superuser (optional, for first deployment)
 create_superuser() {
@@ -113,7 +109,7 @@ main() {
     wait_for_postgres
     # setup_schema
     run_migrations
-    # collect_static
+    collect_static
     create_superuser
     health_check
 
