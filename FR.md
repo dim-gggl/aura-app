@@ -1,9 +1,21 @@
-[![uv](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json)](https://docs.astral.sh/uv/)
-[![Static Badge](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-%233775A9?style=plastic&logo=python&logoColor=%23FFE569)](https://www.python.org/)
-[![Static Badge](https://img.shields.io/badge/django-5.2.5-%2344B78B?style=plastic&logo=django&logoColor=%2344B78B)](https://www.djangoproject.com/)
-[![Static Badge](https://img.shields.io/badge/djangorestframework-3.16.1-%23FF474A?style=plastic&logo=django&logoColor=%23FF474A)](https://www.django-rest-framework.org/)  
-[![GitHub License](https://img.shields.io/github/license/dim-gggl/aura-app?style=plastic&logo=MIT)](./LICENSE.md)
-![GitHub last commit](https://img.shields.io/github/last-commit/dim-gggl/aura-app?display_timestamp=author&style=plastic)
+<div align="center">  
+  <a href="https://docs.astral.sh/uv/">
+  	<img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json?style=plastic"/>
+  </a>
+  <a href="https://www.python.org/">
+	<img src="https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-%233775A9?style=plastic&logo=python&logoColor=%23FFE569">
+  </a>
+  <a href="https://www.djangoproject.com/">
+	<img src="https://img.shields.io/badge/django-5.2.7-%2344B78B?style=plastic&logo=django&logoColor=%2344B78B"/>
+  </a>
+  <a href="https://www.django-rest-framework.org/">
+	<img src="https://img.shields.io/badge/djangorestframework-3.16.1-%23FF474A?style=plastic&logo=django&logoColor=%23FF474A"/>
+  </a>
+  <a href="./LICENSE.md">
+	<img src="https://img.shields.io/github/license/dim-gggl/aura-app?style=plastic&logo=MIT"/>
+  </a>
+  <img src="https://img.shields.io/github/last-commit/dim-gggl/aura-app?display_timestamp=author&style=plastic">
+</div>
 
 ![](./aura-title.png)
 

@@ -19,18 +19,7 @@
 
 # Full documentation ---> [📖](https://aura-app.readthedocs.io/en/latest/)
 
-## 🚀 Déploiement Rapide
-
-| Guide | Description | Temps | Niveau |
-|-------|-------------|-------|--------|
-| [⚡ QUICK_START](./QUICK_START.md) | Démarrage ultra-rapide | 10 min | Débutant |
-| [🚂 RAILWAY_DEPLOY](./RAILWAY_DEPLOY.md) | Guide complet Railway | 15 min | Débutant |
-| [🐳 DEPLOY](./DEPLOY.md) | Guide Docker VPS + Cloudflare | 1-2h | Avancé |
-| [📋 DEPLOYMENT_SUMMARY](./DEPLOYMENT_SUMMARY.md) | Résumé et checklist | 5 min | Tous |
-
-**Nouveau déploiement ?** Commencez par [QUICK_START.md](./QUICK_START.md) !
-
----
+# [Le site](https://aura-app.org/)
 
 [![aura-title](./aura-title.png)](./EN.md)
 

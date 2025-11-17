@@ -16,8 +16,15 @@ Key features:
 
 from django.contrib import admin
 
-from .models import (Artist, Artwork, ArtworkAttachment, ArtworkPhoto,
-                     Collection, Exhibition, WishlistItem)
+from .models import (
+    Artist,
+    Artwork,
+    ArtworkAttachment,
+    ArtworkPhoto,
+    Collection,
+    Exhibition,
+    WishlistItem,
+)
 
 
 class ArtworkPhotoInline(admin.TabularInline):

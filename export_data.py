@@ -18,8 +18,15 @@ from pathlib import Path
 
 import django
 
-from artworks.models import (Artist, ArtType, Artwork, Collection, Exhibition,
-                             Support, Technique)
+from artworks.models import (
+    Artist,
+    ArtType,
+    Artwork,
+    Collection,
+    Exhibition,
+    Support,
+    Technique,
+)
 from contacts.models import Contact
 from core.models import User
 from notes.models import Note

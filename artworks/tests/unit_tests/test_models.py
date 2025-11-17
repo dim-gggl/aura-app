@@ -4,9 +4,18 @@ from decimal import Decimal
 import pytest
 from django.db import IntegrityError
 
-from artworks.models import (Artist, ArtType, Artwork, ArtworkPhoto,
-                             Collection, Exhibition, Keyword, Support,
-                             Technique, WishlistItem)
+from artworks.models import (
+    Artist,
+    ArtType,
+    Artwork,
+    ArtworkPhoto,
+    Collection,
+    Exhibition,
+    Keyword,
+    Support,
+    Technique,
+    WishlistItem,
+)
 from core.models import User
 
 

@@ -17,10 +17,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.dev")
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Aura Art"
+project = "Aura App"
 copyright = "2025, Dimitri Gaggioli"
 author = "Dimitri Gaggioli"
-release = "1.0"
+release = "1.0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

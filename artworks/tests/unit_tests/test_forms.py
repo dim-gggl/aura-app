@@ -4,12 +4,27 @@ from decimal import Decimal
 import pytest
 from django.contrib.auth import get_user_model
 
-from artworks.forms import (ArtistForm, ArtworkForm, ArtworkPhotoForm,
-                            ArtworkPhotoFormSet, CollectionForm,
-                            ExhibitionForm, WishlistItemForm)
-from artworks.models import (Artist, ArtType, Artwork, ArtworkPhoto,
-                             Collection, Exhibition, Keyword, Support,
-                             Technique, WishlistItem)
+from artworks.forms import (
+    ArtistForm,
+    ArtworkForm,
+    ArtworkPhotoForm,
+    ArtworkPhotoFormSet,
+    CollectionForm,
+    ExhibitionForm,
+    WishlistItemForm,
+)
+from artworks.models import (
+    Artist,
+    ArtType,
+    Artwork,
+    ArtworkPhoto,
+    Collection,
+    Exhibition,
+    Keyword,
+    Support,
+    Technique,
+    WishlistItem,
+)
 
 User = get_user_model()
 

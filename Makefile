@@ -76,3 +76,6 @@ type-check: ## Run type checking
 secret-key: ## Generate secret key
 	@key=$$(clinkey -l 64 -s - -t super_strong --lower); \
 	echo "DJANGO_SECRET_KEY='$$key'" >> .env
+
+audit-deps: ## Run dependency vulnerability scans (pip-audit + safety)
+	./Tools/audit_deps.sh

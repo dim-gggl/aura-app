@@ -33,13 +33,29 @@ from django.views.decorators.http import require_POST
 from taggit.models import Tag
 
 from .filters import ArtworkFilter
+
 # Import forms for handling user input
-from .forms import (ArtistForm, ArtworkAttachmentFormSet, ArtworkForm,
-                    ArtworkPhotoFormSet, CollectionForm, ExhibitionForm,
-                    WishlistItemForm)
+from .forms import (
+    ArtistForm,
+    ArtworkAttachmentFormSet,
+    ArtworkForm,
+    ArtworkPhotoFormSet,
+    CollectionForm,
+    ExhibitionForm,
+    WishlistItemForm,
+)
+
 # Import all models used in the views
-from .models import (Artist, ArtType, Artwork, Collection, Exhibition, Support,
-                     Technique, WishlistItem)
+from .models import (
+    Artist,
+    ArtType,
+    Artwork,
+    Collection,
+    Exhibition,
+    Support,
+    Technique,
+    WishlistItem,
+)
 
 # ========================================
 # UTILITAIRES COMMUNS

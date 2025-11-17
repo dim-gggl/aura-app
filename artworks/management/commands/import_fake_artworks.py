@@ -8,8 +8,16 @@ from typing import Any, List, Optional
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from artworks.models import (LOCATIONS, Artist, ArtType, Artwork, Collection,
-                             Exhibition, Support, Technique)
+from artworks.models import (
+    LOCATIONS,
+    Artist,
+    ArtType,
+    Artwork,
+    Collection,
+    Exhibition,
+    Support,
+    Technique,
+)
 from setup.config import get_art_types, get_supports, get_techniques
 
 User = get_user_model()
@@ -67,9 +75,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--path",
             default="setup/fill_up/fake_artworks.json",
-            help=(
-                "Path to the JSON file (default: setup/fill_up/fake_artworks.json)"
-            ),
+            help=("Path to the JSON file (default: setup/fill_up/fake_artworks.json)"),
         )
         parser.add_argument(
             "--username",

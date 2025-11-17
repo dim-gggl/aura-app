@@ -1,6 +1,6 @@
 [project]
 name = "aura-app"
-version = "0.1.0"
+version = "1.0.1"
 author = {name = "Dimitri Gaggioli", email = "dimitri.gaggioli@gmail.com"}
 description = "A Django app to manage your art collection"
 readme = "README.md"

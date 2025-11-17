@@ -6,8 +6,8 @@ This script should be run before running Django migrations.
 import os
 import sys
 from pathlib import Path
-import django
 
+import django
 from django.db import connection
 
 # Add the project root to Python path

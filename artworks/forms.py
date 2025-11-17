@@ -105,9 +105,7 @@ class ArtworkForm(forms.ModelForm):
         if user:
             # Limiter aux artistes de l'utilisateur (inclut ceux sans œuvres)
             artists_field = self.fields["artists"]
-            artists_field.queryset = Artist.objects.filter(
-                user=user
-            ).order_by("name")
+            artists_field.queryset = Artist.objects.filter(user=user).order_by("name")
         else:
             # No user context: do not expose global artists in suggestions
             self.fields["artists"].queryset = Artist.objects.none()

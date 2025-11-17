@@ -15,21 +15,76 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Note',
+            name="Note",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(help_text='Descriptive title for the note', max_length=200, verbose_name='Titre')),
-                ('content', models.TextField(help_text='Main content of the note (supports rich text)', verbose_name='Contenu')),
-                ('is_favorite', models.BooleanField(default=False, help_text='Mark as favorite for quick access from dashboard', verbose_name='Favori')),
-                ('created_at', models.DateTimeField(auto_now_add=True, help_text='When this note was created')),
-                ('updated_at', models.DateTimeField(auto_now=True, help_text='When this note was last modified')),
-                ('user', models.ForeignKey(help_text='Owner of this note', on_delete=django.db.models.deletion.CASCADE, related_name='notes', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        help_text="Descriptive title for the note",
+                        max_length=200,
+                        verbose_name="Titre",
+                    ),
+                ),
+                (
+                    "content",
+                    models.TextField(
+                        help_text="Main content of the note (supports rich text)",
+                        verbose_name="Contenu",
+                    ),
+                ),
+                (
+                    "is_favorite",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Mark as favorite for quick access from dashboard",
+                        verbose_name="Favori",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, help_text="When this note was created"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(
+                        auto_now=True, help_text="When this note was last modified"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="Owner of this note",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Note',
-                'verbose_name_plural': 'Notes',
-                'ordering': ['-updated_at'],
-                'indexes': [models.Index(fields=['user', '-updated_at'], name='notes_note_user_id_d67ab6_idx'), models.Index(fields=['user', 'is_favorite'], name='notes_note_user_id_033aa6_idx')],
+                "verbose_name": "Note",
+                "verbose_name_plural": "Notes",
+                "ordering": ["-updated_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["user", "-updated_at"],
+                        name="notes_note_user_id_d67ab6_idx",
+                    ),
+                    models.Index(
+                        fields=["user", "is_favorite"],
+                        name="notes_note_user_id_033aa6_idx",
+                    ),
+                ],
             },
         ),
     ]

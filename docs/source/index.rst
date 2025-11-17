@@ -44,7 +44,7 @@ The application is organized into several Django apps:
 Live Application
 ----------------
 
-Aura Art is deployed and accessible at: https://aura-art.org
+Aura Art is deployed and accessible at: https://aura-app.org
 
 The production deployment includes:
 * Secure HTTPS access

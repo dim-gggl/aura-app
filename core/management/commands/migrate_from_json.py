@@ -15,10 +15,20 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from artworks.models import (Artist, ArtType, Artwork, ArtworkAttachment,
-                             ArtworkPhoto, Collection, Exhibition, Support,
-                             Technique, WishlistItem)
+from artworks.models import (
+    Artist,
+    ArtType,
+    Artwork,
+    ArtworkAttachment,
+    ArtworkPhoto,
+    Collection,
+    Exhibition,
+    Support,
+    Technique,
+    WishlistItem,
+)
 from contacts.models import Contact
+
 # Import models
 from core.models import User, UserProfile
 from notes.models import Note
