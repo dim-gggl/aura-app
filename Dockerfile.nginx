@@ -1,10 +1,10 @@
 # Nginx Dockerfile for Aura Art
-FROM nginx:1.25-alpine
+FROM nginx:1.29-alpine
 
 # Labels
-LABEL maintainer="dim-gggl" \
+LABEL maintainer="Dimitri Gaggioli" \
       org.opencontainers.image.title="Aura Art Nginx" \
-      org.opencontainers.image.description="Nginx reverse proxy for Aura Art Django application"
+      org.opencontainers.image.description="Nginx reverse proxy for Aura, aDjango application"
 
 # Install curl for healthchecks
 RUN apk add --no-cache curl
