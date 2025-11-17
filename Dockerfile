@@ -42,8 +42,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && mkdir -p /app/staticfiles /app/media \
     && chown -R appuser:appuser /app
 
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+COPY --from=base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=base /usr/local/bin /usr/local/bin
 
 COPY --chown=appuser:appuser . .
 RUN chmod +x /app/entrypoint.sh
