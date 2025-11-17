@@ -43,8 +43,5 @@ urlpatterns = [
     path("health/", views.health_check, name="health"),
 
     # Web App Manifest (served as template to inject hashed static URLs)
-    path("site.webmanifest", views.site_manifest, name="manifest"),
-
-    # Logout endpoint for user logout
-    path("logout/", views.logout, name="logout"),
+    path("site.webmanifest", views.site_manifest, name="manifest")
 ]

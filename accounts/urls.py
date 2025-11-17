@@ -40,7 +40,7 @@ urlpatterns = [
     # Login and logout using Django's built-in views
     # These views use templates in registration/ directory
     path("login/", auth_views.LoginView.as_view(), name="login"),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("logout/", views.logout, name="logout"),
     # ========================================
     # PASSWORD MANAGEMENT URLS
     # ========================================
