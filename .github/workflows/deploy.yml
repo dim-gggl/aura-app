@@ -78,6 +78,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate required secrets
+        run: |
+          if [ -z "$STAGING_SSH_PRIVATE_KEY" ]; then
+            echo "Missing secret: STAGING_SSH_PRIVATE_KEY"
+            exit 1
+          fi
+          if [ -z "$STAGING_HOST" ] || [ -z "$STAGING_USER" ]; then
+            echo "Missing secret: STAGING_HOST or STAGING_USER"
+            exit 1
+          fi
+        env:
+          STAGING_SSH_PRIVATE_KEY: ${{ secrets.STAGING_SSH_PRIVATE_KEY }}
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_USER }}
+
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -140,6 +155,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          if [ -z "$PRODUCTION_SSH_PRIVATE_KEY" ]; then
+            echo "Missing secret: PRODUCTION_SSH_PRIVATE_KEY"
+            exit 1
+          fi
+          if [ -z "$PRODUCTION_HOST" ] || [ -z "$PRODUCTION_USER" ]; then
+            echo "Missing secret: PRODUCTION_HOST or PRODUCTION_USER"
+            exit 1
+          fi
+        env:
+          PRODUCTION_SSH_PRIVATE_KEY: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+          PRODUCTION_HOST: ${{ secrets.PRODUCTION_HOST }}
+          PRODUCTION_USER: ${{ secrets.PRODUCTION_USER }}
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
