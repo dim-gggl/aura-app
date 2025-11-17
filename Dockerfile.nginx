@@ -19,9 +19,6 @@ RUN apk update && \
       libssl3 || true && \
     rm -f /var/cache/apk/*
 
-# (rest of your nginx image steps)
-COPY nginx /etc/nginx
-
 # Remove default nginx configuration
 RUN rm /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 

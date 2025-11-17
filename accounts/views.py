@@ -160,5 +160,5 @@ def profile(request):
 
 
 def logout(request):
-    logout_user(request=request )
+    logout_user(request=request)
     return redirect("core:home")

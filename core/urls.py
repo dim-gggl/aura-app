@@ -26,17 +26,25 @@ urlpatterns = [
     # MAIN APPLICATION URLS
     # ========================================
     # Homepage - entry point for the application
-    # Redirects authenticated users to dashboard, shows welcome page for anonymous users
+    # Redirects authenticated users to dashboard, 
+    # shows welcome page for anonymous users
     path("", views.home, name="home"),
+
     # Main dashboard - central hub for authenticated users
     # Displays statistics, recent activity, and quick access to features
     path("dashboard/", views.dashboard, name="dashboard"),
+
     # Global search - comprehensive search across all user data
     # Searches artworks, contacts, and notes simultaneously
     path("search/", views.search, name="search"),
+
     # Health check endpoint for monitoring and load balancers
     # Used by Docker health checks and monitoring systems
     path("health/", views.health_check, name="health"),
+
     # Web App Manifest (served as template to inject hashed static URLs)
     path("site.webmanifest", views.site_manifest, name="manifest"),
+
+    # Logout endpoint for user logout
+    path("logout/", views.logout, name="logout"),
 ]
