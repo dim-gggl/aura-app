@@ -18,9 +18,9 @@
     /* Base Theme Variables (Art Deco) */
     --font-family-body: "Ancizar Sans", sans-serif;
     --font-family-headings: "Dai Banna SIL", serif;
-    --theme-bg-color: #faf6f0;
-    --theme-text-color: #0a0a0a;
-    --theme-primary-color: #d4af37;
+    --theme-bg-color: #e9e5df;
+    --theme-text-color: #191919;
+    --theme-primary-color: hwb(46 28% 22%);
     --theme-secondary-color: #6a1e0d;
     --theme-primary-text-color: #0a0a0a;
     --theme-link-color: var(--theme-primary-color);
@@ -30,11 +30,11 @@
     --theme-border-radius: 0;
     --theme-header-bg: #0a0a0a;
     --theme-header-text-color: var(--theme-primary-color);
-    --theme-alert-bg: #f2e9d8;
-    --theme-alert-border-color: #d4af37;
-    --theme-alert-text-color: #5c4d18;
-    --bs-secondary-color: #7e8c8b;
-    --bs-warning-rgb: #ffc107;
+    --theme-alert-bg: #a19b8e93;
+    --theme-alert-border-color: #d43a37;
+    --theme-alert-text-color: #2e2e2e;
+    --bs-secondary-color: #1a2020;
+    --bs-warning-rgb: #ff8707;
     --bs-btn-bg: var(--bs-warning-rgb);
 
     /* App specific */
@@ -45,8 +45,8 @@
     --note-form-container-margin: 0 auto;
     --form-floating-textarea-min-height: 300px;
     --form-floating-textarea-resize: vertical;
-    --character-counter-font-size: 0.875rem;
-    --character-counter-color: #6c757d;
+    --character-counter-font-size: 1.01rem;
+    --character-counter-color: #42494e;
     --character-counter-text-align: right;
     --character-counter-margin-top: 0.25rem;
     --favorite-toggle-cursor: pointer;
@@ -844,7 +844,7 @@ a {
 .toolbar button {
     margin-right: 0.25rem;
     padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.98rem;
 }
 
 /* HERO SECTION */

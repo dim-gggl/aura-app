@@ -74,34 +74,34 @@ class UserProfile(models.Model):
     # Comprehensive theme choices for UI customization
     # Each theme provides a different visual experience for the user
     THEME_CHOICES = [
-        ("elegant", "Élégant"),  # Classic, refined appearance
-        ("futuristic", "Futuriste"),  # Modern, sci-fi inspired
-        ("playful", "Ludique"),  # Bright, fun colors
-        ("minimal", "Minimaliste"),  # Clean, simple design
-        ("retro", "Rétro"),  # Vintage-inspired styling
-        ("nature", "Nature"),  # Earth tones, organic feel
-        ("ocean", "Océan"),  # Blue tones, water-inspired
-        ("gothic", "Gothique"),  # Dark, dramatic styling
-        ("sunset", "Coucher de soleil"),  # Warm, golden colors
-        ("forest", "Forêt"),  # Green tones, woodland feel
-        ("desert", "Désert"),  # Sandy, warm earth tones
-        ("cyberpunk", "Cyberpunk"),  # Neon, high-tech aesthetic
-        ("steampunk", "Steampunk"),  # Industrial, brass tones
-        ("artdeco", "Art Déco"),  # 1920s inspired design
-        ("noir", "Noir"),  # Black and white, dramatic
-        ("pastel", "Pastel"),  # Soft, muted colors
-        ("solarized", "Solarisé"),  # Developer-friendly color scheme
-        ("vaporwave", "Vaporwave"),  # 80s retro-futuristic aesthetic
-        ("onyx", "Onyx"),  # Deep, rich black
-        ("burntwood", "Bois Brûlé"),  # Dark, rustic wood
-        ("leather", "Cuir"),  # Rich, luxurious leather
-        ("concrete", "Béton"),  # Industrial, raw concrete
-        ("midnight", "Minuit"),  # Dark, mysterious midnight
-        ("slate", "Ardoise"),  # Slate gray, cool and neutral
-        ("espresso", "Espresso"),  # Rich, dark coffee
-        ("ink", "Encre"),  # Dark, rich ink
-        ("graphite", "Graphite"),  # Graphite gray, cool and neutral
-        ("velvet", "Velours"),  # Soft, velvety texture
+        ("elegant", "Elegant"),        # Elegant, refined appearance
+        ("futuristic", "Futuristic"),  # Modern, sci-fi inspired
+        ("playful", "Playful"),        # Playful, fun colors
+        ("minimal", "Minimal"),        # Minimal, clean design
+        ("retro", "Retro"),            # Retro, vintage-inspired styling
+        ("nature", "Nature"),          # Nature, earth tones, organic feel
+        ("ocean", "Ocean"),            # Ocean, blue tones, water-inspired
+        ("gothic", "Gothic"),          # Gothic, dark, dramatic styling
+        ("sunset", "Sunset"),          # Sunset, warm, golden colors
+        ("forest", "Forest"),          # Forest, green tones, woodland feel
+        ("desert", "Desert"),          # Desert, sandy, warm earth tones
+        ("cyberpunk", "Cyberpunk"),    # Cyberpunk, neon, high-tech aesthetic
+        ("steampunk", "Steampunk"),    # Steampunk, industrial, brass tones
+        ("artdeco", "Art Deco"),       # Art Deco, 1920s inspired design
+        ("noir", "Black"),             # Black, black and white, dramatic
+        ("pastel", "Pastel"),          # Pastel, soft, muted colors
+        ("solarized", "Solarized"),    # Solarized, developer-friendly color scheme
+        ("vaporwave", "Vaporwave"),    # Vaporwave, 80s retro-futuristic aesthetic
+        ("onyx", "Onyx"),              # Onyx, deep, rich black
+        ("burntwood", "Burnt Wood"),   # Burnt Wood, dark, rustic wood
+        ("leather", "Leather"),        # Leather, rich, luxurious leather
+        ("concrete", "Concrete"),      # Concrete, industrial, raw concrete
+        ("midnight", "Midnight"),      # Midnight, dark, mysterious midnight
+        ("slate", "Slate"),            # Slate, slate gray, cool and neutral
+        ("espresso", "Espresso"),      # Espresso, rich, dark coffee
+        ("ink", "Ink"),                # Ink, dark, rich ink
+        ("graphite", "Graphite"),      # Graphite, graphite gray, cool and neutral
+        ("velvet", "Velvet"),          # Velvet, soft, velvety texture
     ]
 
     # One-to-one relationship with User model
@@ -117,7 +117,7 @@ class UserProfile(models.Model):
     theme = models.CharField(
         max_length=20,
         choices=THEME_CHOICES,
-        default="elegant",
+        default="art deco",
         help_text="Visual theme for the user interface",
     )
 
@@ -193,6 +193,6 @@ class UserProfile(models.Model):
             tuple: (UserProfile instance, created boolean)
         """
         profile, created = cls.objects.get_or_create(
-            user=user, defaults={"theme": "elegant"}  # Default theme
+            user=user, defaults={"theme": "art deco"}  # Default theme
         )
         return profile, created

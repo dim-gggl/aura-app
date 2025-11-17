@@ -192,19 +192,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeSelect = document.querySelector('select[name="theme"]');
     const form = document.querySelector('form');
     
-    // Apply theme immediately when changed
     if (themeSelect) {
-        themeSelect.addEventListener('change', function() {
-            const selectedTheme = this.value;
-            console.log('Thème sélectionné:', selectedTheme);
-            console.log('Ancien data-theme:', document.documentElement.getAttribute('data-theme'));
-            
-            document.documentElement.setAttribute('data-theme', selectedTheme);
-            console.log('Nouveau data-theme:', document.documentElement.getAttribute('data-theme'));
-            
-            // Save to localStorage for immediate persistence
-            localStorage.setItem('aura-theme', selectedTheme);
-            console.log('Thème sauvegardé dans localStorage:', localStorage.getItem('aura-theme'));
+        let selectedTheme = themeSelect.value || document.documentElement.getAttribute('data-theme');
+
+        const applyTheme = (theme, persist = false) => {
+            if (!theme) return;
+            document.documentElement.setAttribute('data-theme', theme);
+            if (persist) {
+                try {
+                    localStorage.setItem('aura-theme', theme);
+                } catch (err) {
+                    // Silently ignore storage issues (e.g., private mode)
+                }
+            }
+        };
+
+        // Preview theme while hovering options (native select doesn't fire mouseenter on option)
+        themeSelect.addEventListener('pointerover', (event) => {
+            const option = event.target;
+            if (option && option.tagName === 'OPTION') {
+                applyTheme(option.value);
+            }
+        });
+
+        // Persist theme when an option is selected
+        themeSelect.addEventListener('change', () => {
+            selectedTheme = themeSelect.value;
+            applyTheme(selectedTheme, true);
+        });
+
+        // Restore the selected theme if the menu is closed without selecting
+        themeSelect.addEventListener('blur', () => {
+            applyTheme(selectedTheme, true);
         });
     }
     

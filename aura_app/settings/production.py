@@ -167,6 +167,17 @@ if "csp.middleware.CSPMiddleware" not in MIDDLEWARE:
     except ValueError:
         MIDDLEWARE.insert(0, "csp.middleware.CSPMiddleware")
 
+_img_src_sources = ["'self'", "data:", "blob:"]
+if AWS_S3_ENDPOINT_URL:
+    _img_src_sources.append(AWS_S3_ENDPOINT_URL.rstrip('/'))
+if AWS_STORAGE_BUCKET_NAME:
+    if AWS_S3_ENDPOINT_URL:
+        _img_src_sources.append(f"{AWS_S3_ENDPOINT_URL.rstrip('/')}/{AWS_STORAGE_BUCKET_NAME}")
+    else:
+        _img_src_sources.append(f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com")
+        if AWS_S3_REGION_NAME:
+            _img_src_sources.append(f"https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com")
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ("'self'",),
@@ -180,11 +191,7 @@ CONTENT_SECURITY_POLICY = {
             "https://cdn.jsdelivr.net",
         ),
         "object-src": ("none",),
-        "img-src": (
-            "'self'",
-            "data:",
-            "blob:",
-        ),
+        "img-src": tuple(_img_src_sources),
         "font-src": (
             "'self'",
             "https://fonts.gstatic.com",

@@ -1,17 +1,24 @@
-# Use Python 3.13 for latest security patches
-FROM python:3.13-slim AS builder
+# Patch: upgrade security-sensitive OS packages during build (Debian/Ubuntu based image)
+FROM python:3.11-slim AS base
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && apt-get upgrade -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+# Security upgrades for urgent vulnerabilities (libxml2, libxslt, xz, pip)
+RUN apt-get update && \
+    # upgrade only the packages we care about to minimize layer changes
+    apt-get install -y --only-upgrade \
+      libxml2 \
+      libxslt1.1 \
+      xz-utils \
+      python3-pip \
+      libssl3 || true && \
+    # if you prefer to upgrade everything, use: apt-get upgrade -y
+    rm -rf /var/lib/apt/lists/*
 
+    # Ensure pip is updated to the fixed version that addresses CVE-2025-8869
+RUN python3 -m pip install --upgrade pip==25.3
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Runtime
 FROM python:3.13-slim

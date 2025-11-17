@@ -18,6 +18,7 @@ from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
+from django.contrib.auth import logout as logout_user
 from django.utils.translation import gettext_lazy as _
 
 from core.models import UserProfile
@@ -158,6 +159,6 @@ def profile(request):
     return render(request, "accounts/profile.html", context)
 
 
-# REMOVED: profile_test view was a security risk as it exposed sensitive data
-# in debug output including POST data, files, and form errors.
-# This view has been removed to prevent information disclosure.
+def logout(request):
+    logout_user(request=request )
+    return redirect("core:home")
