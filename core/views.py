@@ -16,6 +16,8 @@ Key features:
 import logging
 from datetime import datetime, timedelta
 
+from django.contrib import messages
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.db.models import Count, Q
@@ -46,6 +48,19 @@ def home(request):
     if request.user.is_authenticated:
         return redirect("core:dashboard")
     return render(request, "core/home.html")
+
+
+@login_required
+def logout(request):
+    """
+    Securely log out the current user and redirect to the homepage.
+
+    The view clears the user's authenticated session, provides user-facing
+    confirmation messaging, and redirects them to the public landing page.
+    """
+    auth_logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect("core:home")
 
 
 @login_required
