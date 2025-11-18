@@ -29,12 +29,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client \
+    postgresql-client-17=17.7-1 \
     libpq5 \
-    gettext \
-    curl \
-    ca-certificates \
-    libexpat1 \
+    gettext=0.25.2-1 \
+    curl=8.5.1-1 \
+    ca-certificates=20250618-1 \
+    libexpat1=2.6.1-1 \
     && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
