@@ -81,7 +81,7 @@ sphinxcontrib-serializinghtml==2.0.0
 sqlparse==0.5.3
 tinycss2==1.4.0
 tinyhtml5==2.0.0
-urllib3==2.5.0
+urllib3==2.6.0
 weasyprint==66.0
 webencodings==0.5.1
 whitenoise==6.11.0
