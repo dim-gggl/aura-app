@@ -17,7 +17,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '25 19 * * 1'
+    - cron: '0 7,19 * * *'
 
 jobs:
   analyze:
@@ -27,7 +27,8 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: 'ubuntu-latest' 
+    timeout-minutes: 360  # Ajout d'un timeout pour éviter les jobs qui traînent
     permissions:
       # required for all workflows
       security-events: write
@@ -50,10 +51,7 @@ jobs:
         - language: python
           build-mode: none
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'rust', 'swift'
-        # Use `c-cpp` to analyze code written in C, C++ or both
-        # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
         # Use 'javascript-typescript' to analyze code written in JavaScript, TypeScript or both
-        # To learn more about changing the languages that are analyzed or customizing the build mode for your analysis,
         # see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning.
         # If you are analyzing a compiled language, you can modify the 'build-mode' for that language to customize how
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
@@ -61,11 +59,29 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Add any setup steps before running the `github/codeql-action/init` action.
-    # This includes steps like installing compilers or runtimes (`actions/setup-node`
-    # or others). This is typically only required for manual builds.
-    # - name: Setup runtime (example)
-    #   uses: actions/setup-example@v1
+    # Setup Python with caching - only for Python analysis
+    - name: Setup Python
+      if: matrix.language == 'python'
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: 'runtime.txt'  # Lit automatiquement depuis runtime.txt
+        cache: 'pip'  # Active le cache pip
+        cache-dependency-path: |
+          requirements.txt
+          pyproject.toml
+
+    # Install UV for dependency management (respects user rules)
+    - name: Install UV
+      if: matrix.language == 'python'
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    # Install Python dependencies using UV (crucial for Django CodeQL analysis)
+    - name: Install dependencies
+      if: matrix.language == 'python'
+      run: |
+        uv pip install --system -r requirements.txt
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -73,12 +89,8 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-
-        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
-        # queries: security-extended,security-and-quality
+        # Enable extended security queries for more comprehensive analysis
+        queries: security-extended,security-and-quality
 
     # If the analyze step fails for one of the languages you are analyzing with
     # "We were unable to automatically build your code", modify the matrix above
@@ -101,3 +113,5 @@ jobs:
       uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{matrix.language}}"
+        # Upload results even if some queries fail
+        upload: always
