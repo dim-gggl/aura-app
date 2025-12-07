@@ -13,4 +13,5 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "sphinx>=9.0.4",
     "shibuya>=2025.11.10",
+    "whitenoise>=6.11.0"
 ]
