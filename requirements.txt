@@ -30,7 +30,6 @@ python-dotenv>=1.2.1
 requests>=2.32.5
 shibuya>=2025.11.10
 sphinx>=8.3.0
-sphinx-rtd-theme>=3.0.2
 sphinxcontrib-applehelp>=2.0.0
 sphinxcontrib-devhelp>=2.0.0
 sphinxcontrib-htmlhelp>=2.1.0
