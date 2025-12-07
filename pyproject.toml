@@ -6,11 +6,12 @@ description = "A Django app to manage your art collection"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "django>=5.2.9",
+    "django>=6.0",
     "djangorestframework>=3.16.1",
     "django-environ>=0.12.0",
-    "psycopg>=3.2.12",
+    "psycopg>=3.3.2",
     "python-dotenv>=1.2.1",
-    "sphinx>=8.3.0",
+    "sphinx>=9.0.4",
     "shibuya>=2025.11.10",
+    "whitenoise>=6.11.0"
 ]
