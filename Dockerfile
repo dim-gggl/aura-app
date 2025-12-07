@@ -18,7 +18,7 @@ RUN apt-get update && \
     # Ensure pip is updated to the fixed version that addresses CVE-2025-8869
 RUN python3 -m pip install --upgrade pip==25.3
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --ignore-requires-python
 
 # Runtime
 FROM python:3.11-slim
