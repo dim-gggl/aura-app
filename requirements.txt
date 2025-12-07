@@ -1,5 +1,6 @@
 alabaster>=1.0.0
 black>=25.11.0
+bleach>=6.3.0
 crispy-bootstrap5>=2025.6
 dj-database-url>=3.0.1
 django>=6.0
