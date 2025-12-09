@@ -1,5 +1,5 @@
 # Patch: upgrade packages on Alpine-based image (nginx)
-FROM nginx:alpine AS base
+FROM nginx:stable AS base
 
 # Labels
 LABEL maintainer="Dimitri Gaggioli" \
