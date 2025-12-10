@@ -4,7 +4,8 @@ FROM python:3.12.12-trixie AS base
 WORKDIR /app
 
 # Mise à jour des paquets système critiques (libxml2, libxslt, xz, OpenSSL)
-# + Mise à jour de zlib, SQLite, PAM, OpenLDAP pour corriger CVE-2023-45853, CVE-2025-7458, CVE-2025-6020, CVE-2023-2953, etc.
+# + Mise à jour de zlib, SQLite, PAM, OpenLDAP, Perl, ncurses, toolchain (libstdc++/libgomp)
+#   pour corriger les CVE signalés par Trivy.
 RUN apt-get update && \
     apt-get install -y --only-upgrade \
       libxml2 \
@@ -14,11 +15,24 @@ RUN apt-get update && \
       zlib1g \
       libsqlite3-0 \
       libpam0g \
+      libpam-runtime \
+      libpam-modules \
+      libpam-modules-bin \
       libldap-2.5-0 \
+      perl \
+      perl-base \
+      perl-modules-5.36 \
+      libperl5.36 \
+      ncurses-base \
+      ncurses-bin \
+      libtinfo6 \
+      libncursesw6 \
+      libstdc++6 \
+      libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Mise à jour de pip et outils build
-# (Python 3.12 gère nativement la sécurité des archives via PEP 706)
+# (Python 3.12 gère nativement la sécurité des archives via PEP 706)
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Installation des dépendances Python (on ignore les warnings de version Python si besoin)
@@ -46,8 +60,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g \
     libsqlite3-0 \
     libpam0g \
+    libpam-runtime \
+    libpam-modules \
+    libpam-modules-bin \
     libldap-2.5-0 \
     libpq5 \
+    perl \
+    perl-base \
+    perl-modules-5.36 \
+    libperl5.36 \
+    ncurses-base \
+    ncurses-bin \
+    libtinfo6 \
+    libncursesw6 \
+    libssl3 \
+    libstdc++6 \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/* \
     && adduser --disabled-password --gecos '' appuser \
     && mkdir -p /app/staticfiles /app/media \

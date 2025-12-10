@@ -1,13 +1,4 @@
-# Patch: upgrade packages on Alpine-based image (nginx)
-FROM nginx:stable AS base
-
-# Labels
-LABEL maintainer="Dimitri Gaggioli" \
-      org.opencontainers.image.title="Aura Art Nginx" \
-      org.opencontainers.image.description="Nginx reverse proxy for Aura, aDjango application"
-
-
-# Install / upgrade vulnerable libraries in Alpine (libxml2, libxslt, xz, openssl/musl)
+# Install / upgrade vulnerable libraries in Alpine (libxml2, libxslt, xz, openssl/musl, libpng)
 RUN apk update && \
     # upgrade libxml2, libxslt, xz, openssl/musl packages
     apk add --no-cache --upgrade \
@@ -16,7 +7,9 @@ RUN apk update && \
       xz \
       musl \
       openssl \
-      libssl3 || true && \
+      libssl3 \
+      libpng \
+      libpng-dev || true && \
     rm -f /var/cache/apk/*
 
 # Remove default nginx configuration
