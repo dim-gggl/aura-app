@@ -1,3 +1,5 @@
+FROM nginx:alpine
+
 # Install / upgrade vulnerable libraries in Alpine (libxml2, libxslt, xz, openssl/musl, libpng)
 RUN apk update && \
     # upgrade libxml2, libxslt, xz, openssl/musl packages
