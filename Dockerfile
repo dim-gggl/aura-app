@@ -1,5 +1,5 @@
 # Utilisation d'une image Python 3.12 slim Bookworm à jour (corrige vuln. zlib, sqlite, etc.)
-FROM python:3.12.12-trixie AS base
+FROM python:3.12-slim-bookworm AS base
 
 WORKDIR /app
 
@@ -40,7 +40,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt --ignore-requires-python
 
 # Image exécution
-FROM python:3.12.12-trixie
+FROM python:3.12-slim-bookworm
 
 # Variables d'env Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
