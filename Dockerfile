@@ -7,7 +7,8 @@ WORKDIR /app
 # + Mise à jour de zlib, SQLite, PAM, OpenLDAP, Perl, ncurses, toolchain (libstdc++/libgomp)
 #   pour corriger les CVE signalés par Trivy.
 RUN apt-get update && \
-    apt-get install -y --only-upgrade \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
       libxml2 \
       libxslt1.1 \
       xz-utils \
@@ -29,14 +30,15 @@ RUN apt-get update && \
       libncursesw6 \
       libstdc++6 \
       libgomp1 \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Mise à jour de pip et outils build
 # (Python 3.12 gère nativement la sécurité des archives via PEP 706)
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Installation des dépendances Python (on ignore les warnings de version Python si besoin)
-COPY requirements.txt .
+COPY requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt --ignore-requires-python
 
 # Image exécution
