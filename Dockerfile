@@ -35,6 +35,7 @@ RUN apt-get update && \
 
 # Mise à jour de pip et outils build
 # (Python 3.12 gère nativement la sécurité des archives via PEP 706)
+COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Installation des dépendances Python (on ignore les warnings de version Python si besoin)
