@@ -38,7 +38,6 @@ RUN apt-get update && \
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Installation des dépendances Python (on ignore les warnings de version Python si besoin)
-COPY requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt --ignore-requires-python
 
 # Image exécution
