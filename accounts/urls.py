@@ -58,7 +58,9 @@ urlpatterns = [
     # Password reset flow for users who forgot their password
     # Step 1: Request password reset (enter email)
     path(
-        "password_reset/", auth_views.PasswordResetView.as_view(), name="password_reset"
+        "password_reset/",
+        views.CustomPasswordResetView.as_view(),
+        name="password_reset",
     ),
     # Step 2: Confirmation that reset email was sent
     path(

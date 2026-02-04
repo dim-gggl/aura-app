@@ -13,10 +13,14 @@ Key features:
 - Comprehensive error handling and user feedback
 """
 
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
 from django.contrib.auth import logout as logout_user
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +28,26 @@ from django.utils.translation import gettext_lazy as _
 from core.models import UserProfile
 
 from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
+
+logger = logging.getLogger(__name__)
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = "registration/password_reset_form.html"
+    email_template_name = "registration/password_reset_email.html"
+    subject_template_name = "registration/password_reset_subject.txt"
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except Exception:
+            logger.exception("Password reset email sending failed.")
+            messages.error(
+                self.request,
+                _("Unable to send the password reset email. Please try again later."),
+            )
+            return self.form_invalid(form)
 
 
 def register(request):
@@ -53,9 +77,10 @@ def register(request):
             user = form.save()
 
             # Create a UserProfile for the new user with default settings
-            # Note: This might be redundant if the signal handler is working,
-            # but provides a fallback to ensure profile creation
-            UserProfile.objects.get_or_create(user=user)
+            # Ensure UserProfile exists for new user; fallback in case signal fails
+            profile, created = UserProfile._default_manager.get_or_create(
+                user=user, defaults={"theme": "elegant"}
+            )
 
             # Automatically log in the new user
             login(request, user)
@@ -96,7 +121,7 @@ def profile(request):
         HttpResponse: Profile form (GET) or redirect after successful update (POST)
     """
     # Ensure the user has a profile, create one with defaults if not
-    profile, created = UserProfile.objects.get_or_create(
+    profile, created = UserProfile._default_manager.get_or_create(
         user=request.user,
         defaults={"theme": "elegant"},  # Default theme for new profiles
     )

@@ -48,7 +48,7 @@ class ArtworkSerializer(serializers.ModelSerializer):
     artist_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         write_only=True,
-        queryset=Artist.objects.none(),
+        queryset=Artist._default_manager.none(),
         source="artists",
     )
 
@@ -75,12 +75,12 @@ class ArtworkSerializer(serializers.ModelSerializer):
         ):
             # Limit selectable artists to the current user's artists or shared
             # records where the user reference is null
-            self.fields["artist_ids"].queryset = Artist.objects.filter(
+            self.fields["artist_ids"].queryset = Artist._default_manager.filter(
                 Q(user=request.user) | Q(user__isnull=True)
             )
         else:
             # No request in context → disallow arbitrary cross-tenant linking
-            self.fields["artist_ids"].queryset = Artist.objects.none()
+            self.fields["artist_ids"].queryset = Artist._default_manager.none()
 
     def create(self, validated_data):
         """

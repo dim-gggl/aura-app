@@ -116,7 +116,7 @@ def _reference_list(
 ):
     """Generic list view for reference entities with artwork counters."""
     items = (
-        model.objects.all().annotate(artwork_count=Count("artwork")).order_by("name")
+        model._default_manager.all().annotate(artwork_count=Count("artwork")).order_by("name")
     )
 
     search = request.GET.get("search", "")
@@ -150,7 +150,7 @@ def _reference_create(
     if request.method == "POST":
         name = request.POST.get("name", "").strip()
         if name:
-            obj, created = model.objects.get_or_create(name=name)
+            obj, created = model._default_manager.get_or_create(name=name)
             if created:
                 messages.success(
                     request, f"{entity_label.capitalize()} '{name}' créé avec succès."
@@ -187,7 +187,7 @@ def _reference_update(
         name = request.POST.get("name", "").strip()
         if name:
             if name != obj.name:
-                if model.objects.filter(name=name).exists():
+                if model._default_manager.filter(name=name).exists():
                     messages.error(
                         request,
                         f"Un {entity_label} avec le nom '{name}' existe déjà.",
@@ -254,7 +254,7 @@ def _create_by_name_ajax_impl(
         if with_user:
             kwargs["user"] = request.user
 
-        obj, created = model.objects.get_or_create(defaults=defaults or {}, **kwargs)
+        obj, created = model._default_manager.get_or_create(defaults=defaults or {}, **kwargs)
         return JsonResponse(
             {
                 "success": True,
@@ -300,12 +300,12 @@ def artwork_list(request):
     """
     # Get all user's artworks with optimized queries to reduce database hits
     # prefetch_related loads related artists and photos in separate queries
-    artworks = Artwork.objects.filter(user=request.user).prefetch_related(
+    artworks = Artwork._default_manager.filter(user=request.user).prefetch_related(
         "artists", "photos"
     )
 
     # Get artists that have artworks for this user (for filter dropdown)
-    artist_queryset = Artist.objects.filter(artwork__user=request.user).distinct()
+    artist_queryset = Artist._default_manager.filter(artwork__user=request.user).distinct()
 
     # Apply filters based on GET parameters
     artwork_filter = ArtworkFilter(request.GET, queryset=artworks)
@@ -313,27 +313,27 @@ def artwork_list(request):
     artwork_fields = artwork_filter.form.fields
     artwork_fields["artists"].queryset = artist_queryset
     if "collections" in artwork_fields:
-        artwork_fields["collections"].queryset = Collection.objects.filter(
+        artwork_fields["collections"].queryset = Collection._default_manager.filter(
             user=request.user
         )
 
     if "exhibitions" in artwork_fields:
-        artwork_fields["exhibitions"].queryset = Exhibition.objects.filter(
+        artwork_fields["exhibitions"].queryset = Exhibition._default_manager.filter(
             user=request.user
         )
 
     if "parent_artwork" in artwork_fields:
-        artwork_fields["parent_artwork"].queryset = Artwork.objects.filter(
+        artwork_fields["parent_artwork"].queryset = Artwork._default_manager.filter(
             user=request.user
         )
 
     if "tags" in artwork_fields:
-        artwork_ct = ContentType.objects.get_for_model(Artwork)
-        user_artwork_ids = Artwork.objects.filter(user=request.user).values_list(
+        artwork_ct = ContentType._default_manager.get_for_model(Artwork)
+        user_artwork_ids = Artwork._default_manager.filter(user=request.user).values_list(
             "id", flat=True
         )
         artwork_fields["tags"].queryset = (
-            Tag.objects.filter(
+            Tag._default_manager.filter(
                 artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
                 artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,
             )
@@ -590,7 +590,7 @@ def random_suggestion(request):
         # Find artworks that are available for exhibition:
         # - Located at home or in storage (not already on display/loan)
         # - Not exhibited recently or never exhibited
-        artworks = Artwork.objects.filter(
+        artworks = Artwork._default_manager.filter(
             user=request.user,
             current_location__in=["domicile", "stockage"],  # Available locations
         ).filter(
@@ -645,7 +645,7 @@ def artist_list(request):
     """
     # Afficher uniquement les artistes de l'utilisateur et annoter le nombre d'œuvres
     artists = (
-        Artist.objects.filter(user=request.user)
+        Artist._default_manager.filter(user=request.user)
         .annotate(artwork_count=Count("artwork", filter=Q(artwork__user=request.user)))
         .order_by("name")
     )
@@ -675,7 +675,7 @@ def artist_list(request):
 @login_required
 def artist_detail(request, pk):
     artist = get_object_or_404(Artist, pk=pk, user=request.user)
-    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    artworks = Artwork._default_manager.filter(artists=artist, user=request.user)
 
     context = {
         "artist": artist,
@@ -746,7 +746,7 @@ def artist_delete(request, pk):
     """
     artist = get_object_or_404(Artist, pk=pk)
     # Count the user's current artworks linked to this artist (for information)
-    linked_artworks_count = Artwork.objects.filter(
+    linked_artworks_count = Artwork._default_manager.filter(
         artists=artist, user=request.user
     ).count()
     # If the artist is linked to artworks, these links will be removed (M2M),
@@ -770,7 +770,7 @@ def artist_delete(request, pk):
 @login_required
 def artist_export_html(request, pk):
     artist = get_object_or_404(Artist, pk=pk)
-    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    artworks = Artwork._default_manager.filter(artists=artist, user=request.user)
     return _export_response_from_template(
         request=request,
         template_name="artworks/artist_export.html",
@@ -783,7 +783,7 @@ def artist_export_html(request, pk):
 @login_required
 def artist_export_pdf(request, pk):
     artist = get_object_or_404(Artist, pk=pk)
-    artworks = Artwork.objects.filter(artists=artist, user=request.user)
+    artworks = Artwork._default_manager.filter(artists=artist, user=request.user)
     return _export_response_from_template(
         request=request,
         template_name="artworks/artist_export.html",
@@ -804,7 +804,7 @@ def artist_export_pdf(request, pk):
 @login_required
 def collection_list(request):
     collections = (
-        Collection.objects.filter(user=request.user)
+        Collection._default_manager.filter(user=request.user)
         .annotate(artwork_count=Count("artwork"))
         .order_by("name")
     )
@@ -947,7 +947,7 @@ def collection_export_pdf(request, pk):
 @login_required
 def exhibition_list(request):
     exhibitions = (
-        Exhibition.objects.filter(user=request.user)
+        Exhibition._default_manager.filter(user=request.user)
         .annotate(artwork_count=Count("artwork"))
         .order_by("-start_date")
     )
@@ -1282,7 +1282,7 @@ def technique_delete(request, pk):
 
 @login_required
 def wishlist(request):
-    items = WishlistItem.objects.filter(user=request.user)
+    items = WishlistItem._default_manager.filter(user=request.user)
 
     if request.method == "POST":
         form = WishlistItemForm(request.POST)
@@ -1406,12 +1406,12 @@ def tags_autocomplete(request):
     """
     q = request.GET.get("q", "").strip()
     # Restrict to tags actually used on the user's artworks
-    artwork_ct = ContentType.objects.get_for_model(Artwork)
-    user_artwork_ids = Artwork.objects.filter(user=request.user).values_list(
+    artwork_ct = ContentType._default_manager.get_for_model(Artwork)
+    user_artwork_ids = Artwork._default_manager.filter(user=request.user).values_list(
         "id", flat=True
     )
 
-    user_tags = Tag.objects.filter(
+    user_tags = Tag._default_manager.filter(
         artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
         artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,  # noqa: E501
     ).distinct()

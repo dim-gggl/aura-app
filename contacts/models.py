@@ -204,4 +204,4 @@ class Contact(models.Model):
         Returns:
             QuerySet: Contacts of the specified type
         """
-        return cls.objects.filter(user=user, contact_type=contact_type)
+        return cls._default_manager.filter(user=user, contact_type=contact_type)

@@ -50,7 +50,7 @@ class ArtworkViewSet(UserScopedMixin, viewsets.ModelViewSet):
     artworks. It uses the ArtworkSerializer to serialize the data.
     """
 
-    queryset = Artwork.objects.all().prefetch_related(
+    queryset = Artwork._default_manager.all().prefetch_related(
         "artists",
         Prefetch("photos"),
         "collections",
@@ -72,7 +72,7 @@ class ArtistViewSet(UserScopedMixin, viewsets.ModelViewSet):
     artists. It uses the ArtistSerializer to serialize the data.
     """
 
-    queryset = Artist.objects.all()
+    queryset = Artist._default_manager.all()
     serializer_class = ArtistSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = DefaultPagination

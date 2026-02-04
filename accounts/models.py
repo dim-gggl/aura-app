@@ -48,4 +48,4 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         # Create a new UserProfile for the newly created user
         # Uses default values defined in the UserProfile model
-        UserProfile.objects.create(user=instance)
+        UserProfile._default_manager.create(user=instance)

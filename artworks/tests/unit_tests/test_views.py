@@ -31,7 +31,7 @@ def client():
 @pytest.fixture
 def user():
     """Fixture pour créer un utilisateur de test."""
-    return User.objects.create_user(
+    return User._default_manager.create_user(
         username="testuser", email="test@example.com", password="testpassword123"
     )
 
@@ -39,7 +39,7 @@ def user():
 @pytest.fixture
 def other_user():
     """Fixture pour créer un autre utilisateur (pour tester la sécurité)."""
-    return User.objects.create_user(
+    return User._default_manager.create_user(
         username="otheruser", email="other@example.com", password="otherpassword123"
     )
 
@@ -47,7 +47,7 @@ def other_user():
 @pytest.fixture
 def artist():
     """Fixture pour créer un artiste de test."""
-    return Artist.objects.create(
+    return Artist._default_manager.create(
         name="Vincent van Gogh",
         birth_year=1853,
         death_year=1890,
@@ -59,7 +59,7 @@ def artist():
 @pytest.fixture
 def collection(user):
     """Fixture pour créer une collection de test."""
-    return Collection.objects.create(
+    return Collection._default_manager.create(
         user=user,
         name="Ma Collection Test",
         description="Une collection pour les tests",
@@ -69,7 +69,7 @@ def collection(user):
 @pytest.fixture
 def exhibition(user):
     """Fixture pour créer une exposition de test."""
-    return Exhibition.objects.create(
+    return Exhibition._default_manager.create(
         user=user,
         name="Exposition Test",
         location="Musée Test",
@@ -82,25 +82,25 @@ def exhibition(user):
 @pytest.fixture
 def art_type():
     """Fixture pour créer un type d'art de test."""
-    return ArtType.objects.create(name="Peinture")
+    return ArtType._default_manager.create(name="Peinture")
 
 
 @pytest.fixture
 def support():
     """Fixture pour créer un support de test."""
-    return Support.objects.create(name="Toile")
+    return Support._default_manager.create(name="Toile")
 
 
 @pytest.fixture
 def technique():
     """Fixture pour créer une technique de test."""
-    return Technique.objects.create(name="Huile sur toile")
+    return Technique._default_manager.create(name="Huile sur toile")
 
 
 @pytest.fixture
 def keyword():
     """Fixture pour créer un mot-clé de test."""
-    return Keyword.objects.create(name="Impressionnisme")
+    return Keyword._default_manager.create(name="Impressionnisme")
 
 
 @pytest.fixture
@@ -108,7 +108,7 @@ def artwork(
     user, artist, art_type, support, technique, collection, exhibition, keyword
 ):
     """Fixture pour créer une œuvre d'art complète de test."""
-    artwork = Artwork.objects.create(
+    artwork = Artwork._default_manager.create(
         user=user,
         title="La Nuit étoilée",
         creation_year=1889,
@@ -132,7 +132,7 @@ def artwork(
 @pytest.fixture
 def wishlist_item(user):
     """Fixture pour créer un élément de wishlist de test."""
-    return WishlistItem.objects.create(
+    return WishlistItem._default_manager.create(
         user=user,
         title="Œuvre Convoitée",
         artist_name="Artiste Célèbre",
@@ -177,7 +177,7 @@ class TestArtworkViews:
     ):
         """Test que la liste ne montre que les œuvres de l'utilisateur connecté."""
         # Créer une œuvre pour un autre utilisateur
-        other_artwork = Artwork.objects.create(
+        other_artwork = Artwork._default_manager.create(
             user=other_user, title="Œuvre d'un autre utilisateur"
         )
 
@@ -201,7 +201,7 @@ class TestArtworkViews:
 
     def test_artwork_detail_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas voir l'œuvre d'un autre utilisateur."""
-        other_artwork = Artwork.objects.create(
+        other_artwork = Artwork._default_manager.create(
             user=other_user, title="Œuvre d'un autre utilisateur"
         )
 
@@ -253,7 +253,7 @@ class TestArtworkViews:
         assert response.status_code == 302
 
         # Vérifier que l'œuvre a été créée
-        artwork = Artwork.objects.get(title="Nouvelle Œuvre Test")
+        artwork = Artwork._default_manager.get(title="Nouvelle Œuvre Test")
         assert artwork.user == user
         assert artist in artwork.artists.all()
         assert artwork.art_type == art_type
@@ -320,7 +320,7 @@ class TestArtworkViews:
 
     def test_artwork_update_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas modifier l'œuvre d'un autre utilisateur."""
-        other_artwork = Artwork.objects.create(
+        other_artwork = Artwork._default_manager.create(
             user=other_user, title="Œuvre d'un autre utilisateur"
         )
 
@@ -350,11 +350,11 @@ class TestArtworkViews:
         assert response.url == reverse("artworks:list")
 
         # Vérifier que l'œuvre a été supprimée
-        assert not Artwork.objects.filter(pk=artwork_pk).exists()
+        assert not Artwork._default_manager.filter(pk=artwork_pk).exists()
 
     def test_artwork_delete_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas supprimer l'œuvre d'un autre utilisateur."""
-        other_artwork = Artwork.objects.create(
+        other_artwork = Artwork._default_manager.create(
             user=other_user, title="Œuvre d'un autre utilisateur"
         )
 
@@ -364,7 +364,7 @@ class TestArtworkViews:
         assert response.status_code == 404
 
         # Vérifier que l'œuvre n'a pas été supprimée
-        assert Artwork.objects.filter(pk=other_artwork.pk).exists()
+        assert Artwork._default_manager.filter(pk=other_artwork.pk).exists()
 
 
 # Tests pour les vues d'export et suggestion aléatoire
@@ -386,7 +386,7 @@ class TestArtworkSpecialViews:
 
     def test_artwork_export_html_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas exporter l'œuvre d'un autre utilisateur."""
-        other_artwork = Artwork.objects.create(
+        other_artwork = Artwork._default_manager.create(
             user=other_user, title="Œuvre d'un autre utilisateur"
         )
 
@@ -432,7 +432,7 @@ class TestArtworkSpecialViews:
         """Test la suggestion aléatoire quand il y a des œuvres disponibles."""
         # Créer une œuvre non exposée depuis longtemps
         old_date = datetime.now().date() - timedelta(days=200)
-        artwork = Artwork.objects.create(
+        artwork = Artwork._default_manager.create(
             user=user,
             title="Œuvre à suggérer",
             current_location="domicile",
@@ -451,7 +451,7 @@ class TestArtworkSpecialViews:
         """Test la suggestion aléatoire quand il n'y a pas d'œuvres disponibles."""
         # Créer une œuvre récemment exposée (ne sera pas suggérée)
         recent_date = datetime.now().date() - timedelta(days=30)
-        Artwork.objects.create(
+        Artwork._default_manager.create(
             user=user,
             title="Œuvre récemment exposée",
             current_location="exposee",
@@ -474,7 +474,7 @@ class TestArtworkSpecialViews:
         recent_date = datetime.now().date() - timedelta(days=30)
 
         # Œuvre éligible (domicile, ancienne exposition)
-        eligible_artwork = Artwork.objects.create(
+        eligible_artwork = Artwork._default_manager.create(
             user=user,
             title="Œuvre éligible",
             current_location="domicile",
@@ -482,14 +482,14 @@ class TestArtworkSpecialViews:
         )
 
         # Œuvres non éligibles
-        Artwork.objects.create(
+        Artwork._default_manager.create(
             user=user,
             title="Œuvre en exposition",
             current_location="exposee",
             last_exhibited=old_date,
         )
 
-        Artwork.objects.create(
+        Artwork._default_manager.create(
             user=user,
             title="Œuvre récemment exposée",
             current_location="domicile",
@@ -537,7 +537,7 @@ class TestWishlistViews:
         assert response.url == reverse("artworks:wishlist")
 
         # Vérifier que l'élément a été créé
-        item = WishlistItem.objects.get(title="Nouvelle Œuvre Convoitée")
+        item = WishlistItem._default_manager.get(title="Nouvelle Œuvre Convoitée")
         assert item.user == user
         assert item.artist_name == "Picasso"
         assert item.priority == 2
@@ -563,7 +563,7 @@ class TestWishlistViews:
     ):
         """Test que la wishlist ne montre que les éléments de l'utilisateur connecté."""
         # Créer un élément pour un autre utilisateur
-        other_item = WishlistItem.objects.create(
+        other_item = WishlistItem._default_manager.create(
             user=other_user, title="Élément d'un autre utilisateur"
         )
 
@@ -596,11 +596,11 @@ class TestWishlistViews:
         assert response.url == reverse("artworks:wishlist")
 
         # Vérifier que l'élément a été supprimé
-        assert not WishlistItem.objects.filter(pk=item_pk).exists()
+        assert not WishlistItem._default_manager.filter(pk=item_pk).exists()
 
     def test_wishlist_delete_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas supprimer l'élément d'un autre utilisateur."""
-        other_item = WishlistItem.objects.create(
+        other_item = WishlistItem._default_manager.create(
             user=other_user, title="Élément d'un autre utilisateur"
         )
 
@@ -610,7 +610,7 @@ class TestWishlistViews:
         assert response.status_code == 404
 
         # Vérifier que l'élément n'a pas été supprimé
-        assert WishlistItem.objects.filter(pk=other_item.pk).exists()
+        assert WishlistItem._default_manager.filter(pk=other_item.pk).exists()
 
 
 # Tests pour les vues CRUD d'Artist
@@ -620,7 +620,7 @@ class TestArtistViews:
     def test_artist_list_view_authenticated(self, authenticated_client, user, artist):
         """Test l'affichage de la liste des artistes."""
         # Créer une œuvre pour associer l'artiste à l'utilisateur
-        Artwork.objects.create(user=user, title="Test").artists.add(artist)
+        Artwork._default_manager.create(user=user, title="Test").artists.add(artist)
 
         url = reverse("artworks:artist_list")
         response = authenticated_client.get(url)
@@ -633,12 +633,12 @@ class TestArtistViews:
     def test_artist_list_view_with_search(self, authenticated_client, user):
         """Test la recherche dans la liste des artistes."""
         # Créer des artistes
-        artist1 = Artist.objects.create(name="Pablo Picasso")
-        artist2 = Artist.objects.create(name="Claude Monet")
+        artist1 = Artist._default_manager.create(name="Pablo Picasso")
+        artist2 = Artist._default_manager.create(name="Claude Monet")
 
         # Associer les artistes à des œuvres de l'utilisateur
-        Artwork.objects.create(user=user, title="Test1").artists.add(artist1)
-        Artwork.objects.create(user=user, title="Test2").artists.add(artist2)
+        Artwork._default_manager.create(user=user, title="Test1").artists.add(artist1)
+        Artwork._default_manager.create(user=user, title="Test2").artists.add(artist2)
 
         # Recherche de "Picasso"
         url = reverse("artworks:artist_list")
@@ -654,7 +654,7 @@ class TestArtistViews:
     def test_artist_detail_view(self, authenticated_client, user, artist):
         """Test l'affichage du détail d'un artiste."""
         # Créer une œuvre pour l'artiste
-        artwork = Artwork.objects.create(user=user, title="Œuvre test")
+        artwork = Artwork._default_manager.create(user=user, title="Œuvre test")
         artwork.artists.add(artist)
 
         url = reverse("artworks:artist_detail", kwargs={"pk": artist.pk})
@@ -692,7 +692,7 @@ class TestArtistViews:
         assert response.status_code == 302
 
         # Vérifier que l'artiste a été créé
-        artist = Artist.objects.get(name="Frida Kahlo")
+        artist = Artist._default_manager.get(name="Frida Kahlo")
         assert artist.birth_year == 1907
         assert artist.nationality == "Mexicaine"
 
@@ -767,8 +767,8 @@ class TestCollectionViews:
 
     def test_collection_list_view_with_search(self, authenticated_client, user):
         """Test la recherche dans la liste des collections."""
-        collection1 = Collection.objects.create(user=user, name="Collection Moderne")
-        collection2 = Collection.objects.create(
+        collection1 = Collection._default_manager.create(user=user, name="Collection Moderne")
+        collection2 = Collection._default_manager.create(
             user=user, name="Collection Classique", description="Art classique"
         )
 
@@ -790,7 +790,7 @@ class TestCollectionViews:
         self, authenticated_client, user, other_user, collection
     ):
         """Test que la liste ne montre que les collections de l'utilisateur connecté."""
-        other_collection = Collection.objects.create(
+        other_collection = Collection._default_manager.create(
             user=other_user, name="Collection autre utilisateur"
         )
 
@@ -805,7 +805,7 @@ class TestCollectionViews:
     def test_collection_detail_view(self, authenticated_client, user, collection):
         """Test l'affichage du détail d'une collection."""
         # Créer une œuvre dans la collection
-        artwork = Artwork.objects.create(user=user, title="Œuvre test")
+        artwork = Artwork._default_manager.create(user=user, title="Œuvre test")
         artwork.collections.add(collection)
 
         url = reverse("artworks:collection_detail", kwargs={"pk": collection.pk})
@@ -819,7 +819,7 @@ class TestCollectionViews:
 
     def test_collection_detail_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas voir la collection d'un autre utilisateur."""
-        other_collection = Collection.objects.create(
+        other_collection = Collection._default_manager.create(
             user=other_user, name="Collection autre utilisateur"
         )
 
@@ -851,7 +851,7 @@ class TestCollectionViews:
         assert response.status_code == 302
 
         # Vérifier que la collection a été créée
-        collection = Collection.objects.get(name="Nouvelle Collection")
+        collection = Collection._default_manager.get(name="Nouvelle Collection")
         assert collection.user == user
         assert collection.description == "Description de la nouvelle collection"
 
@@ -890,7 +890,7 @@ class TestCollectionViews:
 
     def test_collection_update_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas modifier la collection d'un autre utilisateur."""
-        other_collection = Collection.objects.create(
+        other_collection = Collection._default_manager.create(
             user=other_user, name="Collection autre utilisateur"
         )
 

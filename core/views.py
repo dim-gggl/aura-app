@@ -89,15 +89,15 @@ def dashboard(request):
     """
     # === BASIC STATISTICS ===
     # Get counts of all major entities for the current user
-    total_artworks = Artwork.objects.filter(user=request.user).count()
-    total_contacts = Contact.objects.filter(user=request.user).count()
-    total_notes = Note.objects.filter(user=request.user).count()
-    total_wishlist = WishlistItem.objects.filter(user=request.user).count()
+    total_artworks = Artwork._default_manager.filter(user=request.user).count()
+    total_contacts = Contact._default_manager.filter(user=request.user).count()
+    total_notes = Note._default_manager.filter(user=request.user).count()
+    total_wishlist = WishlistItem._default_manager.filter(user=request.user).count()
 
     # === RECENT ACTIVITY ===
     # Get the 5 most recently added artworks for quick access
     recent_artworks = (
-        Artwork.objects.filter(user=request.user)
+        Artwork._default_manager.filter(user=request.user)
         .select_related("art_type")
         .prefetch_related("artists", "photos")
         .order_by("-created_at")[:5]
@@ -107,7 +107,7 @@ def dashboard(request):
     # Artwork distribution by current location
     # Helps users understand where their collection is stored/displayed
     location_stats = (
-        Artwork.objects.filter(user=request.user)
+        Artwork._default_manager.filter(user=request.user)
         .values("current_location")
         .annotate(count=Count("id"))
         .order_by("-count")
@@ -116,7 +116,7 @@ def dashboard(request):
     # Artwork distribution by art type (top 5)
     # Excludes artworks without art_type to avoid null entries in stats
     art_type_stats = (
-        Artwork.objects.filter(user=request.user)
+        Artwork._default_manager.filter(user=request.user)
         .exclude(art_type__isnull=True)  # Exclude artworks without art type
         .values("art_type__name")
         .annotate(count=Count("id"))  # Use art_type__name for readable labels
@@ -126,7 +126,7 @@ def dashboard(request):
     # === FAVORITE NOTES ===
     # Get user's favorite notes for quick access
     # Limited to 3 most recently updated for dashboard space efficiency
-    favorite_notes = Note.objects.filter(user=request.user, is_favorite=True).order_by(
+    favorite_notes = Note._default_manager.filter(user=request.user, is_favorite=True).order_by(
         "-updated_at"
     )[:3]
 
@@ -135,7 +135,7 @@ def dashboard(request):
     # Helps users discover pieces in their collection that could be displayed
     six_months_ago = datetime.now().date() - timedelta(days=180)
     suggested_artwork = (
-        Artwork.objects.filter(
+        Artwork._default_manager.filter(
             user=request.user,
             # Only consider artworks that are available for exhibition
             current_location__in=["domicile", "stockage"],
@@ -211,7 +211,7 @@ def search(request):
         # === ARTWORK SEARCH ===
         # Search across title, artist names, tags, and notes fields
         results["artworks"] = (
-            Artwork.objects.filter(user=request.user)
+            Artwork._default_manager.filter(user=request.user)
             .filter(
                 Q(title__icontains=query)  # Title contains query
                 | Q(artists__name__icontains=query)  # Artist name contains query
@@ -225,7 +225,7 @@ def search(request):
 
         # === CONTACT SEARCH ===
         # Search across name, address, and notes fields
-        results["contacts"] = Contact.objects.filter(user=request.user).filter(
+        results["contacts"] = Contact._default_manager.filter(user=request.user).filter(
             Q(name__icontains=query)  # Name contains query
             | Q(address__icontains=query)  # Address contains query
             | Q(notes__icontains=query)  # Notes contain query
@@ -235,7 +235,7 @@ def search(request):
 
         # === NOTE SEARCH ===
         # Search across title and content fields
-        results["notes"] = Note.objects.filter(user=request.user).filter(
+        results["notes"] = Note._default_manager.filter(user=request.user).filter(
             Q(title__icontains=query)  # Title contains query
             | Q(content__icontains=query)  # Content contains query
         )[

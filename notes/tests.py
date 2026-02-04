@@ -8,8 +8,8 @@ from .models import Note
 
 class NotesViewsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="password")
-        self.note = Note.objects.create(
+        self.user = User._default_manager.create_user(username="testuser", password="password")
+        self.note = Note._default_manager.create(
             user=self.user,
             title="Idées pour la collection",
             content="Acheter plus de cubistes.",

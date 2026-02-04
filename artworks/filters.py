@@ -50,14 +50,14 @@ class ArtworkFilter(django_filters.FilterSet):
     # Multiple artist selection filter
     # Queryset is set dynamically in the view to show only relevant artists
     artists = django_filters.ModelMultipleChoiceFilter(
-        queryset=Artist.objects.all(),
+        queryset=Artist._default_manager.all(),
         label="Artiste(s)",
         help_text="Sélectionnez un ou plusieurs artistes",
     )
 
     # Explicit filter for TaggableManager using Tag model
     tags = django_filters.ModelMultipleChoiceFilter(
-        field_name="tags", queryset=Tag.objects.all(), label="Mots-clés"
+        field_name="tags", queryset=Tag._default_manager.all(), label="Mots-clés"
     )
 
     class Meta:

@@ -132,7 +132,7 @@ class DataExporter:
             list: Liste des utilisateurs exportés
         """
         logger.info("Export des utilisateurs...")
-        users = User.objects.all()
+        users = User._default_manager.all()
         users_data = self.serialize_model_to_dict(users)
         self.export_stats["users"] = len(users_data)
         logger.info(f"{len(users_data)} utilisateurs exportés")
@@ -146,7 +146,7 @@ class DataExporter:
             list: Liste des artistes exportés
         """
         logger.info("Export des artistes...")
-        artists = Artist.objects.all()
+        artists = Artist._default_manager.all()
         artists_data = self.serialize_model_to_dict(artists)
         self.export_stats["artists"] = len(artists_data)
         logger.info(f"{len(artists_data)} artistes exportés")
@@ -161,9 +161,9 @@ class DataExporter:
         """
         logger.info("Export des types d'art, supports et techniques...")
 
-        art_types = [art_type.name for art_type in ArtType.objects.all()]
-        supports = [support.name for support in Support.objects.all()]
-        techniques = [technique.name for technique in Technique.objects.all()]
+        art_types = [art_type.name for art_type in ArtType._default_manager.all()]
+        supports = [support.name for support in Support._default_manager.all()]
+        techniques = [technique.name for technique in Technique._default_manager.all()]
 
         self.export_stats["art_types"] = len(art_types)
         self.export_stats["supports"] = len(supports)
@@ -183,7 +183,7 @@ class DataExporter:
             list: Liste des collections exportées
         """
         logger.info("Export des collections...")
-        collections = Collection.objects.all()
+        collections = Collection._default_manager.all()
         collections_data = self.serialize_model_to_dict(collections)
         self.export_stats["collections"] = len(collections_data)
         logger.info(f"{len(collections_data)} collections exportées")
@@ -197,7 +197,7 @@ class DataExporter:
             list: Liste des expositions exportées
         """
         logger.info("Export des expositions...")
-        exhibitions = Exhibition.objects.all()
+        exhibitions = Exhibition._default_manager.all()
         exhibitions_data = self.serialize_model_to_dict(exhibitions)
         self.export_stats["exhibitions"] = len(exhibitions_data)
         logger.info(f"{len(exhibitions_data)} expositions exportées")
@@ -211,7 +211,7 @@ class DataExporter:
             list: Liste des œuvres d'art exportées
         """
         logger.info("Export des œuvres d'art...")
-        artworks = Artwork.objects.all()
+        artworks = Artwork._default_manager.all()
         artworks_data = self.serialize_model_to_dict(artworks)
         self.export_stats["artworks"] = len(artworks_data)
         logger.info(f"{len(artworks_data)} œuvres d'art exportées")
@@ -225,7 +225,7 @@ class DataExporter:
             list: Liste des contacts exportés
         """
         logger.info("Export des contacts...")
-        contacts = Contact.objects.all()
+        contacts = Contact._default_manager.all()
         contacts_data = self.serialize_model_to_dict(contacts)
         self.export_stats["contacts"] = len(contacts_data)
         logger.info(f"{len(contacts_data)} contacts exportés")
@@ -239,7 +239,7 @@ class DataExporter:
             list: Liste des notes exportées
         """
         logger.info("Export des notes...")
-        notes = Note.objects.all()
+        notes = Note._default_manager.all()
         notes_data = self.serialize_model_to_dict(notes)
         self.export_stats["notes"] = len(notes_data)
         logger.info(f"{len(notes_data)} notes exportées")

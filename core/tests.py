@@ -6,7 +6,7 @@ from .models import User
 
 class CoreViewsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="password")
+        self.user = User._default_manager.create_user(username="testuser", password="password")
 
     def test_home_view_unauthenticated(self):
         response = self.client.get(reverse("core:home"))

@@ -137,44 +137,46 @@
             </form>
 
             {# Formulaire 2: Changement de mot de passe #}
-            <form method="post" class="mb-5">
-                {% csrf_token %}
-                <input type="hidden" name="form" value="password">
+            {% if password_form %}
+              <form method="post" class="mb-5">
+                  {% csrf_token %}
+                  <input type="hidden" name="form" value="password">
 
-                {% if password_form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>Veuillez corriger les erreurs ci-dessous :</strong>
-                        {{ password_form.errors }}
-                    </div>
-                {% endif %}
+                  {% if password_form.errors %}
+                      <div class="alert alert-danger">
+                          <strong>Veuillez corriger les erreurs ci-dessous :</strong>
+                          {{ password_form.errors }}
+                      </div>
+                  {% endif %}
 
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0"><i class="bi bi-key"></i> Changer le mot de passe</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label" for="{{ password_form.old_password.id_for_label }}">Mot de passe actuel</label>
-                            {{ password_form.old_password }}
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label" for="{{ password_form.new_password1.id_for_label }}">Nouveau mot de passe</label>
-                                {{ password_form.new_password1 }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label" for="{{ password_form.new_password2.id_for_label }}">Confirmation</label>
-                                {{ password_form.new_password2 }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-shield-lock"></i> Mettre à jour le mot de passe
-                        </button>
-                    </div>
-                </div>
-            </form>
+                  <div class="card">
+                      <div class="card-header">
+                          <h5 class="card-title mb-0"><i class="bi bi-key"></i> Changer le mot de passe</h5>
+                      </div>
+                      <div class="card-body">
+                          <div class="mb-3">
+                              <label class="form-label" for="{{ password_form.old_password.id_for_label }}">Mot de passe actuel</label>
+                              {{ password_form.old_password }}
+                          </div>
+                          <div class="row">
+                              <div class="col-md-6 mb-3">
+                                  <label class="form-label" for="{{ password_form.new_password1.id_for_label }}">Nouveau mot de passe</label>
+                                  {{ password_form.new_password1 }}
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                  <label class="form-label" for="{{ password_form.new_password2.id_for_label }}">Confirmation</label>
+                                  {{ password_form.new_password2 }}
+                              </div>
+                          </div>
+                      </div>
+                      <div class="card-footer">
+                          <button type="submit" class="btn btn-warning">
+                              <i class="bi bi-shield-lock"></i> Mettre à jour le mot de passe
+                          </button>
+                      </div>
+                  </div>
+              </form>
+            {% endif %}
         </div>
     </div>
 </div>

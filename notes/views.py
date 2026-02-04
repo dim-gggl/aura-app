@@ -54,7 +54,7 @@ def note_list(request):
         HttpResponse: Rendered note list with pagination and filters
     """
     # Get all notes for the current user
-    notes = Note.objects.filter(user=request.user)
+    notes = Note._default_manager.filter(user=request.user)
 
     # === FILTERING AND SEARCH ===
     # Extract filter parameters from GET request
@@ -89,7 +89,7 @@ def note_list(request):
             "favorites": favorites_only,
         },  # Preserve current filters for form population
         "total_notes": notes.count(),  # Total count for display
-        "favorite_count": Note.objects.filter(
+        "favorite_count": Note._default_manager.filter(
             user=request.user, is_favorite=True
         ).count(),
     }

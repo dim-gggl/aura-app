@@ -159,7 +159,7 @@ class Note(models.Model):
         Returns:
             QuerySet: User's favorite notes
         """
-        queryset = cls.objects.filter(user=user, is_favorite=True)
+        queryset = cls._default_manager.filter(user=user, is_favorite=True)
         if limit:
             queryset = queryset[:limit]
         return queryset
@@ -181,7 +181,7 @@ class Note(models.Model):
 
         cutoff_date = timezone.now() - timedelta(days=days)
 
-        return cls.objects.filter(user=user, updated_at__gte=cutoff_date)[:limit]
+        return cls._default_manager.filter(user=user, updated_at__gte=cutoff_date)[:limit]
 
     def is_recently_updated(self, hours=24):
         """

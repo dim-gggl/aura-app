@@ -192,7 +192,7 @@ class UserProfile(models.Model):
         Returns:
             tuple: (UserProfile instance, created boolean)
         """
-        profile, created = cls.objects.get_or_create(
+        profile, created = cls._default_manager.get_or_create(
             user=user, defaults={"theme": "art deco"}  # Default theme
         )
         return profile, created

@@ -51,11 +51,11 @@ def resolve_reference(model, value: Any, names: List[str]):
     if isinstance(value, int):
         if 1 <= value <= len(names):
             name = names[value - 1]
-            obj, _ = model.objects.get_or_create(name=name)
+            obj, _ = model._default_manager.get_or_create(name=name)
             return obj
         return None
     if isinstance(value, str) and value.strip():
-        obj, _ = model.objects.get_or_create(name=value.strip())
+        obj, _ = model._default_manager.get_or_create(name=value.strip())
         return obj
     return None
 
@@ -87,7 +87,7 @@ class Command(BaseCommand):
         path = options.get("path")
         username = options.get("username")
 
-        user, _ = User.objects.get_or_create(
+        user, _ = User._default_manager.get_or_create(
             username=username, defaults={"is_active": True}
         )
 
@@ -95,11 +95,11 @@ class Command(BaseCommand):
         support_names = list(get_supports())
         technique_names = list(get_techniques())
         for name in art_type_names:
-            ArtType.objects.get_or_create(name=name)
+            ArtType._default_manager.get_or_create(name=name)
         for name in support_names:
-            Support.objects.get_or_create(name=name)
+            Support._default_manager.get_or_create(name=name)
         for name in technique_names:
-            Technique.objects.get_or_create(name=name)
+            Technique._default_manager.get_or_create(name=name)
 
         artists_catalog: List[Artist] = []
         artists_file = "setup/fill_up/artists.json"
@@ -111,7 +111,7 @@ class Command(BaseCommand):
                     name = (a.get("name") or "").strip()
                     if not name:
                         continue
-                    artist, _ = Artist.objects.get_or_create(
+                    artist, _ = Artist._default_manager.get_or_create(
                         name=name,
                         defaults={
                             "birth_year": a.get("birth_year"),
@@ -201,7 +201,7 @@ class Command(BaseCommand):
                     last_exhibited=to_date(item.get("last_exhibited")),
                 )
 
-                obj, was_created = Artwork.objects.update_or_create(
+                obj, was_created = Artwork._default_manager.update_or_create(
                     id=art_uuid, defaults=defaults
                 )
                 id_to_artwork[str(obj.id)] = obj
@@ -220,7 +220,7 @@ class Command(BaseCommand):
                 if not key:
                     continue
                 artwork = (
-                    id_to_artwork.get(key) or Artwork.objects.filter(id=key).first()
+                    id_to_artwork.get(key) or Artwork._default_manager.filter(id=key).first()
                 )
                 if not artwork:
                     continue
@@ -249,7 +249,7 @@ class Command(BaseCommand):
                         elif isinstance(val, str) and val.strip():
                             name = val.strip()
                         if name:
-                            col, _ = Collection.objects.get_or_create(
+                            col, _ = Collection._default_manager.get_or_create(
                                 user=user, name=name
                             )
                             collections_objs.append(col)
@@ -266,7 +266,7 @@ class Command(BaseCommand):
                         elif isinstance(val, str) and val.strip():
                             name = val.strip()
                         if name:
-                            ex, _ = Exhibition.objects.get_or_create(
+                            ex, _ = Exhibition._default_manager.get_or_create(
                                 user=user, name=name
                             )
                             exhibitions_objs.append(ex)
@@ -277,7 +277,7 @@ class Command(BaseCommand):
                 if parent_id:
                     parent = (
                         id_to_artwork.get(str(parent_id))
-                        or Artwork.objects.filter(id=parent_id).first()
+                        or Artwork._default_manager.filter(id=parent_id).first()
                     )
                     if parent:
                         artwork.parent_artwork = parent

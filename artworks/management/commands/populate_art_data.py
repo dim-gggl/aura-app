@@ -15,18 +15,18 @@ class Command(BaseCommand):
         art_types = get_art_types()
 
         for art_type in art_types:
-            ArtType.objects.get_or_create(name=art_type)
+            ArtType._default_manager.get_or_create(name=art_type)
 
         # Supports initiaux
         supports = get_supports()
 
         for support in supports:
-            Support.objects.get_or_create(name=support)
+            Support._default_manager.get_or_create(name=support)
 
         # Techniques initiales
         techniques = get_techniques()
 
         for technique in techniques:
-            Technique.objects.get_or_create(name=technique)
+            Technique._default_manager.get_or_create(name=technique)
 
         self.stdout.write(self.style.SUCCESS("Données initiales créées avec succès!"))

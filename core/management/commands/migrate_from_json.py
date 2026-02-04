@@ -132,20 +132,20 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             # Delete in reverse order of dependencies
-            ArtworkPhoto.objects.all().delete()
-            ArtworkAttachment.objects.all().delete()
-            WishlistItem.objects.all().delete()
-            Artwork.objects.all().delete()
-            Collection.objects.all().delete()
-            Exhibition.objects.all().delete()
-            Artist.objects.all().delete()
-            Contact.objects.all().delete()
-            Note.objects.all().delete()
-            UserProfile.objects.all().delete()
-            User.objects.all().delete()
-            ArtType.objects.all().delete()
-            Support.objects.all().delete()
-            Technique.objects.all().delete()
+            ArtworkPhoto._default_manager.all().delete()
+            ArtworkAttachment._default_manager.all().delete()
+            WishlistItem._default_manager.all().delete()
+            Artwork._default_manager.all().delete()
+            Collection._default_manager.all().delete()
+            Exhibition._default_manager.all().delete()
+            Artist._default_manager.all().delete()
+            Contact._default_manager.all().delete()
+            Note._default_manager.all().delete()
+            UserProfile._default_manager.all().delete()
+            User._default_manager.all().delete()
+            ArtType._default_manager.all().delete()
+            Support._default_manager.all().delete()
+            Technique._default_manager.all().delete()
 
         self.stdout.write(self.style.SUCCESS("✅ Existing data cleared"))
 
@@ -219,15 +219,15 @@ class Command(BaseCommand):
 
         # Migrate art types
         for art_type_name in data.get("art_types", []):
-            ArtType.objects.get_or_create(name=art_type_name)
+            ArtType._default_manager.get_or_create(name=art_type_name)
 
         # Migrate supports
         for support_name in data.get("supports", []):
-            Support.objects.get_or_create(name=support_name)
+            Support._default_manager.get_or_create(name=support_name)
 
         # Migrate techniques
         for technique_name in data.get("techniques", []):
-            Technique.objects.get_or_create(name=technique_name)
+            Technique._default_manager.get_or_create(name=technique_name)
 
     def migrate_users(self, users_data, stats):
         """
@@ -238,7 +238,7 @@ class Command(BaseCommand):
         for user_data in users_data:
             try:
                 with transaction.atomic():
-                    user, created = User.objects.get_or_create(
+                    user, created = User._default_manager.get_or_create(
                         username=user_data["username"],
                         defaults={
                             "email": user_data.get("email", ""),
@@ -269,7 +269,7 @@ class Command(BaseCommand):
         for artist_data in artists_data:
             try:
                 with transaction.atomic():
-                    artist, created = Artist.objects.get_or_create(
+                    artist, created = Artist._default_manager.get_or_create(
                         name=artist_data["name"],
                         defaults={
                             "birth_year": artist_data.get("birth_year"),
@@ -296,8 +296,8 @@ class Command(BaseCommand):
         for collection_data in collections_data:
             try:
                 with transaction.atomic():
-                    user = User.objects.get(username=collection_data["user"])
-                    collection, created = Collection.objects.get_or_create(
+                    user = User._default_manager.get(username=collection_data["user"])
+                    collection, created = Collection._default_manager.get_or_create(
                         user=user,
                         name=collection_data["name"],
                         defaults={
@@ -322,8 +322,8 @@ class Command(BaseCommand):
         for exhibition_data in exhibitions_data:
             try:
                 with transaction.atomic():
-                    user = User.objects.get(username=exhibition_data["user"])
-                    exhibition, created = Exhibition.objects.get_or_create(
+                    user = User._default_manager.get(username=exhibition_data["user"])
+                    exhibition, created = Exhibition._default_manager.get_or_create(
                         user=user,
                         name=exhibition_data["name"],
                         defaults={
@@ -351,8 +351,8 @@ class Command(BaseCommand):
         for artwork_data in artworks_data:
             try:
                 with transaction.atomic():
-                    user = User.objects.get(username=artwork_data["user"])
-                    artwork, created = Artwork.objects.get_or_create(
+                    user = User._default_manager.get(username=artwork_data["user"])
+                    artwork, created = Artwork._default_manager.get_or_create(
                         user=user,
                         title=artwork_data.get("title", ""),
                         defaults={
@@ -390,7 +390,7 @@ class Command(BaseCommand):
                         # Associate artists
                         for artist_name in artwork_data.get("artists", []):
                             try:
-                                artist = Artist.objects.get(name=artist_name)
+                                artist = Artist._default_manager.get(name=artist_name)
                                 artwork.artists.add(artist)
                             except Artist.DoesNotExist:
                                 pass
@@ -398,7 +398,7 @@ class Command(BaseCommand):
                         # Associate collections
                         for collection_name in artwork_data.get("collections", []):
                             try:
-                                collection = Collection.objects.get(
+                                collection = Collection._default_manager.get(
                                     user=user, name=collection_name
                                 )
                                 artwork.collections.add(collection)
@@ -408,7 +408,7 @@ class Command(BaseCommand):
                         # Associate exhibitions
                         for exhibition_name in artwork_data.get("exhibitions", []):
                             try:
-                                exhibition = Exhibition.objects.get(
+                                exhibition = Exhibition._default_manager.get(
                                     user=user, name=exhibition_name
                                 )
                                 artwork.exhibitions.add(exhibition)
@@ -429,8 +429,8 @@ class Command(BaseCommand):
         for contact_data in contacts_data:
             try:
                 with transaction.atomic():
-                    user = User.objects.get(username=contact_data["user"])
-                    contact, created = Contact.objects.get_or_create(
+                    user = User._default_manager.get(username=contact_data["user"])
+                    contact, created = Contact._default_manager.get_or_create(
                         user=user,
                         name=contact_data["name"],
                         defaults={
@@ -460,8 +460,8 @@ class Command(BaseCommand):
         for note_data in notes_data:
             try:
                 with transaction.atomic():
-                    user = User.objects.get(username=note_data["user"])
-                    note, created = Note.objects.get_or_create(
+                    user = User._default_manager.get(username=note_data["user"])
+                    note, created = Note._default_manager.get_or_create(
                         user=user,
                         title=note_data["title"],
                         defaults={

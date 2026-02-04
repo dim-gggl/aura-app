@@ -9,7 +9,7 @@ class ContactViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Contact.objects.filter(user=self.request.user).only(
+        return Contact._default_manager.filter(user=self.request.user).only(
             "id", "name", "email", "phone", "contact_type"
         )
 

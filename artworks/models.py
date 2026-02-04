@@ -444,7 +444,7 @@ class ArtworkPhoto(models.Model):
             # Save first to get a primary key
             super().save(*args, **kwargs)
             # Then update other photos to remove primary status
-            ArtworkPhoto.objects.filter(artwork=self.artwork).exclude(
+            ArtworkPhoto._default_manager.filter(artwork=self.artwork).exclude(
                 pk=self.pk
             ).update(is_primary=False)
         else:

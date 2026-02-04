@@ -92,11 +92,11 @@ class ArtworkForm(forms.ModelForm):
 
         # Limit collections and exhibitions to current user only
         if user:
-            self.fields["collections"].queryset = Collection.objects.filter(user=user)
-            self.fields["exhibitions"].queryset = Exhibition.objects.filter(user=user)
+            self.fields["collections"].queryset = Collection._default_manager.filter(user=user)
+            self.fields["exhibitions"].queryset = Exhibition._default_manager.filter(user=user)
             # Limit parent artwork choices to the user's own artworks
             if "parent_artwork" in self.fields:
-                self.fields["parent_artwork"].queryset = Artwork.objects.filter(
+                self.fields["parent_artwork"].queryset = Artwork._default_manager.filter(
                     user=user
                 )
 
@@ -105,14 +105,14 @@ class ArtworkForm(forms.ModelForm):
         if user:
             # Limiter aux artistes de l'utilisateur (inclut ceux sans œuvres)
             artists_field = self.fields["artists"]
-            artists_field.queryset = Artist.objects.filter(user=user).order_by("name")
+            artists_field.queryset = Artist._default_manager.filter(user=user).order_by("name")
         else:
             # No user context: do not expose global artists in suggestions
-            self.fields["artists"].queryset = Artist.objects.none()
+            self.fields["artists"].queryset = Artist._default_manager.none()
         # - Reference entities remain global/common
-        self.fields["art_type"].queryset = ArtType.objects.all()
-        self.fields["support"].queryset = Support.objects.all()
-        self.fields["technique"].queryset = Technique.objects.all()
+        self.fields["art_type"].queryset = ArtType._default_manager.all()
+        self.fields["support"].queryset = Support._default_manager.all()
+        self.fields["technique"].queryset = Technique._default_manager.all()
         self.fields["tags"].label = "Mots-clés"
         # Remove the comma-based help text; handled via JS (Tom Select-like)
         self.fields["tags"].help_text = ""

@@ -67,7 +67,7 @@ def theme_context(request):
                 from core.models import UserProfile
 
                 # Create profile if it doesn't exist, or update existing one
-                profile, created = UserProfile.objects.get_or_create(
+                profile, created = UserProfile._default_manager.get_or_create(
                     user=request.user, defaults={"theme": default_theme}
                 )
                 theme = profile.theme if profile.theme else default_theme

@@ -50,7 +50,7 @@ def contact_list(request):
         HttpResponse: Rendered contact list with pagination and filters
     """
     # Get all contacts for the current user
-    contacts = Contact.objects.filter(user=request.user).only(
+    contacts = Contact._default_manager.filter(user=request.user).only(
         "id", "name", "email", "phone", "contact_type", "created_at"
     )
 

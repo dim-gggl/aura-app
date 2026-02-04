@@ -123,8 +123,8 @@ Organize tests in the following structure:
    class TestArtworkModel(TestCase):
        def setUp(self):
            """Set up test data."""
-           self.artist = Artist.objects.create(name="Test Artist")
-           self.artwork = Artwork.objects.create(
+           self.artist = Artist._default_manager.create(name="Test Artist")
+           self.artwork = Artwork._default_manager.create(
                title="Test Artwork",
                artist=self.artist
            )

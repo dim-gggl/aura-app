@@ -9,7 +9,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = Note.objects.filter(user=self.request.user)
+        qs = Note._default_manager.filter(user=self.request.user)
         search = self.request.query_params.get("search")
         if search:
             qs = qs.filter(title__icontains=search) | qs.filter(

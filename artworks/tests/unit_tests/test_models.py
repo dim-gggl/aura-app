@@ -22,7 +22,7 @@ from core.models import User
 @pytest.fixture
 def user():
     """Fixture pour créer un utilisateur de test."""
-    return User.objects.create_user(
+    return User._default_manager.create_user(
         username="testuser", email="test@example.com", password="testpassword"
     )
 
@@ -30,7 +30,7 @@ def user():
 @pytest.fixture
 def artist():
     """Fixture pour créer un artiste de test."""
-    return Artist.objects.create(
+    return Artist._default_manager.create(
         name="Leonardo da Vinci",
         birth_year=1452,
         death_year=1519,
@@ -44,7 +44,7 @@ def artist():
 @pytest.fixture
 def collection(user):
     """Fixture pour créer une collection de test."""
-    return Collection.objects.create(
+    return Collection._default_manager.create(
         user=user, name="Ma Collection", description="Une belle collection d'art"
     )
 
@@ -52,7 +52,7 @@ def collection(user):
 @pytest.fixture
 def exhibition(user):
     """Fixture pour créer une exposition de test."""
-    return Exhibition.objects.create(
+    return Exhibition._default_manager.create(
         user=user,
         name="Exposition Renaissance",
         location="Musée du Louvre",
@@ -65,31 +65,31 @@ def exhibition(user):
 @pytest.fixture
 def art_type():
     """Fixture pour créer un type d'art de test."""
-    return ArtType.objects.create(name="Peinture")
+    return ArtType._default_manager.create(name="Peinture")
 
 
 @pytest.fixture
 def support():
     """Fixture pour créer un support de test."""
-    return Support.objects.create(name="Toile")
+    return Support._default_manager.create(name="Toile")
 
 
 @pytest.fixture
 def technique():
     """Fixture pour créer une technique de test."""
-    return Technique.objects.create(name="Huile sur toile")
+    return Technique._default_manager.create(name="Huile sur toile")
 
 
 @pytest.fixture
 def keyword():
     """Fixture pour créer un mot-clé de test."""
-    return Keyword.objects.create(name="Renaissance")
+    return Keyword._default_manager.create(name="Renaissance")
 
 
 @pytest.fixture
 def artwork(user, artist, art_type, support, technique):
     """Fixture pour créer une œuvre d'art de test."""
-    artwork = Artwork.objects.create(
+    artwork = Artwork._default_manager.create(
         user=user,
         title="Mona Lisa",
         creation_year=1503,
@@ -139,18 +139,18 @@ class TestArtistModel:
 
     def test_artist_ordering(self):
         """Test l'ordre par défaut des artistes."""
-        Artist.objects.create(name="Picasso")
-        Artist.objects.create(name="Da Vinci")
-        Artist.objects.create(name="Monet")
+        Artist._default_manager.create(name="Picasso")
+        Artist._default_manager.create(name="Da Vinci")
+        Artist._default_manager.create(name="Monet")
 
-        artists = Artist.objects.all()
+        artists = Artist._default_manager.all()
         assert artists[0].name == "Da Vinci"
         assert artists[1].name == "Monet"
         assert artists[2].name == "Picasso"
 
     def test_artist_optional_fields(self):
         """Test la création d'un artiste avec des champs optionnels."""
-        artist = Artist.objects.create(name="Artiste Inconnu")
+        artist = Artist._default_manager.create(name="Artiste Inconnu")
         assert artist.birth_year is None
         assert artist.death_year is None
         assert artist.nationality == ""
@@ -174,8 +174,8 @@ class TestCollectionModel:
 
     def test_collection_user_relationship(self, user):
         """Test la relation avec l'utilisateur."""
-        collection1 = Collection.objects.create(user=user, name="Collection 1")
-        collection2 = Collection.objects.create(user=user, name="Collection 2")
+        collection1 = Collection._default_manager.create(user=user, name="Collection 1")
+        collection2 = Collection._default_manager.create(user=user, name="Collection 2")
 
         assert user.collections.count() == 2
         assert collection1 in user.collections.all()
@@ -202,11 +202,11 @@ class TestExhibitionModel:
 
     def test_exhibition_ordering(self, user):
         """Test l'ordre par défaut des expositions (par date de début décroissante)."""
-        Exhibition.objects.create(user=user, name="Expo 1", start_date=date(2023, 1, 1))
-        Exhibition.objects.create(user=user, name="Expo 2", start_date=date(2023, 6, 1))
-        Exhibition.objects.create(user=user, name="Expo 3", start_date=date(2023, 3, 1))
+        Exhibition._default_manager.create(user=user, name="Expo 1", start_date=date(2023, 1, 1))
+        Exhibition._default_manager.create(user=user, name="Expo 2", start_date=date(2023, 6, 1))
+        Exhibition._default_manager.create(user=user, name="Expo 3", start_date=date(2023, 3, 1))
 
-        exhibitions = Exhibition.objects.all()
+        exhibitions = Exhibition._default_manager.all()
         assert exhibitions[0].name == "Expo 2"  # Date la plus récente
         assert exhibitions[1].name == "Expo 3"
         assert exhibitions[2].name == "Expo 1"
@@ -225,7 +225,7 @@ class TestSimpleModels:
     def test_art_type_unique_constraint(self, art_type):
         """Test la contrainte d'unicité sur le nom du type d'art."""
         with pytest.raises(IntegrityError):
-            ArtType.objects.create(name="Peinture")
+            ArtType._default_manager.create(name="Peinture")
 
     def test_support_creation(self, support):
         """Test la création d'un support."""
@@ -236,7 +236,7 @@ class TestSimpleModels:
     def test_support_unique_constraint(self, support):
         """Test la contrainte d'unicité sur le nom du support."""
         with pytest.raises(IntegrityError):
-            Support.objects.create(name="Toile")
+            Support._default_manager.create(name="Toile")
 
     def test_technique_creation(self, technique):
         """Test la création d'une technique."""
@@ -247,7 +247,7 @@ class TestSimpleModels:
     def test_technique_unique_constraint(self, technique):
         """Test la contrainte d'unicité sur le nom de la technique."""
         with pytest.raises(IntegrityError):
-            Technique.objects.create(name="Huile sur toile")
+            Technique._default_manager.create(name="Huile sur toile")
 
     def test_keyword_creation(self, keyword):
         """Test la création d'un mot-clé."""
@@ -258,7 +258,7 @@ class TestSimpleModels:
     def test_keyword_unique_constraint(self, keyword):
         """Test la contrainte d'unicité sur le nom du mot-clé."""
         with pytest.raises(IntegrityError):
-            Keyword.objects.create(name="Renaissance")
+            Keyword._default_manager.create(name="Renaissance")
 
 
 # Tests pour le modèle Artwork
@@ -287,13 +287,13 @@ class TestArtworkModel:
 
     def test_artwork_str_method_without_title_with_artists(self, user, artist):
         """Test la méthode __str__ sans titre mais avec artistes."""
-        artwork = Artwork.objects.create(user=user, title="")
+        artwork = Artwork._default_manager.create(user=user, title="")
         artwork.artists.add(artist)
         assert str(artwork) == "Œuvre de Leonardo da Vinci"
 
     def test_artwork_str_method_without_title_and_artists(self, user):
         """Test la méthode __str__ sans titre ni artistes."""
-        artwork = Artwork.objects.create(user=user, title="")
+        artwork = Artwork._default_manager.create(user=user, title="")
         result = str(artwork)
         assert result.startswith("Œuvre #")
         assert len(result) == 15  # "Œuvre #" + 8 caractères de l'UUID
@@ -309,12 +309,12 @@ class TestArtworkModel:
         assert artwork.get_artists_display() == "Leonardo da Vinci"
 
         # Avec plusieurs artistes
-        artist2 = Artist.objects.create(name="Michel-Ange")
+        artist2 = Artist._default_manager.create(name="Michel-Ange")
         artwork.artists.add(artist2)
         assert artwork.get_artists_display() == "Leonardo da Vinci, Michel-Ange"
 
         # Sans artiste
-        artwork_no_artist = Artwork.objects.create(user=user, title="Test")
+        artwork_no_artist = Artwork._default_manager.create(user=user, title="Test")
         assert artwork_no_artist.get_artists_display() == ""
 
     def test_artwork_get_dimensions_display(self, artwork, user):
@@ -324,7 +324,7 @@ class TestArtworkModel:
         assert artwork.get_dimensions_display() == expected
 
         # Avec toutes les dimensions non-nulles
-        artwork_full = Artwork.objects.create(
+        artwork_full = Artwork._default_manager.create(
             user=user,
             title="Test",
             height=Decimal("50.00"),
@@ -337,13 +337,13 @@ class TestArtworkModel:
         )
 
         # Avec seulement hauteur et largeur
-        artwork_partial = Artwork.objects.create(
+        artwork_partial = Artwork._default_manager.create(
             user=user, title="Test", height=Decimal("50.00"), width=Decimal("40.00")
         )
         assert artwork_partial.get_dimensions_display() == "H: 50.00cm x L: 40.00cm"
 
         # Sans dimensions
-        artwork_no_dim = Artwork.objects.create(user=user, title="Test")
+        artwork_no_dim = Artwork._default_manager.create(user=user, title="Test")
         assert artwork_no_dim.get_dimensions_display() == "Non spécifiées"
 
     def test_artwork_many_to_many_relationships(
@@ -363,7 +363,7 @@ class TestArtworkModel:
 
     def test_artwork_parent_relationship(self, user, artwork):
         """Test la relation parent-enfant entre œuvres."""
-        child_artwork = Artwork.objects.create(
+        child_artwork = Artwork._default_manager.create(
             user=user, title="Étude pour Mona Lisa", parent_artwork=artwork
         )
         assert child_artwork.parent_artwork == artwork
@@ -371,10 +371,10 @@ class TestArtworkModel:
     def test_artwork_ordering(self, user):
         """Test l'ordre par défaut des œuvres (par date de création décroissante)."""
         # Les fixtures créent déjà une œuvre, on en crée deux autres
-        Artwork.objects.create(user=user, title="Œuvre 2")
-        Artwork.objects.create(user=user, title="Œuvre 3")
+        Artwork._default_manager.create(user=user, title="Œuvre 2")
+        Artwork._default_manager.create(user=user, title="Œuvre 3")
 
-        artworks = Artwork.objects.all()
+        artworks = Artwork._default_manager.all()
         # La plus récemment créée doit être en premier
         assert artworks[0].title == "Œuvre 3"
 
@@ -385,7 +385,7 @@ class TestArtworkPhotoModel:
 
     def test_artwork_photo_creation(self, artwork):
         """Test la création d'une photo d'œuvre."""
-        photo = ArtworkPhoto.objects.create(
+        photo = ArtworkPhoto._default_manager.create(
             artwork=artwork, caption="Vue de face", is_primary=True
         )
         assert photo.artwork == artwork
@@ -395,17 +395,17 @@ class TestArtworkPhotoModel:
 
     def test_artwork_photo_str_method(self, artwork):
         """Test la méthode __str__ de ArtworkPhoto."""
-        photo = ArtworkPhoto.objects.create(artwork=artwork)
+        photo = ArtworkPhoto._default_manager.create(artwork=artwork)
         assert str(photo) == f"Photo de {artwork}"
 
     def test_artwork_photo_primary_logic(self, artwork):
         """Test la logique de photo principale."""
         # Créer la première photo comme principale
-        photo1 = ArtworkPhoto.objects.create(artwork=artwork, is_primary=True)
+        photo1 = ArtworkPhoto._default_manager.create(artwork=artwork, is_primary=True)
         assert photo1.is_primary is True
 
         # Créer une deuxième photo comme principale
-        photo2 = ArtworkPhoto.objects.create(artwork=artwork, is_primary=True)
+        photo2 = ArtworkPhoto._default_manager.create(artwork=artwork, is_primary=True)
 
         # Recharger la première photo depuis la base de données
         photo1.refresh_from_db()
@@ -416,11 +416,11 @@ class TestArtworkPhotoModel:
 
     def test_artwork_photo_ordering(self, artwork):
         """Test l'ordre des photos (principale d'abord, puis par date)."""
-        ArtworkPhoto.objects.create(artwork=artwork, is_primary=False)
-        photo2 = ArtworkPhoto.objects.create(artwork=artwork, is_primary=True)
-        ArtworkPhoto.objects.create(artwork=artwork, is_primary=False)
+        ArtworkPhoto._default_manager.create(artwork=artwork, is_primary=False)
+        photo2 = ArtworkPhoto._default_manager.create(artwork=artwork, is_primary=True)
+        ArtworkPhoto._default_manager.create(artwork=artwork, is_primary=False)
 
-        photos = list(ArtworkPhoto.objects.all())
+        photos = list(ArtworkPhoto._default_manager.all())
         assert photos[0].id == photo2.id  # Photo principale en premier
         assert photos[0].is_primary is True
         # Les photos non-principales suivent l'ordre de création
@@ -434,7 +434,7 @@ class TestWishlistItemModel:
 
     def test_wishlist_item_creation(self, user):
         """Test la création d'un élément de liste de souhaits."""
-        item = WishlistItem.objects.create(
+        item = WishlistItem._default_manager.create(
             user=user,
             title="Starry Night",
             artist_name="Vincent van Gogh",
@@ -454,29 +454,29 @@ class TestWishlistItemModel:
 
     def test_wishlist_item_str_method(self, user):
         """Test la méthode __str__ de WishlistItem."""
-        item = WishlistItem.objects.create(user=user, title="Test Artwork")
+        item = WishlistItem._default_manager.create(user=user, title="Test Artwork")
         assert str(item) == "Test Artwork"
 
     def test_wishlist_item_default_priority(self, user):
         """Test la priorité par défaut."""
-        item = WishlistItem.objects.create(user=user, title="Test")
+        item = WishlistItem._default_manager.create(user=user, title="Test")
         assert item.priority == 3  # Priorité basse par défaut
 
     def test_wishlist_item_ordering(self, user):
         """Test l'ordre des éléments (par priorité puis par date décroissante)."""
-        item1 = WishlistItem.objects.create(user=user, title="Item 1", priority=3)
-        item2 = WishlistItem.objects.create(user=user, title="Item 2", priority=1)
-        item3 = WishlistItem.objects.create(user=user, title="Item 3", priority=2)
+        item1 = WishlistItem._default_manager.create(user=user, title="Item 1", priority=3)
+        item2 = WishlistItem._default_manager.create(user=user, title="Item 2", priority=1)
+        item3 = WishlistItem._default_manager.create(user=user, title="Item 3", priority=2)
 
-        items = WishlistItem.objects.all()
+        items = WishlistItem._default_manager.all()
         assert items[0] == item2  # Priorité 1 (haute)
         assert items[1] == item3  # Priorité 2 (moyenne)
         assert items[2] == item1  # Priorité 3 (basse)
 
     def test_wishlist_item_user_relationship(self, user):
         """Test la relation avec l'utilisateur."""
-        item1 = WishlistItem.objects.create(user=user, title="Item 1")
-        item2 = WishlistItem.objects.create(user=user, title="Item 2")
+        item1 = WishlistItem._default_manager.create(user=user, title="Item 1")
+        item2 = WishlistItem._default_manager.create(user=user, title="Item 2")
 
         assert user.wishlist.count() == 2
         assert item1 in user.wishlist.all()
@@ -493,7 +493,7 @@ class TestIntegrationAndEdgeCases:
         user.delete()
 
         # L'œuvre doit être supprimée
-        assert not Artwork.objects.filter(id=artwork_id).exists()
+        assert not Artwork._default_manager.filter(id=artwork_id).exists()
 
     def test_set_null_on_foreign_key_deletion(self, artwork, art_type):
         """Test SET_NULL quand une clé étrangère est supprimée."""
@@ -503,7 +503,7 @@ class TestIntegrationAndEdgeCases:
 
     def test_artwork_with_minimal_data(self, user):
         """Test la création d'une œuvre avec le minimum de données."""
-        artwork = Artwork.objects.create(user=user)
+        artwork = Artwork._default_manager.create(user=user)
         assert artwork.user == user
         assert artwork.title == ""
         assert artwork.is_acquired is True  # Valeur par défaut
@@ -511,11 +511,11 @@ class TestIntegrationAndEdgeCases:
 
     def test_multiple_artists_on_artwork(self, user):
         """Test une œuvre avec plusieurs artistes."""
-        artist1 = Artist.objects.create(name="Artiste 1")
-        artist2 = Artist.objects.create(name="Artiste 2")
-        artist3 = Artist.objects.create(name="Artiste 3")
+        artist1 = Artist._default_manager.create(name="Artiste 1")
+        artist2 = Artist._default_manager.create(name="Artiste 2")
+        artist3 = Artist._default_manager.create(name="Artiste 3")
 
-        artwork = Artwork.objects.create(user=user, title="Œuvre collaborative")
+        artwork = Artwork._default_manager.create(user=user, title="Œuvre collaborative")
         artwork.artists.add(artist1, artist2, artist3)
 
         assert artwork.artists.count() == 3
@@ -523,11 +523,11 @@ class TestIntegrationAndEdgeCases:
 
     def test_artwork_photo_multiple_primary_different_artworks(self, user):
         """Ensure photos on separate artworks can both be primary."""
-        artwork1 = Artwork.objects.create(user=user, title="Œuvre 1")
-        artwork2 = Artwork.objects.create(user=user, title="Œuvre 2")
+        artwork1 = Artwork._default_manager.create(user=user, title="Œuvre 1")
+        artwork2 = Artwork._default_manager.create(user=user, title="Œuvre 2")
 
-        photo1 = ArtworkPhoto.objects.create(artwork=artwork1, is_primary=True)
-        photo2 = ArtworkPhoto.objects.create(artwork=artwork2, is_primary=True)
+        photo1 = ArtworkPhoto._default_manager.create(artwork=artwork1, is_primary=True)
+        photo2 = ArtworkPhoto._default_manager.create(artwork=artwork2, is_primary=True)
 
         # Les deux photos peuvent être principales car sur des œuvres différentes
         assert photo1.is_primary is True
@@ -535,24 +535,24 @@ class TestIntegrationAndEdgeCases:
 
     def test_artwork_uuid_uniqueness(self, user):
         """Test que chaque œuvre a un UUID unique."""
-        artwork1 = Artwork.objects.create(user=user, title="Œuvre 1")
-        artwork2 = Artwork.objects.create(user=user, title="Œuvre 2")
+        artwork1 = Artwork._default_manager.create(user=user, title="Œuvre 1")
+        artwork2 = Artwork._default_manager.create(user=user, title="Œuvre 2")
 
         assert artwork1.id != artwork2.id
         assert str(artwork1.id) != str(artwork2.id)
 
     def test_artwork_choices_validation(self, user):
         """Test les choix prédéfinis pour current_location."""
-        artwork = Artwork.objects.create(
+        artwork = Artwork._default_manager.create(
             user=user, title="Test", current_location="pretee"
         )
         assert artwork.current_location == "pretee"
 
     def test_wishlist_priority_choices(self, user):
         """Test les choix de priorité pour WishlistItem."""
-        item_high = WishlistItem.objects.create(user=user, title="High", priority=1)
-        item_medium = WishlistItem.objects.create(user=user, title="Medium", priority=2)
-        item_low = WishlistItem.objects.create(user=user, title="Low", priority=3)
+        item_high = WishlistItem._default_manager.create(user=user, title="High", priority=1)
+        item_medium = WishlistItem._default_manager.create(user=user, title="Medium", priority=2)
+        item_low = WishlistItem._default_manager.create(user=user, title="Low", priority=3)
 
         assert item_high.priority == 1
         assert item_medium.priority == 2

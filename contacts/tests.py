@@ -8,8 +8,8 @@ from .models import Contact
 
 class ContactsViewsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="password")
-        self.contact = Contact.objects.create(
+        self.user = User._default_manager.create_user(username="testuser", password="password")
+        self.contact = Contact._default_manager.create(
             user=self.user,
             name="Galerie Durand-Ruel",
             contact_type="galerie",

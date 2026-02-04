@@ -6,7 +6,7 @@ from core.models import User, UserProfile
 
 class AccountsViewsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="password")
+        self.user = User._default_manager.create_user(username="testuser", password="password")
 
     def test_profile_view_authenticated(self):
         self.client.login(username="testuser", password="password")

@@ -37,7 +37,7 @@ User = get_user_model()
 @pytest.fixture
 def user():
     """Utilisateur pour les tests."""
-    return User.objects.create_user(
+    return User._default_manager.create_user(
         username="testuser", email="test@example.com", password="testpass123"
     )
 
@@ -45,7 +45,7 @@ def user():
 @pytest.fixture
 def other_user():
     """Autre utilisateur pour les tests d'isolation."""
-    return User.objects.create_user(
+    return User._default_manager.create_user(
         username="otheruser", email="other@example.com", password="testpass123"
     )
 
@@ -53,7 +53,7 @@ def other_user():
 @pytest.fixture
 def artist():
     """Artiste pour les tests."""
-    return Artist.objects.create(
+    return Artist._default_manager.create(
         name="Vincent van Gogh",
         birth_year=1853,
         death_year=1890,
@@ -65,25 +65,25 @@ def artist():
 @pytest.fixture
 def art_type():
     """Type d'art pour les tests."""
-    return ArtType.objects.create(name="Peinture")
+    return ArtType._default_manager.create(name="Peinture")
 
 
 @pytest.fixture
 def support():
     """Support pour les tests."""
-    return Support.objects.create(name="Toile")
+    return Support._default_manager.create(name="Toile")
 
 
 @pytest.fixture
 def technique():
     """Technique pour les tests."""
-    return Technique.objects.create(name="Huile sur toile")
+    return Technique._default_manager.create(name="Huile sur toile")
 
 
 @pytest.fixture
 def collection(user):
     """Collection pour les tests."""
-    return Collection.objects.create(
+    return Collection._default_manager.create(
         user=user, name="Ma Collection Test", description="Description de test"
     )
 
@@ -91,7 +91,7 @@ def collection(user):
 @pytest.fixture
 def exhibition(user):
     """Exposition pour les tests."""
-    return Exhibition.objects.create(
+    return Exhibition._default_manager.create(
         user=user,
         name="Exposition Test",
         location="Musée Test",
@@ -104,7 +104,7 @@ def exhibition(user):
 @pytest.fixture
 def artwork(user, artist, art_type, support, technique):
     """Œuvre d'art pour les tests."""
-    artwork = Artwork.objects.create(
+    artwork = Artwork._default_manager.create(
         user=user,
         title="La Nuit étoilée",
         creation_year=1889,
@@ -126,13 +126,13 @@ def artwork(user, artist, art_type, support, technique):
 @pytest.fixture
 def keyword():
     """Mot-clé pour les tests."""
-    return Keyword.objects.create(name="impressionnisme")
+    return Keyword._default_manager.create(name="impressionnisme")
 
 
 @pytest.fixture
 def wishlist_item(user):
     """Élément de liste de souhaits pour les tests."""
-    return WishlistItem.objects.create(
+    return WishlistItem._default_manager.create(
         user=user,
         title="Œuvre souhaitée",
         artist_name="Artiste Souhaité",
@@ -214,7 +214,7 @@ class TestArtworkForm:
 
     def test_artwork_form_keywords_existing(self, user, artist, keyword):
         """Test que les mots-clés existants sont réutilisés."""
-        initial_count = Keyword.objects.count()
+        initial_count = Keyword._default_manager.count()
 
         form_data = {
             "title": "Test Existing Keywords",
@@ -233,7 +233,7 @@ class TestArtworkForm:
         form.save()
 
         # Vérifier qu'un seul nouveau mot-clé a été créé
-        assert Keyword.objects.count() == initial_count + 1
+        assert Keyword._default_manager.count() == initial_count + 1
 
         keywords = artwork.keywords.all()
         keyword_names = [kw.name for kw in keywords]
@@ -242,8 +242,8 @@ class TestArtworkForm:
 
     def test_artwork_form_user_collections_filter(self, user, other_user):
         """Test que le formulaire filtre les collections par utilisateur."""
-        user_collection = Collection.objects.create(user=user, name="Collection User")
-        other_collection = Collection.objects.create(
+        user_collection = Collection._default_manager.create(user=user, name="Collection User")
+        other_collection = Collection._default_manager.create(
             user=other_user, name="Collection Other"
         )
 
@@ -255,14 +255,14 @@ class TestArtworkForm:
 
     def test_artwork_form_user_exhibitions_filter(self, user, other_user):
         """Test que le formulaire filtre les expositions par utilisateur."""
-        user_exhibition = Exhibition.objects.create(
+        user_exhibition = Exhibition._default_manager.create(
             user=user,
             name="Expo User",
             location="Lieu",
             start_date=date.today(),
             end_date=date.today(),
         )
-        other_exhibition = Exhibition.objects.create(
+        other_exhibition = Exhibition._default_manager.create(
             user=other_user,
             name="Expo Other",
             location="Lieu",
@@ -301,8 +301,8 @@ class TestArtworkForm:
     def test_artwork_form_empty_keywords(self, user, artist, artwork):
         """Test la gestion des mots-clés vides."""
         # Ajouter des mots-clés existants
-        keyword1 = Keyword.objects.create(name="test1")
-        keyword2 = Keyword.objects.create(name="test2")
+        keyword1 = Keyword._default_manager.create(name="test1")
+        keyword2 = Keyword._default_manager.create(name="test2")
         artwork.keywords.add(keyword1, keyword2)
 
         form_data = {
@@ -568,7 +568,7 @@ class TestArtworkPhotoFormSet:
     def test_artwork_photo_formset_with_existing_photos(self, artwork):
         """Test le formset avec des photos existantes."""
         # Créer une photo existante
-        photo = ArtworkPhoto.objects.create(
+        photo = ArtworkPhoto._default_manager.create(
             artwork=artwork, caption="Photo existante", is_primary=True
         )
 
