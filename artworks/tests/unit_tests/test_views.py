@@ -242,6 +242,7 @@ class TestArtworkViews:
             "art_type": art_type.pk,
             "is_acquired": True,
             "current_location": "domicile",
+            "tags": "",
             # Données pour le formset de photos (vide)
             "photos-TOTAL_FORMS": "0",
             "attachments-TOTAL_FORMS": "0",
@@ -309,6 +310,7 @@ class TestArtworkViews:
             "creation_year": 1890,  # Changement d'année
             "current_location": "stockage",  # Changement de localisation
             "is_acquired": True,
+            "tags": "",
             # Données pour le formset de photos
             "photos-TOTAL_FORMS": "0",
             "attachments-TOTAL_FORMS": "0",
