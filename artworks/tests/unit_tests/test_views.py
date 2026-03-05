@@ -46,7 +46,7 @@ def other_user():
 
 
 @pytest.fixture
-def artist():
+def artist(user):
     """Fixture pour créer un artiste de test."""
     return Artist._default_manager.create(
         name="Vincent van Gogh",
@@ -54,6 +54,7 @@ def artist():
         death_year=1890,
         nationality="Néerlandais",
         biography="Peintre post-impressionniste néerlandais",
+        user=user,
     )
 
 
@@ -417,9 +418,9 @@ class TestArtworkSpecialViews:
         )
         assert response.content == b"fake_pdf_content"
 
-    @patch("weasyprint.HTML", side_effect=ImportError("WeasyPrint not available"))
+    @patch.dict("sys.modules", {"weasyprint": None})
     def test_artwork_export_pdf_view_no_weasyprint(
-        self, mock_html, authenticated_client, artwork
+        self, authenticated_client, artwork
     ):
         """Test l'export PDF quand WeasyPrint n'est pas disponible."""
         url = reverse("artworks:export_pdf", kwargs={"pk": artwork.pk})
@@ -634,8 +635,8 @@ class TestArtistViews:
     def test_artist_list_view_with_search(self, authenticated_client, user):
         """Test la recherche dans la liste des artistes."""
         # Créer des artistes
-        artist1 = Artist._default_manager.create(name="Pablo Picasso")
-        artist2 = Artist._default_manager.create(name="Claude Monet")
+        artist1 = Artist._default_manager.create(name="Pablo Picasso", user=user)
+        artist2 = Artist._default_manager.create(name="Claude Monet", user=user)
 
         # Associer les artistes à des œuvres de l'utilisateur
         Artwork._default_manager.create(user=user, title="Test1").artists.add(artist1)
