@@ -4,6 +4,8 @@ from decimal import Decimal
 import pytest
 from django.db import IntegrityError
 
+from taggit.models import Tag
+
 from artworks.models import (
     Artist,
     ArtType,
@@ -11,7 +13,6 @@ from artworks.models import (
     ArtworkPhoto,
     Collection,
     Exhibition,
-    Keyword,
     Support,
     Technique,
     WishlistItem,
@@ -83,7 +84,7 @@ def technique():
 @pytest.fixture
 def keyword():
     """Fixture pour créer un mot-clé de test."""
-    return Keyword._default_manager.create(name="Renaissance")
+    return Tag.objects.create(name="Renaissance")
 
 
 @pytest.fixture
@@ -252,13 +253,13 @@ class TestSimpleModels:
     def test_keyword_creation(self, keyword):
         """Test la création d'un mot-clé."""
         assert keyword.name == "Renaissance"
-        assert keyword.created_at is not None
+        assert keyword.slug == "renaissance"
         assert str(keyword) == "Renaissance"
 
     def test_keyword_unique_constraint(self, keyword):
         """Test la contrainte d'unicité sur le nom du mot-clé."""
         with pytest.raises(IntegrityError):
-            Keyword._default_manager.create(name="Renaissance")
+            Tag.objects.create(name="Renaissance")
 
 
 # Tests pour le modèle Artwork
@@ -352,14 +353,14 @@ class TestArtworkModel:
         """Test les relations many-to-many."""
         artwork.collections.add(collection)
         artwork.exhibitions.add(exhibition)
-        artwork.keywords.add(keyword)
+        artwork.tags.add(keyword.name)
 
         assert artwork.collections.count() == 1
         assert artwork.exhibitions.count() == 1
-        assert artwork.keywords.count() == 1
+        assert artwork.tags.count() == 1
         assert collection in artwork.collections.all()
         assert exhibition in artwork.exhibitions.all()
-        assert keyword in artwork.keywords.all()
+        assert keyword in artwork.tags.all()
 
     def test_artwork_parent_relationship(self, user, artwork):
         """Test la relation parent-enfant entre œuvres."""

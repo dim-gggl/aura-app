@@ -7,13 +7,14 @@ from django.contrib.auth import get_user_model
 from django.test import Client
 from django.urls import reverse
 
+from taggit.models import Tag
+
 from artworks.models import (
     Artist,
     ArtType,
     Artwork,
     Collection,
     Exhibition,
-    Keyword,
     Support,
     Technique,
     WishlistItem,
@@ -100,7 +101,7 @@ def technique():
 @pytest.fixture
 def keyword():
     """Fixture pour créer un mot-clé de test."""
-    return Keyword._default_manager.create(name="Impressionnisme")
+    return Tag.objects.create(name="Impressionnisme")
 
 
 @pytest.fixture
@@ -125,7 +126,7 @@ def artwork(
     artwork.artists.add(artist)
     artwork.collections.add(collection)
     artwork.exhibitions.add(exhibition)
-    artwork.keywords.add(keyword)
+    artwork.tags.add(keyword.name)
     return artwork
 
 
