@@ -52,7 +52,7 @@ def other_user():
 
 
 @pytest.fixture
-def artist():
+def artist(user):
     """Artiste pour les tests."""
     return Artist._default_manager.create(
         name="Vincent van Gogh",
@@ -60,6 +60,7 @@ def artist():
         death_year=1890,
         nationality="Néerlandais",
         biography="Peintre post-impressionniste néerlandais",
+        user=user,
     )
 
 
