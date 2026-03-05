@@ -307,7 +307,7 @@ class TestArtworkViews:
         data = {
             "title": "Titre Modifié",
             "creation_year": 1890,  # Changement d'année
-            "current_location": "exposee",  # Changement de localisation
+            "current_location": "stockage",  # Changement de localisation
             "is_acquired": True,
             # Données pour le formset de photos
             "photos-TOTAL_FORMS": "0",
@@ -330,7 +330,7 @@ class TestArtworkViews:
         artwork.refresh_from_db()
         assert artwork.title == "Titre Modifié"
         assert artwork.creation_year == 1890
-        assert artwork.current_location == "exposee"
+        assert artwork.current_location == "stockage"
 
     def test_artwork_update_view_wrong_user(self, authenticated_client, other_user):
         """Test qu'on ne peut pas modifier l'œuvre d'un autre utilisateur."""
