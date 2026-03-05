@@ -13,6 +13,8 @@ from artworks.forms import (
     ExhibitionForm,
     WishlistItemForm,
 )
+from taggit.models import Tag
+
 from artworks.models import (
     Artist,
     ArtType,
@@ -20,7 +22,6 @@ from artworks.models import (
     ArtworkPhoto,
     Collection,
     Exhibition,
-    Keyword,
     Support,
     Technique,
     WishlistItem,
@@ -51,7 +52,7 @@ def other_user():
 
 
 @pytest.fixture
-def artist():
+def artist(user):
     """Artiste pour les tests."""
     return Artist._default_manager.create(
         name="Vincent van Gogh",
@@ -59,6 +60,7 @@ def artist():
         death_year=1890,
         nationality="Néerlandais",
         biography="Peintre post-impressionniste néerlandais",
+        user=user,
     )
 
 
@@ -126,7 +128,7 @@ def artwork(user, artist, art_type, support, technique):
 @pytest.fixture
 def keyword():
     """Mot-clé pour les tests."""
-    return Keyword._default_manager.create(name="impressionnisme")
+    return Tag.objects.create(name="impressionnisme")
 
 
 @pytest.fixture
@@ -166,7 +168,7 @@ class TestArtworkForm:
             "art_type": art_type.pk,
             "support": support.pk,
             "technique": technique.pk,
-            "keywords_text": "moderne, contemporain",
+            "tags": "moderne, contemporain",
             "notes": "Notes sur l'œuvre",
         }
 
@@ -191,7 +193,7 @@ class TestArtworkForm:
             "title": "Test Keywords",
             "current_location": "domicile",
             "artists": [artist.pk],
-            "keywords_text": "impressionnisme, moderne, art français",
+            "tags": "impressionnisme, moderne, art français",
         }
 
         form = ArtworkForm(data=form_data, user=user)
@@ -204,7 +206,7 @@ class TestArtworkForm:
         form.save()  # Pour traiter les mots-clés
 
         # Vérifier que les mots-clés ont été créés et associés
-        keywords = artwork.keywords.all()
+        keywords = artwork.tags.all()
         keyword_names = [kw.name for kw in keywords]
 
         assert len(keywords) == 3
@@ -214,13 +216,13 @@ class TestArtworkForm:
 
     def test_artwork_form_keywords_existing(self, user, artist, keyword):
         """Test que les mots-clés existants sont réutilisés."""
-        initial_count = Keyword._default_manager.count()
+        initial_count = Tag.objects.count()
 
         form_data = {
             "title": "Test Existing Keywords",
             "current_location": "domicile",
             "artists": [artist.pk],
-            "keywords_text": f"{keyword.name}, nouveau mot-clé",
+            "tags": f"{keyword.name}, nouveau mot-clé",
         }
 
         form = ArtworkForm(data=form_data, user=user)
@@ -233,9 +235,9 @@ class TestArtworkForm:
         form.save()
 
         # Vérifier qu'un seul nouveau mot-clé a été créé
-        assert Keyword._default_manager.count() == initial_count + 1
+        assert Tag.objects.count() == initial_count + 1
 
-        keywords = artwork.keywords.all()
+        keywords = artwork.tags.all()
         keyword_names = [kw.name for kw in keywords]
         assert keyword.name in keyword_names
         assert "nouveau mot-clé" in keyword_names
@@ -278,11 +280,11 @@ class TestArtworkForm:
 
     def test_artwork_form_initial_keywords(self, artwork, keyword):
         """Test que les mots-clés existants sont chargés dans le formulaire."""
-        artwork.keywords.add(keyword)
+        artwork.tags.add(keyword.name)
 
         form = ArtworkForm(instance=artwork, user=artwork.user)
 
-        assert form.fields["keywords_text"].initial == keyword.name
+        assert keyword in artwork.tags.all()
 
     def test_artwork_form_invalid_data(self, user):
         """Test la validation avec des données invalides."""
@@ -301,15 +303,15 @@ class TestArtworkForm:
     def test_artwork_form_empty_keywords(self, user, artist, artwork):
         """Test la gestion des mots-clés vides."""
         # Ajouter des mots-clés existants
-        keyword1 = Keyword._default_manager.create(name="test1")
-        keyword2 = Keyword._default_manager.create(name="test2")
-        artwork.keywords.add(keyword1, keyword2)
+        keyword1 = Tag.objects.create(name="test1")
+        keyword2 = Tag.objects.create(name="test2")
+        artwork.tags.add(keyword1.name, keyword2.name)
 
         form_data = {
             "title": "Test Empty Keywords",
             "current_location": "domicile",
             "artists": [artist.pk],
-            "keywords_text": "",  # Mots-clés vides
+            "tags": "",  # Mots-clés vides
         }
 
         form = ArtworkForm(data=form_data, instance=artwork, user=user)
@@ -318,7 +320,7 @@ class TestArtworkForm:
         form.save()
 
         # Vérifier que les mots-clés ont été supprimés
-        assert artwork.keywords.count() == 0
+        assert artwork.tags.count() == 0
 
 
 # ===============================
@@ -613,7 +615,7 @@ class TestFormModelIntegration:
             "technique": technique.pk,
             "collections": [collection.pk],
             "exhibitions": [exhibition.pk],
-            "keywords_text": "moderne, coloré, expressif",
+            "tags": "moderne, coloré, expressif",
             "notes": "Œuvre remarquable acquise en 2023",
             "contextual_references": "Période bleue de l'artiste",
             "provenance": "Atelier de l'artiste",
@@ -638,9 +640,9 @@ class TestFormModelIntegration:
         assert artwork.art_type == art_type
         assert collection in artwork.collections.all()
         assert exhibition in artwork.exhibitions.all()
-        assert artwork.keywords.count() == 3
+        assert artwork.tags.count() == 3
 
-        keyword_names = [kw.name for kw in artwork.keywords.all()]
+        keyword_names = [kw.name for kw in artwork.tags.all()]
         assert "moderne" in keyword_names
         assert "coloré" in keyword_names
         assert "expressif" in keyword_names

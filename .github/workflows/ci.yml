@@ -9,7 +9,7 @@ on:
     branches: [main, develop]
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.12'
   POSTGRES_VERSION: '16'
 
 jobs:
@@ -182,7 +182,7 @@ jobs:
 
       - name: Run Django deployment checks
         env:
-          SECRET_KEY: test-secret-key-for-ci-deployment-check
+          SECRET_KEY: test-secret-key-for-ci-deployment-check-aura-app-django-2024-xk9m
           DATABASE_URL: sqlite:///db.sqlite3
           DJANGO_SETTINGS_MODULE: aura_app.settings.production
           ALLOWED_HOSTS: example.com
