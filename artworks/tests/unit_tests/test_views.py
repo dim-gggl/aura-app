@@ -244,6 +244,10 @@ class TestArtworkViews:
             "current_location": "domicile",
             # Données pour le formset de photos (vide)
             "photos-TOTAL_FORMS": "0",
+            "attachments-TOTAL_FORMS": "0",
+            "attachments-INITIAL_FORMS": "0",
+            "attachments-MIN_NUM_FORMS": "0",
+            "attachments-MAX_NUM_FORMS": "1000",
             "photos-INITIAL_FORMS": "0",
             "photos-MIN_NUM_FORMS": "0",
             "photos-MAX_NUM_FORMS": "1000",
@@ -270,6 +274,10 @@ class TestArtworkViews:
             # Pas de titre - données invalides
             "creation_year": "invalid_year",  # Année invalide
             "photos-TOTAL_FORMS": "0",
+            "attachments-TOTAL_FORMS": "0",
+            "attachments-INITIAL_FORMS": "0",
+            "attachments-MIN_NUM_FORMS": "0",
+            "attachments-MAX_NUM_FORMS": "1000",
             "photos-INITIAL_FORMS": "0",
             "photos-MIN_NUM_FORMS": "0",
             "photos-MAX_NUM_FORMS": "1000",
@@ -303,6 +311,10 @@ class TestArtworkViews:
             "is_acquired": True,
             # Données pour le formset de photos
             "photos-TOTAL_FORMS": "0",
+            "attachments-TOTAL_FORMS": "0",
+            "attachments-INITIAL_FORMS": "0",
+            "attachments-MIN_NUM_FORMS": "0",
+            "attachments-MAX_NUM_FORMS": "1000",
             "photos-INITIAL_FORMS": "0",
             "photos-MIN_NUM_FORMS": "0",
             "photos-MAX_NUM_FORMS": "1000",
