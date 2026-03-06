@@ -18,7 +18,6 @@ The views are organized into the following sections:
 
 import json
 import logging
-import random  # Used for random artwork suggestions
 from datetime import datetime, timedelta
 
 from django.contrib import messages
@@ -60,6 +59,19 @@ from .models import (
 # ========================================
 # UTILITAIRES COMMUNS
 # ========================================
+
+
+def _get_user_tags(user, q=None):
+    """Return Tag objects used on artworks belonging to `user`, optionally filtered by `q`."""
+    artwork_ct = ContentType._default_manager.get_for_model(Artwork)
+    user_artwork_ids = Artwork._default_manager.filter(user=user).values_list("id", flat=True)
+    qs = Tag._default_manager.filter(
+        artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
+        artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,
+    ).distinct()
+    if q:
+        qs = qs.filter(name__icontains=q)
+    return qs
 
 
 def _export_response_from_template(
@@ -328,18 +340,7 @@ def artwork_list(request):
         )
 
     if "tags" in artwork_fields:
-        artwork_ct = ContentType._default_manager.get_for_model(Artwork)
-        user_artwork_ids = Artwork._default_manager.filter(user=request.user).values_list(
-            "id", flat=True
-        )
-        artwork_fields["tags"].queryset = (
-            Tag._default_manager.filter(
-                artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
-                artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,
-            )
-            .distinct()
-            .order_by("name")
-        )
+        artwork_fields["tags"].queryset = _get_user_tags(request.user).order_by("name")
 
     # Use filtered queryset for pagination
     artworks = artwork_filter.qs.prefetch_related("artists", "photos")
@@ -508,7 +509,7 @@ def artwork_update(request, pk):
         "photo_formset": photo_formset,
         "attachment_formset": attachment_formset,
         "artwork": artwork,
-        "title": 'Modifier l"œuvre',
+        "title": "Modifier l'œuvre",
     }
 
     return render(request, "artworks/artwork_form.html", context)
@@ -600,10 +601,7 @@ def random_suggestion(request):
         )
 
         if artworks.exists():
-            # Convert queryset to list to avoid issues with random.choice on querysets
-            # This loads all matching artworks into memory but improves reliability
-            artworks_list = list(artworks)
-            suggested_artwork = random.choice(artworks_list)
+            suggested_artwork = artworks.order_by("?").first()
             return render(
                 request,
                 "artworks/random_suggestion.html",
@@ -728,7 +726,7 @@ def artist_update(request, pk):
     context = {
         "form": form,
         "artist": artist,
-        "title": 'Modifier l"artiste',
+        "title": "Modifier l'artiste",
     }
 
     return render(request, "artworks/artist_form.html", context)
@@ -744,7 +742,7 @@ def artist_delete(request, pk):
     Si l'artiste est lié à des œuvres, ces liens seront supprimés (M2M),
     les œuvres ne sont pas supprimées.
     """
-    artist = get_object_or_404(Artist, pk=pk)
+    artist = get_object_or_404(Artist, pk=pk, user=request.user)
     # Count the user's current artworks linked to this artist (for information)
     linked_artworks_count = Artwork._default_manager.filter(
         artists=artist, user=request.user
@@ -769,7 +767,7 @@ def artist_delete(request, pk):
 
 @login_required
 def artist_export_html(request, pk):
-    artist = get_object_or_404(Artist, pk=pk)
+    artist = get_object_or_404(Artist, pk=pk, user=request.user)
     artworks = Artwork._default_manager.filter(artists=artist, user=request.user)
     return _export_response_from_template(
         request=request,
@@ -782,7 +780,7 @@ def artist_export_html(request, pk):
 
 @login_required
 def artist_export_pdf(request, pk):
-    artist = get_object_or_404(Artist, pk=pk)
+    artist = get_object_or_404(Artist, pk=pk, user=request.user)
     artworks = Artwork._default_manager.filter(artists=artist, user=request.user)
     return _export_response_from_template(
         request=request,
@@ -1406,17 +1404,6 @@ def tags_autocomplete(request):
     """
     q = request.GET.get("q", "").strip()
     # Restrict to tags actually used on the user's artworks
-    artwork_ct = ContentType._default_manager.get_for_model(Artwork)
-    user_artwork_ids = Artwork._default_manager.filter(user=request.user).values_list(
-        "id", flat=True
-    )
-
-    user_tags = Tag._default_manager.filter(
-        artworks_artworks_uuidtaggeditem_items__content_type=artwork_ct,
-        artworks_artworks_uuidtaggeditem_items__object_id__in=user_artwork_ids,  # noqa: E501
-    ).distinct()
-    if q:
-        user_tags = user_tags.filter(name__icontains=q)
-    user_tags = user_tags.order_by("name")[:20]
+    user_tags = _get_user_tags(request.user, q=q if q else None).order_by("name")[:20]
     data = [{"value": t.name, "text": t.name} for t in user_tags]
     return JsonResponse(data, safe=False)

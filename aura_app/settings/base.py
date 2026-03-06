@@ -216,10 +216,17 @@ CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", False)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "core.User"
-EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backen ds.console.EmailBackend")
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",  # dev default — overridden in production.py
+)
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
-EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", 587))
+EMAIL_USE_TLS = get_bool_env("EMAIL_USE_TLS", True)
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Aura <noreply@aura-app.org>")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Reset links expire after 24 h (Django default = 3 days)
+PASSWORD_RESET_TIMEOUT = 86400
