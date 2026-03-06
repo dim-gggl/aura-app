@@ -216,10 +216,10 @@ CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", False)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "core.User"
-EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backen ds.console.EmailBackend")
-EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
-EMAIL_PORT = os.environ.get("EMAIL_PORT", 587)
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.resend.com")
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 465)
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
-EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "resend")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Aura <noreply@aura-app.org>")
