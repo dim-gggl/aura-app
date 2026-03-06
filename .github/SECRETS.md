@@ -17,7 +17,7 @@ Allez dans **Settings → Secrets and variables → Actions** de votre repositor
 | Secret Name | Description | Example |
 |-------------|-------------|---------|
 | `STAGING_SSH_PRIVATE_KEY` | Clé SSH privée pour accéder au serveur staging | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `STAGING_HOST` | Hostname ou IP du serveur staging | `staging.aura-art.org` ou `192.168.1.100` |
+| `STAGING_HOST` | Hostname ou IP du serveur staging | `staging.aura-app.org` ou `192.168.1.100` |
 | `STAGING_USER` | Utilisateur SSH sur le serveur staging | `deploy` ou `ubuntu` |
 
 #### Production Environment
@@ -25,7 +25,7 @@ Allez dans **Settings → Secrets and variables → Actions** de votre repositor
 | Secret Name | Description | Example |
 |-------------|-------------|---------|
 | `PRODUCTION_SSH_PRIVATE_KEY` | Clé SSH privée pour accéder au serveur production | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| `PRODUCTION_HOST` | Hostname ou IP du serveur production | `aura-art.org` ou `192.168.1.200` |
+| `PRODUCTION_HOST` | Hostname ou IP du serveur production | `aura-app.org` ou `192.168.1.200` |
 | `PRODUCTION_USER` | Utilisateur SSH sur le serveur production | `deploy` ou `ubuntu` |
 
 ### Docker Registry (Optionnel)
@@ -95,12 +95,12 @@ gh auth login
 
 # Ajouter un secret
 gh secret set STAGING_SSH_PRIVATE_KEY < ~/.ssh/github_deploy_key
-gh secret set STAGING_HOST -b "staging.aura-art.org"
+gh secret set STAGING_HOST -b "staging.aura-app.org"
 gh secret set STAGING_USER -b "deploy"
 
 # Même chose pour production
 gh secret set PRODUCTION_SSH_PRIVATE_KEY < ~/.ssh/github_deploy_key_prod
-gh secret set PRODUCTION_HOST -b "aura-art.org"
+gh secret set PRODUCTION_HOST -b "aura-app.org"
 gh secret set PRODUCTION_USER -b "deploy"
 ```
 

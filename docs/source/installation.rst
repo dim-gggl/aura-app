@@ -137,7 +137,7 @@ You should now be able to access Aura Art at http://localhost:8000.
 Production Deployment
 ---------------------
 
-Aura Art is deployed at https://aura-art.org. The production deployment includes:
+Aura Art is deployed at https://aura-app.org. The production deployment includes:
 
 * **HTTPS**: Secure SSL/TLS encryption
 * **CDN**: Fast global content delivery
@@ -145,7 +145,7 @@ Aura Art is deployed at https://aura-art.org. The production deployment includes
 * **Backups**: Automated daily backups
 * **Updates**: Regular security and feature updates
 
-Access the live application at: https://aura-art.org
+Access the live application at: https://aura-app.org
 
 Configuration
 -------------

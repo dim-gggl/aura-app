@@ -51,7 +51,7 @@ Configure your database in the environment-specific settings file:
    DATABASES = {
        'default': {
            'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'aura_art',
+           'NAME': 'aura-app',
            'USER': 'your_username',
            'PASSWORD': 'your_password',
            'HOST': 'localhost',
@@ -138,7 +138,7 @@ Configure logging for different environments:
            'file': {
                'level': 'INFO',
                'class': 'logging.FileHandler',
-               'filename': 'aura_art.log',
+               'filename': 'aura-app.log',
            },
        },
        'loggers': {
