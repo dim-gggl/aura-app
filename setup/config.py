@@ -1,8 +1,11 @@
 import json
+from pathlib import Path
 
-ART_TYPES = json.load(open("setup/art_types.json", encoding="utf-8"))
-TECHNIQUES = json.load(open("setup/techniques.json", encoding="utf-8"))
-SUPPORTS = json.load(open("setup/supports.json", encoding="utf-8"))
+_BASE = Path(__file__).parent
+
+ART_TYPES = json.loads((_BASE / "art_types.json").read_text(encoding="utf-8"))
+TECHNIQUES = json.loads((_BASE / "techniques.json").read_text(encoding="utf-8"))
+SUPPORTS = json.loads((_BASE / "supports.json").read_text(encoding="utf-8"))
 
 
 def get_art_types():

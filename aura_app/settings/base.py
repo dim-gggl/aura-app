@@ -223,3 +223,7 @@ EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "resend")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Aura <noreply@aura-app.org>")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Reset links expire after 24 h (Django default = 3 days)
+PASSWORD_RESET_TIMEOUT = 86400

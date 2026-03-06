@@ -34,7 +34,8 @@ logger = logging.getLogger(__name__)
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = "registration/password_reset_form.html"
-    email_template_name = "registration/password_reset_email.html"
+    email_template_name = "registration/password_reset_email.txt"       # plaintext fallback
+    html_email_template_name = "registration/password_reset_email.html"  # HTML version
     subject_template_name = "registration/password_reset_subject.txt"
     success_url = reverse_lazy("accounts:password_reset_done")
 
