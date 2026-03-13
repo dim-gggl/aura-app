@@ -80,7 +80,7 @@ Docker Deployment
             - "8000:8000"
           environment:
             - DEBUG=False
-            - DATABASE_URL=postgresql://user:pass@db:5432/aura_art
+            - DATABASE_URL=postgresql://user:pass@db:5432/aura-app
           depends_on:
             - db
             - redis
@@ -88,7 +88,7 @@ Docker Deployment
         db:
           image: postgres:13
           environment:
-            - POSTGRES_DB=aura_art
+            - POSTGRES_DB=aura-app
             - POSTGRES_USER=user
             - POSTGRES_PASSWORD=pass
           volumes:
@@ -154,9 +154,9 @@ Traditional Deployment
 
    .. code-block:: bash
 
-      sudo -u postgres createdb aura_art
+      sudo -u postgres createdb aura-app
       sudo -u postgres createuser aura-app
-      sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aura_art TO aura-app;"
+      sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aura-app TO aura-app;"
 
 5. Run migrations:
 
@@ -222,7 +222,7 @@ Configure production settings in ``production.py``:
    DATABASES = {
        'default': {
            'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'aura_art',
+           'NAME': 'aura-app',
            'USER': 'aura-app',
            'PASSWORD': 'secure_password',
            'HOST': 'localhost',
@@ -246,7 +246,7 @@ Set production environment variables:
 
    export DEBUG=False
    export SECRET_KEY="your-secret-key"
-   export DATABASE_URL="postgresql://user:pass@localhost:5432/aura_art"
+   export DATABASE_URL="postgresql://user:pass@localhost:5432/aura-app"
    export ALLOWED_HOSTS="your-domain.com,www.your-domain.com"
 
 SSL Configuration
@@ -344,7 +344,7 @@ Set up automated database backups:
    
    mkdir -p $BACKUP_DIR
    
-   pg_dump -h localhost -U aura-app aura_art > $BACKUP_DIR/aura_art_$DATE.sql
+   pg_dump -h localhost -U aura-app aura-app > $BACKUP_DIR/aura-app_$DATE.sql
    
    # Keep only last 30 days of backups
    find $BACKUP_DIR -name "*.sql" -mtime +30 -delete

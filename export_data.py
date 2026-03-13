@@ -18,7 +18,15 @@ from pathlib import Path
 
 import django
 
-from artworks.models import (
+# Add the project root to Python path — must happen before django.setup()
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+# Setup Django environment — must happen before any model imports
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.dev")
+django.setup()
+
+from artworks.models import (  # noqa: E402
     Artist,
     ArtType,
     Artwork,
@@ -27,18 +35,9 @@ from artworks.models import (
     Support,
     Technique,
 )
-from contacts.models import Contact
-from core.models import User
-from notes.models import Note
-
-# Add the project root to Python path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
-# Setup Django environment
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aura_app.settings.dev")
-
-django.setup()
+from contacts.models import Contact  # noqa: E402
+from core.models import User  # noqa: E402
+from notes.models import Note  # noqa: E402
 
 # Setup logging
 logging.basicConfig(

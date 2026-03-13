@@ -363,8 +363,8 @@ main() {
     log "Application is running at:"
 
     if [ "$ENVIRONMENT" = "production" ]; then
-        log "  https://aura-art.org"
-        log "  Admin: https://aura-art.org/${ADMIN_URL:-admin/}"
+        log "  https://aura-app.org"
+        log "  Admin: https://aura-app.org/${ADMIN_URL:-admin/}"
     else
         log "  http://localhost:${NGINX_HTTP_PORT:-80}"
         log "  Admin: http://localhost:${NGINX_HTTP_PORT:-80}/${ADMIN_URL:-admin/}"

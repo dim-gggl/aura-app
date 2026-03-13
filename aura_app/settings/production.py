@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import cast
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
@@ -34,7 +35,7 @@ STORAGES = base.STORAGES.copy()
 ############################################
 def get_env(name: str, default=None, required: bool = False):
     val = os.getenv(name, default)
-    if required and (val is None or (isinstance(val, str) and val.strip() == "")):
+    if required and (not val or (isinstance(val, str) and val.strip() == "")):
         raise ImproperlyConfigured(f"Missing required environment variable: {name}")
     return val
 
@@ -44,11 +45,14 @@ def get_env(name: str, default=None, required: bool = False):
 ############################################
 DEBUG = False
 
-SECRET_KEY = get_env("SECRET_KEY", required=True)
+SECRET_KEY = cast(str, get_env("SECRET_KEY", required=True))
 
-ALLOWED_HOSTS = [h.strip() for h in get_env("ALLOWED_HOSTS", required=True).split(",")]
+ALLOWED_HOSTS = [
+    h.strip() for h in cast(str, get_env("ALLOWED_HOSTS", required=True)).split(",")
+]
 CSRF_TRUSTED_ORIGINS = [
-    o.strip() for o in get_env("CSRF_TRUSTED_ORIGINS", required=True).split(",")
+    o.strip()
+    for o in cast(str, get_env("CSRF_TRUSTED_ORIGINS", required=True)).split(",")
 ]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -57,7 +61,7 @@ USE_X_FORWARDED_HOST = True
 ############################################
 #               DATABASE
 ############################################
-DATABASE_URL = get_env("DATABASE_URL", required=True)
+DATABASE_URL = cast(str, get_env("DATABASE_URL", required=True))
 DATABASES = {
     "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False)
 }
@@ -253,3 +257,20 @@ LOGGING = {
         },
     },
 }
+
+############################################
+#               EMAIL
+############################################
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend",  # type: ignore
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.resend.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in {"1", "true", "yes"}
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() in {"1", "true", "yes"}
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "resend")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@aura-app.org")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", "server@aura-app.org")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))

@@ -19,7 +19,7 @@ Base URL
 
 All API endpoints are prefixed with ``/api/``:
 
-**Production**: https://aura-art.org/api/
+**Production**: https://aura-app.org/api/
 
 **Development**: http://localhost:8000/api/
 
@@ -33,7 +33,7 @@ The API supports API key authentication:
 
 .. code-block:: bash
 
-   curl -H "Authorization: Api-Key your-api-key" https://aura-art.org/api/artworks/
+   curl -H "Authorization: Api-Key your-api-key" https://aura-app.org/api/artworks/
 
 Session Authentication
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +42,7 @@ For web applications, session authentication is supported:
 
 .. code-block:: bash
 
-   curl -H "Cookie: sessionid=your-session-id" https://aura-art.org/api/artworks/
+   curl -H "Cookie: sessionid=your-session-id" https://aura-app.org/api/artworks/
 
 Endpoints
 ---------

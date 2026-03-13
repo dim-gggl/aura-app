@@ -12,25 +12,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def get_bool_env(name: str, default: bool = False) -> bool:
-    raw_value = os.getenv(name)
+    raw_value = os.environ.get(name)
     if raw_value is None:
         return default
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def get_list_env(name: str, default: list[str] | None = None) -> list[str]:
-    raw_value = os.getenv(name)
+    raw_value = os.environ.get(name)
     if raw_value is None:
         return default or []
     return [item.strip() for item in raw_value.split(",") if item.strip()]
 
 
 DEBUG = get_bool_env("DEBUG", False)
-SECRET_KEY = os.getenv("SECRET_KEY") or "change-me-now"
+SECRET_KEY = os.environ.get("SECRET_KEY") or "change-me-now"
 if not DEBUG and SECRET_KEY == "change-me-now":
     raise ImproperlyConfigured("SECRET_KEY must be set in production")
 
-ALLOWED_HOSTS = get_list_env("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 if not DEBUG and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production")
 
@@ -104,7 +104,7 @@ ASGI_APPLICATION = "aura_app.asgi.application"
 
 # DB
 # Construire un fallback pour DATABASE_URL à partir des variables POSTGRES_*
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     pg_user = os.environ.get("POSTGRES_USER")
     pg_password = os.environ.get("POSTGRES_PASSWORD")
@@ -141,11 +141,11 @@ TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = os.getenv("STATIC_URL", "/static/")
+STATIC_URL = os.environ.get("STATIC_URL", "/static/")
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = os.getenv("MEDIA_URL", "/media/")
+MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Static & media storages (Django 5 requires aliases under STORAGES)
@@ -157,18 +157,18 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
 WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year for hashed files
 USE_S3 = get_bool_env("USE_S3", False)
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "").strip()
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "").strip()
 if USE_S3 and AWS_STORAGE_BUCKET_NAME:
     STORAGES["default"] = {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
     }
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+    AWS_S3_REGION_NAME = ("AWS_S3_REGION_NAME")
     AWS_QUERYSTRING_AUTH = True  # URLs signées
     AWS_S3_FILE_OVERWRITE = False
     AWS_DEFAULT_ACL = None
-
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -216,3 +216,14 @@ CSRF_COOKIE_SECURE = get_bool_env("CSRF_COOKIE_SECURE", False)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "core.User"
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.resend.com")
+EMAIL_PORT = os.environ.get("EMAIL_PORT", 465)
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "resend")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Aura <noreply@aura-app.org>")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Reset links expire after 24 h (Django default = 3 days)
+PASSWORD_RESET_TIMEOUT = 86400
