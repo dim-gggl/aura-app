@@ -12,13 +12,61 @@ Key features:
 - Custom validation and field handling
 """
 
+import logging
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Layout, Submit
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
+from django.core.mail import EmailMultiAlternatives
+from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User, UserProfile
+
+logger = logging.getLogger(__name__)
+
+
+class SafePasswordResetForm(PasswordResetForm):
+    """
+    Password reset form that never lets email delivery failures break the page.
+
+    Django catches SMTP errors raised by ``email_message.send()``, but template
+    rendering or provider-specific failures can still escape before the send
+    call. In production, users should always see the neutral confirmation page,
+    while operators get the details in logs.
+    """
+
+    def send_mail(
+        self,
+        subject_template_name,
+        email_template_name,
+        context,
+        from_email,
+        to_email,
+        html_email_template_name=None,
+    ):
+        try:
+            subject = loader.render_to_string(subject_template_name, context)
+            subject = "".join(subject.splitlines())
+            body = loader.render_to_string(email_template_name, context)
+
+            email_message = EmailMultiAlternatives(
+                subject,
+                body,
+                from_email,
+                [to_email],
+            )
+            if html_email_template_name is not None:
+                html_email = loader.render_to_string(html_email_template_name, context)
+                email_message.attach_alternative(html_email, "text/html")
+
+            email_message.send(fail_silently=True)
+        except Exception:
+            logger.exception(
+                "Password reset email preparation or sending failed for user %s.",
+                context["user"].pk,
+            )
 
 
 class CustomUserCreationForm(UserCreationForm):

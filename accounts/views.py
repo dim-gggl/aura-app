@@ -27,12 +27,18 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import UserProfile
 
-from .forms import CustomUserCreationForm, UserProfileForm, UserUpdateForm
+from .forms import (
+    CustomUserCreationForm,
+    SafePasswordResetForm,
+    UserProfileForm,
+    UserUpdateForm,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class CustomPasswordResetView(PasswordResetView):
+    form_class = SafePasswordResetForm
     template_name = "registration/password_reset_form.html"
     email_template_name = "registration/password_reset_email.txt"       # plaintext fallback
     html_email_template_name = "registration/password_reset_email.html"  # HTML version

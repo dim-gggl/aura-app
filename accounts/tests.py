@@ -1,6 +1,8 @@
+from unittest.mock import patch
+
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
-from django.core import mail
 
 from core.models import User, UserProfile
 
@@ -37,3 +39,16 @@ class AccountsViewsTest(TestCase):
         self.assertRedirects(response, reverse("accounts:password_reset_done"))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Réinitialisation", mail.outbox[0].subject)
+
+    @patch("accounts.forms.EmailMultiAlternatives.send", side_effect=TimeoutError)
+    def test_password_reset_redirects_even_when_email_send_fails(self, mocked_send):
+        self.user.email = "testuser@example.com"
+        self.user.save(update_fields=["email"])
+
+        response = self.client.post(
+            reverse("accounts:password_reset"),
+            {"email": "testuser@example.com"},
+        )
+
+        self.assertRedirects(response, reverse("accounts:password_reset_done"))
+        mocked_send.assert_called_once_with(fail_silently=True)
