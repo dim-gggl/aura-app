@@ -25,6 +25,16 @@ def get_list_env(name: str, default: list[str] | None = None) -> list[str]:
     return [item.strip() for item in raw_value.split(",") if item.strip()]
 
 
+def get_int_env(name: str, default: int) -> int:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+    try:
+        return int(raw_value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(f"{name} must be an integer") from exc
+
+
 DEBUG = get_bool_env("DEBUG", False)
 SECRET_KEY = os.environ.get("SECRET_KEY") or "change-me-now"
 if not DEBUG and SECRET_KEY == "change-me-now":
@@ -218,12 +228,16 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "core.User"
 EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.resend.com")
-EMAIL_PORT = os.environ.get("EMAIL_PORT", 465)
-EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", True)
+EMAIL_PORT = get_int_env("EMAIL_PORT", 465)
+EMAIL_USE_TLS = get_bool_env("EMAIL_USE_TLS", EMAIL_PORT in {25, 587, 2587})
+EMAIL_USE_SSL = get_bool_env("EMAIL_USE_SSL", EMAIL_PORT in {465, 2465})
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ImproperlyConfigured("EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled")
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "resend")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Aura <noreply@aura-app.org>")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_TIMEOUT = get_int_env("EMAIL_TIMEOUT", 10)
 
 # Reset links expire after 24 h (Django default = 3 days)
 PASSWORD_RESET_TIMEOUT = 86400

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.core import mail
 
 from core.models import User, UserProfile
 
@@ -23,3 +24,16 @@ class AccountsViewsTest(TestCase):
         # A profile should be created automatically by the signal
         self.assertTrue(hasattr(self.user, "profile"))
         self.assertIsInstance(self.user.profile, UserProfile)
+
+    def test_password_reset_sends_email_and_redirects(self):
+        self.user.email = "testuser@example.com"
+        self.user.save(update_fields=["email"])
+
+        response = self.client.post(
+            reverse("accounts:password_reset"),
+            {"email": "testuser@example.com"},
+        )
+
+        self.assertRedirects(response, reverse("accounts:password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Réinitialisation", mail.outbox[0].subject)
