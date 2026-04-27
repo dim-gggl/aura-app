@@ -267,8 +267,23 @@ EMAIL_BACKEND = os.getenv(
 )
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.resend.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in {"1", "true", "yes"}
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() in {"1", "true", "yes"}
+EMAIL_USE_TLS = os.getenv(
+    "EMAIL_USE_TLS",
+    "true" if EMAIL_PORT in {25, 587, 2587} else "false",
+).lower() in {"1", "true", "yes"}
+EMAIL_USE_SSL = os.getenv(
+    "EMAIL_USE_SSL",
+    "true" if EMAIL_PORT in {465, 2465} else "false",
+).lower() in {"1", "true", "yes"}
+if EMAIL_HOST == "smtp.resend.com":
+    if EMAIL_PORT in {465, 2465}:
+        EMAIL_USE_TLS = False
+        EMAIL_USE_SSL = True
+    elif EMAIL_PORT in {587, 2587}:
+        EMAIL_USE_TLS = True
+        EMAIL_USE_SSL = False
+if EMAIL_USE_TLS and EMAIL_USE_SSL:
+    raise ImproperlyConfigured("EMAIL_USE_TLS and EMAIL_USE_SSL cannot both be enabled")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "resend")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@aura-app.org")
